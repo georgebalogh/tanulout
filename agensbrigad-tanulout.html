@@ -17328,7 +17328,7 @@ $ brigade-guard tests check --decisions …        # a brigade/1 ágon
 Összesen: 0 hiba a feltételek és a tesztek kötésében; gyanús teszt: 0.
 [kilépési kód: 0]
 $ brigade-guard tests check --decisions …        # a próba után
-HIBA ac:duplicate:AC-1: Egy viselkedés = egy teszt: a AC-1 feltételt 2 teszt ellenőrzi. (…)
+HIBA ac:duplicate:AC-1: Egy viselkedés = egy teszt, de a feltételt 2 teszt ellenőrzi: AC-1. (…)
 HIBA ac:unknown:AC-3@StatementTests.An_unknown_customer_is_flagged: A teszt nem létező …
 HIBA ac:untested:AC-2: A feltételhez nincs teszt: AC-2 (Ismeretlen ügyfél kimutatása …).
 Összesen: 3 hiba a feltételek és a tesztek kötésében; gyanús teszt: 0.
@@ -17343,8 +17343,8 @@ foreach (var criterion in acceptance.Workflows.SelectMany(w => w.Criteria))
             $"A feltételhez nincs teszt: {criterion.Id} ({criterion.Text}).", []));
     else if (tests.Count > 1)
         found.Add(new($"ac:duplicate:{criterion.Id}", Rule,
-            $"Egy viselkedés = egy teszt: a {criterion.Id} feltételt "
-                + $"{tests.Count} teszt ellenőrzi.", tests));
+            $"Egy viselkedés = egy teszt, de a feltételt {tests.Count} teszt ellenőrzi: "
+                + $"{criterion.Id}.", tests));
 }
 // … és ac:unknown:<feltétel>@<teszt>, ha a teszt nem létező feltételre hivatkozik` }
     ],
@@ -19318,14 +19318,17 @@ DeliveryOutcome? Park(TaskBoard board, BoardTask task, int round, DecisionItem i
       ]
     },
     code: [
-      { file: "AGENTS.md (git show brigade/1:AGENTS.md)", lang: "md", code: raw`
+      { file: "AGENTS.md (a Brigade jelölt része, ahogy ma írja)", lang: "md", code: raw`
 <!-- brigade:begin -->
 # Parancsok   (a Brigade írja)
 build:          dotnet build -warnaserror
-állapot:        brigade-guard state compute      -> architecture/state/
-szabályok:      brigade-guard rules check        -> violations.json, kilépési kód
+állapot:        brigade-guard state compute --dry-run    -> alapnézet a kimeneten
+szabályok:      brigade-guard rules check --dry-run      -> új sértések, kilépési kód
 érintett teszt: brigade-guard tests impacted --since HEAD
 teljes teszt:   dotnet test
+A --dry-run nem ír fájlt: az architecture/state/ a gépé, a kör elején friss.
+Egy hívásban egy parancs (;-vel, &&-sel ne fűzd össze), különben nincs rá engedély.
+A kilépési kódot a hívás eredménye mutatja, nem kell kiírni.
 
 # Tilos
 - helykitöltő kód (NotImplementedException, TODO)
@@ -19366,7 +19369,7 @@ public static AgentsReview Review(string before, string after, int limit = Limit
     ],
     why: [
       "A Ralph loop `AGENTS.md`-je azt írja le, hogyan kell buildelni és tesztelni, és rövid tanulságokat gyűjt. Minden körben betöltődik, ezért rövidnek kell maradnia. A Brigade csak a jelölők közé ír (`<!-- brigade:begin -->` és `end`); ha a repóban már van `AGENTS.md`, a jelölt részen kívül semmihez nem nyúl.",
-      "A parancsokat és a tiltásokat a gép írja; a fenti a kedvezmény-szállítás valódi fájlja. A tanulság az egyetlen nem-kód rész, amit az építő írhat, legfeljebb 10 sor; ha betelt, új sor csak egy régi helyére jöhet. Ha a jelölt részen kívül, a parancsokban vagy a tiltásokban változik valami, vagy 10-nél több a sor, a kör bukik (G4).",
+      "A parancsokat és a tiltásokat a gép írja. Az őr két parancsa `--dry-run`-nal fut: kiír, de fájlt nem ír, mert az `architecture/state/` a gépé (a valódi próba hozta elő, 30. állomás). A tanulság az egyetlen nem-kód rész, amit az építő írhat, legfeljebb 10 sor; ha betelt, új sor csak egy régi helyére jöhet. Ha a jelölt részen kívül, a parancsokban vagy a tiltásokban változik valami, vagy 10-nél több a sor, a kör bukik (G4).",
       "Minden új tanulság-sort az ellenőrző is lát (G5, 29. állomás); ha egy sor szabályt vagy tesztet gyengítene, a kör bukik. Így az építő tanulhat abból, hogyan dolgozzon, de nem írhatja át, mit kell tartania. A kedvezmény-szállításban a szakasz üres maradt."
     ],
     key: "Az AGENTS.md-ben két írás van: a gépé, amit tartani kell, és az építőé, amit tanult. A kettő határát jelölő választja el, és a gép ellenőrzi."
@@ -19957,7 +19960,7 @@ if (!task.IsRed)
 
 - **Típus:** HIBAJAVÍTÁS — termelő kódhoz és teszthez nyúlhatsz; meglévő elvárást (assert) csak …
 - **Kiindulópont:** Billing/Invoice.cs::CalcDiscount
-- **Elfogadási feltétel:** AC-D-002 — A kedvezmény legalább 0 Ft.. A tesztjét így kösd hozzá:
+- **Elfogadási feltétel:** AC-D-002 — A kedvezmény legalább 0 Ft. A tesztjét így kösd hozzá:
   [Trait("ac", "AC-D-002")]; feltételenként pontosan egy teszt.
 - **Próbálkozás:** 1.
 ## Leírás … ## Módosítási lap … ## Érintett szabályok (szándék, nem módosíthatod) …
@@ -19965,13 +19968,15 @@ if (!task.IsRed)
 - Csak ezt az egy feladatot végezd el, a módosítási lapon belül.
 - Az AGENTS.md parancsait futtathatod a saját visszajelzésedért; a döntés a gép újramérésén múlik.
 - … Commitolni csak a gép commitol.` },
-      { file: "act2: runs/r003-T-001/claude-settings.json (rövidítve)", lang: "json", code: raw`
+      { file: "runs/r003-T-001/claude-settings.json (rövidítve)", lang: "json", code: raw`
 "permissions": {
   "allow": [
     "Edit(//…/deliveries/szamlazas/work/**)",
     "Edit(//…/runs/r003-T-001/notes.md)", "Edit(//…/runs/r003-T-001/result.json)",
     "Read(//…/rounds/003/brief.md)",
-    "Bash(dotnet build *)", "Bash(dotnet test *)", "Bash(brigade-guard *)"
+    "Bash(dotnet build *)", "Bash(dotnet test *)",
+    "Bash(brigade-guard state compute --dry-run *)", "Bash(brigade-guard rules check --dry-run *)",
+    "Bash(brigade-guard tests impacted *)"
   ],
   "deny": [
     "Edit(//…/work/architecture/rules/**)", "Edit(//…/work/architecture/acceptance/**)",
@@ -20361,8 +20366,9 @@ Brigade-Rules: boundaries, dependency
 if (TaskCommitsSince(state.FullGreen ?? state.Base) >= cx.Calibration.FullSuiteEvery)
     return FullSuite(cx);
 // …
-// G6: a teljes tesztkészlet. Bukásnál a gép a legutóbbi zöld teljes futás óta visszafelé megkeresi
-// a törő commitot, és annak a feladatát nyitja újra; a javítás új commit lesz. …
+// G6: a teljes tesztkészlet. Bukásnál a gép a legutóbbi zöld teljes futás utáni feladat-commitokon,
+// a legrégebbitől haladva megkeresi az elsőt, amelyen a bukott teszt már piros (a törő commitot),
+// és annak a feladatát nyitja újra; a javítás új commit lesz. …
 DeliveryOutcome? FullSuite(Context cx)
 {
     var head = Work.Head();
@@ -20407,7 +20413,7 @@ public IReadOnlyList<string> Commits(string from, string to) =>
     ],
     why: [
       "A G2 csak a lap tesztjeit futtatja. Ami a hálón kívül törik el (például egy típus nélküli fájlban), azt a teljes készlet fogja meg, a G6: minden 3. feladat-commit után, átadás előtt, és a körben is, ha a lap kéri (ismeretlen kapcsolat, szerződés-érintés). A `szamlazas` szállításban a T-004 volt a 3. feladat-commit; utána a naplóban „G6 zöld”. A trailerében ezért áll „G6 kihagyva”.",
-      "Ha a G6 piros, a gép a legutóbbi zöld teljes futás óta commitonként újrafuttatja a piros teszteket: a régebbitől az újabb felé, az első piros commit a törő. Ez a **bisect** gondolata; a `git bisect` felezve keres, itt legfeljebb néhány commit van, elég a sor. (A kód kommentje „visszafelé”-t mond, a ciklus előre halad.) A trailerből jön a feladat, az újranyílik, és a javítás új commit lesz."
+      "Ha a G6 piros, a gép a legutóbbi zöld teljes futás óta commitonként újrafuttatja a piros teszteket: a régebbitől az újabb felé, az első piros commit a törő. Ez a **bisect** gondolata; a `git bisect` felezve keres, itt legfeljebb néhány commit van, elég a sor. A trailerből jön a feladat, az újranyílik, és a javítás új commit lesz."
     ],
     key: "A trailer itt fizetődik ki: a törő commitból gépileg kiolvasható, melyik feladat törte el a készletet. Ha egyik commit sem, a teszt billeg, és döntés kell."
   },
@@ -23076,7 +23082,7 @@ Válasz:   elmarad: ugyanaz a hiba, mint a D-003` }
     why: [
       "Egy: `acceptEdits` módban a Claude a nem engedett parancsnál (például a `dotnet test`-nél) kérdezett volna, és a felügyelet nélküli panelben senki nem válaszol. Most minden szerep `dontAsk` módban fut: ami nincs a listán, azt kérdés nélkül elutasítja. Az építő listáján a munkakönyvtár szerkesztése és az `AGENTS.md` parancsai. A próba fájljai szerint mind a 8 futás már így ment.",
       "Kettő: a tervező saját gyanús-jelölést talált ki (`Suspicious` a teszt nevében), mert a trait magyarázatát nem ismerte; az építő végül mindkettőt használta. Most minden jellemző teszt leírása és a tervező is megkapja. Három: két gyanús teszt rögzítette ugyanazt a hibát (D-003, D-004). A hibajavítás most a gyanús tesztek elvárását is átírhatja, és az „elmarad” válasz nem számít vaklármának.",
-      "Négy, megfigyelés: a tervező és az építő a munkakönyvtáron kívül is olvasott, és a próba-repó a Brigade forrásai alatt volt. A cél-repó ezért legyen a Brigade forrásain kívül. A bizalmi kérdést a Claude Code repónként egyszer teszi fel, a munkafák öröklik."
+      "Négy, megfigyelés: az ágensek a munkakönyvtáron kívül is olvastak, és a próba-repó a Brigade forrásai alatt volt, ezért a cél-repó legyen azokon kívül. Öt, a fájlokból: az építő négyszer próbálta a `brigade-guard rules check`-et összefűzve futtatni, és a Claude elutasította. Ha lefut, a G4 bukott volna, mert a védett `architecture/state/`-be írt. Most az őr-parancsok `--dry-run`-nal futnak, és csak ezek vannak a listán (26. állomás)."
     ],
     key: "A valódi ágens ott tört, ahol az álágens nem kérdez és nem kezdeményez: engedélynél, jelölésnél, és ott, ahol a saját fejétől olvasott."
   },
