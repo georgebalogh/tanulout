@@ -817,7 +817,7 @@ button{font:inherit;color:inherit}
   {
    "id": "s30",
    "num": "30",
-   "short": "Végig, és a valódi próba",
+   "short": "Végig, és a valódi próbák",
    "section": "Végig"
   },
   {
@@ -16041,8 +16041,8 @@ public static Graph Mark(Graph g)
         { id: "u_proc", kind: "box", title: "külső program", sub: "a neve futáskor dől el", w: 240, x: 140, y: 325 },
         { id: "q", kind: "box", title: "?", sub: "dynamic:? · marked", w: 150, x: 430, y: 190, tone: "bad" },
         { id: "n_never", kind: "note", tone: "accent", text: "nem tüntetjük el:\nkiírjuk, és számít", x: 500, y: 60, at: 1300 },
-        { id: "count", kind: "box", title: "a Brigade önmagán: 138", w: 250, x: 500, y: 330, at: 900,
-          lines: ["135 írás, olvasás ? célba", "3 jelölt dinamikus kötés"] }
+        { id: "count", kind: "box", title: "a Brigade önmagán: 142", w: 250, x: 500, y: 330, at: 900,
+          lines: ["139 írás, olvasás ? célba", "3 jelölt dinamikus kötés"] }
       ],
       edges: [
         { id: "e_refl", from: "u_refl", to: "q", kind: "bad" },
@@ -16080,7 +16080,7 @@ void Unknown(Node from, string note) =>
     edges.Add(new(from.Id, Add(new Node(Graph.UnknownTarget, NodeKind.Unknown, "?")).Id,
         EdgeKind.Unknown, EdgeSource.Marked, note));` },
       { file: "architecture/state/view.md (a Brigade önmagán, rövidítve)", lang: "md", code: raw`
-## Ismeretlen élek (138)
+## Ismeretlen élek (142)
 
 A gép látja, hogy itt kötés van, de nem tudja, mivel. Nem tüntetjük el.
 
@@ -16097,11 +16097,11 @@ A gép látja, hogy itt kötés van, de nem tudja, mivel. Nem tüntetjük el.
       { nodes: ["u_dyn", "e_dyn"], match: ["Unknown(from, $\"dynamic hívás: {dynamicAccess}\");"] },
       { nodes: ["u_proc", "e_proc"], match: ["Unknown(from, \"külső folyamat: a program neve futáskor dől el\");", "- RunnerTests.Runner -> ?"] },
       { nodes: ["q"], match: ["void Unknown(Node from, string note) =>", "EdgeKind.Unknown, EdgeSource.Marked, note));"] },
-      { nodes: ["count", "n_never"], match: ["## Ismeretlen élek (138)", "A gép látja, hogy itt kötés van, de nem tudja, mivel. Nem tüntetjük el."] }
+      { nodes: ["count", "n_never"], match: ["## Ismeretlen élek (142)", "A gép látja, hogy itt kötés van, de nem tudja, mivel. Nem tüntetjük el."] }
     ],
     why: [
       "Van kötés, amit egyik forrás sem old fel: reflexió (`Type.GetType`, `Activator.CreateInstance`, `Invoke`), kulcsos szolgáltatás-feloldás, `dynamic` hívás, és külső program, amelynek a neve csak futáskor dől el. Ezekből `unknown` él lesz `marked` címkével, egy közös `?` célba, és a megjegyzés leírja, mi állt a kódban.",
-      "A Brigade saját alapnézetében 138 ilyen sor van. 135 olyan fájlírás vagy -olvasás, amelynek a célját a szabályfájl mintái nem ismerik (például a szállítás naplói és a tesztek ideiglenes fájljai), 3 jelölt dinamikus kötés. Az egyik a 10. állomás kulcsos feloldása: a `WorkerManager` a szolgáltató nevével kéri el az adaptert, és ezt a gép nem tudja végigkövetni.",
+      "A Brigade saját alapnézetében 142 ilyen sor van. 139 olyan fájlírás vagy -olvasás, amelynek a célját a szabályfájl mintái nem ismerik (például a szállítás naplói és a tesztek ideiglenes fájljai), 3 jelölt dinamikus kötés. Az egyik a 10. állomás kulcsos feloldása: a `WorkerManager` a szolgáltató nevével kéri el az adaptert, és ezt a gép nem tudja végigkövetni.",
       "Az ismeretlen él sosem tűnik el: a fedettség nem törli, a nézet és a hatástérkép kiírja. A módosítási lap meg is számolja: ha az érintett területen van ilyen, a teljes tesztkészlet fut, 5 fölött döntési tétel lesz belőle (25. állomás)."
     ],
     key: "Amit a gép nem tud, azt is tudja: megjelöli, és nem tesz úgy, mintha ott semmi nem volna."
@@ -16242,7 +16242,7 @@ $ brigade-guard state detail --area Billing
       { nodes: ["n_plan", "n_build"], match: ["## Konfigurációs kulcsok, külső szolgáltatások, események · ## Célzott függvények"] }
     ],
     why: [
-      "A teljes háló nagy: a mintán 25 csomópont és 28 él, a Brigade-en 2327 csomópont és 3947 él. Ezért két nézete van, ahogy a gazda módszertana hibridként leírja: a gép mindig mindent kiszámol, de az alapnézet szűrt. A `view.md` modulokat, adattárakat a gazdájukkal, íróikkal és olvasóikkal, erőforrásokat, célzott függvényeket, teszteket, folyamatokat, ismeretlen éleket és sértéseket mutat.",
+      "A teljes háló nagy: a mintán 25 csomópont és 28 él, a Brigade-en 2345 csomópont és 3999 él. Ezért két nézete van, ahogy a gazda módszertana hibridként leírja: a gép mindig mindent kiszámol, de az alapnézet szűrt. A `view.md` modulokat, adattárakat a gazdájukkal, íróikkal és olvasóikkal, erőforrásokat, célzott függvényeket, teszteket, folyamatokat, ismeretlen éleket és sértéseket mutat.",
       "A részlet kérésre jön, egy területre: a `state detail --area` egy modul vagy útvonal minden típusát, függvényét és kimenő élét kiírja; egy függvény nem statikus élénél a forráscímkét is. A tervező feladatleírása a `view.md`-t nevezi meg. Az építő a módosítási lapot kapja, amely ugyanebből a hálóból készül (25. állomás)."
     ],
     key: "A gép mindent kiszámol, de nem mindent mutat egyszerre. Az alapnézet a döntéshez kell, a részlet a kérdéshez."
@@ -18833,7 +18833,7 @@ public static class TaskField
         { id: "s_struct", kind: "box", title: "SZERKEZETI", sub: "T-042 · a kiemelés", w: 270, x: 165, y: 90, tone: "current",
           lines: [ok("termelő kód"), mut("teszt: csak import")] },
         { id: "s_behav", kind: "box", title: "VISELKEDÉSI", sub: "új viselkedés", w: 270, x: 475, y: 90,
-          lines: [ok("termelő kód, teszt"), "assert: a feltétel tesztje"] },
+          lines: [ok("termelő kód, teszt"), "assert: feltétel (+ döntésből)"] },
         { id: "s_char", kind: "box", title: "JELLEMZŐ-TESZT", sub: "T-041 · a mai viselkedés", w: 270, x: 165, y: 225,
           lines: [ok("új tesztek"), bad("termelő kód: nem")] },
         { id: "s_fix", kind: "box", title: "HIBAJAVÍTÁS", sub: "T-043 · a −2,5 Ft", w: 270, x: 475, y: 225,
@@ -18846,9 +18846,9 @@ public static class TaskField
 típus            termelő kód  tesztfájl            meglévő elvárás (assert)
 ---------------  -----------  -------------------  -----------------------------------
 SZERKEZETI       igen         csak import-útvonal  nem
-VISELKEDÉSI      igen         igen                 csak a jóváhagyott feltétel tesztje
+VISELKEDÉSI      igen         igen                 a feltétel tesztje; döntésből más is bővülhet
 JELLEMZŐ-TESZT   nem          igen, új tesztek     nem
-HIBAJAVÍTÁS      igen         igen                 csak a jóváhagyott feltétel tesztje
+HIBAJAVÍTÁS      igen         igen                 a feltétel tesztje; döntésből más is bővülhet
 minden típusnál: rules/, acceptance/, waivers.md nem; tanulság (AGENTS.md) igen;
 a tesztszám nem csökken, új Skip nem kerül be` },
       { file: "Purity.cs (PurityGuard.Check, rövidítve)", code: raw`
@@ -18857,11 +18857,15 @@ var own = task.Type is TaskType.Behavioral or TaskType.Bugfix && task.Acceptance
         .Select(e => e.From).ToHashSet()
     : [];
 var suspects = task.Type == TaskType.Bugfix ? was.Suspects.ToHashSet() : [];
+var allowed = task.Changeable.ToHashSet();
 foreach (var (id, node) in testsBefore)
     if (testsAfter.TryGetValue(id, out var changed) && changed.Asserts != node.Asserts
         && !own.Contains(id) && !suspects.Contains(id))
-        problems.Add($"meglévő elvárás (assert) változott: {id} "
-            + $"({Count(node.Asserts)} → {Count(changed.Asserts)} assert)");
+        if (!allowed.Contains(id))
+            problems.Add($"meglévő elvárás (assert) változott: {id} "
+                + $"({Count(node.Asserts)} → {Count(changed.Asserts)} assert)");
+        else if (int.Parse(Count(changed.Asserts)) < int.Parse(Count(node.Asserts)))
+            problems.Add($"a döntés szerint változtatható teszt elvárása gyengült: {id} …");
 // …
 switch (task.Type)
 {
@@ -18883,12 +18887,12 @@ switch (task.Type)
     pairs: [
       { nodes: ["s_struct"], match: ["SZERKEZETI       igen", "case TaskType.Structural:", "problems.Add($\"szerkezeti feladat új tesztfájlt hozott: {change.Path}\");"], on: true },
       { nodes: ["s_char"], match: ["JELLEMZŐ-TESZT   nem", "case TaskType.Characterization when production.Count > 0:"] },
-      { nodes: ["s_fix", "s_behav"], match: ["var suspects = task.Type == TaskType.Bugfix ? was.Suspects.ToHashSet() : [];", "HIBAJAVÍTÁS      igen", "VISELKEDÉSI      igen"] },
+      { nodes: ["s_fix", "s_behav"], match: ["var suspects = task.Type == TaskType.Bugfix ? was.Suspects.ToHashSet() : [];", "var allowed = task.Changeable.ToHashSet();", "HIBAJAVÍTÁS      igen", "VISELKEDÉSI      igen"] },
       { nodes: ["n_all"], match: ["minden típusnál: rules/, acceptance/, waivers.md nem; tanulság (AGENTS.md) igen;"] }
     ],
     why: [
       "A típus dönti el, mihez nyúlhat a változtatás. A szerkezeti feladat nem változtat viselkedést: termelő kódhoz nyúlhat, tesztfájlban csak importot írhat át. A jellemző teszt csak tesztet ír, a mai viselkedésre (7. állomás). A viselkedési és a hibajavító feladat termelő kódot és tesztet is írhat, de meglévő elvárást csak a jóváhagyott feltétel tesztjében változtathat.",
-      "A tábla nem jó szándék: a G4 kapu a gitből ellenőrzi (`PurityGuard`, 27. állomás). Egy eltérés a végső terv táblájától: a valódi próba után a hibajavító feladat a gyanúsként jelölt jellemző teszt elvárását is átírhatja, mert két gyanús teszt rögzítheti ugyanazt a hibát.",
+      "A tábla nem jó szándék: a G4 kapu a gitből ellenőrzi (`PurityGuard`, 27. állomás). Egy eltérés a végső terv táblájától: a valódi próba után a hibajavító feladat a gyanúsként jelölt jellemző teszt elvárását is átírhatja, mert két gyanús teszt rögzítheti ugyanazt a hibát. A nagy próba után a te döntésed („változhat: <teszt>”) egy másik teszt elvárásának bővítését is engedheti; az assertek száma ott sem csökkenhet.",
       "A gép magától szerkezeti, jellemzőteszt- és bontási feladatot vehet fel, és a piros alapvonalhoz hibajavítást (27. állomás). Más hibajavítás vagy új viselkedés jóváhagyott feltétel nélkül csak „döntésre vár” állapotban kerülhet a táblára."
     ],
     key: "Egy feladat, egy típus, egy fajta változás. A típus a feladat engedélye: megmondja, mihez nyúlhat, és a gép a gitből ellenőrzi."
@@ -19280,10 +19284,12 @@ DeliveryOutcome? Park(TaskBoard board, BoardTask task, int round, DecisionItem i
     // …
     return Commit(round, task, $"{task.Id}: döntésre vár ({id}): {reason}", attempt);
 }` },
-      { file: "rounds/005/brief.md (Hogyan dolgozz, részlet)", lang: "md", code: raw`
+      { file: "rounds/NNN/brief.md (Hogyan dolgozz, részlet)", lang: "md", code: raw`
 - Ha a feladathoz tiltott kapcsolat kellene (például egy tiltott import), ne írd meg:
   az összegzésed kezdődjön így: „DÖNTÉS: <a kérdés>”.
-- Ha a feladat szerkezeti és viselkedési változást keverne, kérj bontást: „BONTÁS: <javaslat>”.` }
+- Ha a feladat szerkezeti és viselkedési változást keverne, kérj bontást: „BONTÁS: <javaslat>”.
+- Ha egy másik feltétel meglévő tesztjének elvárását kellene bővíteni, ne írd át: kérj döntést,
+  a teszt teljes nevével.` }
     ],
     pairs: [
       { nodes: ["keys", "you", "e_you"], match: ["gyanús jellemző teszt: hiba ez?", "bevezetés, szándék: jóváhagyod?"], on: true },
@@ -19292,7 +19298,7 @@ DeliveryOutcome? Park(TaskBoard board, BoardTask task, int round, DecisionItem i
     ],
     why: [
       "A döntési sorba az kerül, amit csak te dönthetsz el: a szándék (J0, J1), új vagy módosított elfogadási feltétel, egy gyanús viselkedés helyes formája, billegő teszt, túl sok ismeretlen kapcsolat, háromszor bukott feladat, és ha egy ágens kérdez. A tétel kulcsa megmondja, honnan jött; egy kérdés, egy tétel.",
-      "A gép sem dönt helyetted: szabályt nem lazít, eltérést nem vesz fel, feltételt nem talál ki. Amit eldönthet, az a menet: választ, mér, commitol, és a megválaszolt tételt feloldja (a válaszból feltétel lesz, a feladat újranyílik vagy elmarad; a bontást a tervező végzi, 28. állomás).",
+      "A gép sem dönt helyetted: szabályt nem lazít, eltérést nem vesz fel, feltételt nem talál ki. Amit eldönthet, az a menet: választ, mér, commitol, és a megválaszolt tételt feloldja (a válaszból feltétel lesz, a feladat újranyílik vagy elmarad, „változhat: <teszt>” válasznál egy másik teszt elvárása is bővülhet; a bontást a tervező végzi, 28. állomás).",
       "Az ágens sem dönt, és nem is vár. Ha az építőnek tiltott kapcsolat kellene, az összegzését így kezdi: „DÖNTÉS: <a kérdés>”. A gép visszaállítja a munkát, tételt nyit, a feladatot félreteszi (`Park`), és jön a következő. Ez a válasz az 1. lépés panelben váró kérdésére."
     ],
     key: "A kérdés útja mindig ugyanaz: tétel a sorban, a feladat félreáll, a munka megy tovább. A döntés a tiéd, a menet a gépé."
@@ -20135,7 +20141,8 @@ public static PurityResult Check(PurityInput input)
     var skippedBefore = was.Skipped.Select(s => s.Test).ToHashSet();
     problems.AddRange(now.Skipped.Where(s => !skippedBefore.Contains(s.Test))
         .Select(s => $"új kihagyott teszt (Skip): {s.Test}"));
-    // … törölt teszt; assert csak a feltétel és a gyanús tesztben; NotImplementedException, TODO
+    // … törölt teszt; assert csak a feltétel, a gyanús és a döntésben megengedett tesztben;
+    // NotImplementedException, TODO
     switch (task.Type)
     {
         // … JELLEMZŐ-TESZT: „jellemző-teszt feladat termelő kódhoz nyúlt”
@@ -20165,7 +20172,7 @@ public static PurityResult Check(PurityInput input)
       { nodes: ["guard"], match: ["public static PurityResult Check(PurityInput input)", "if (now.Tests < was.Tests)", "védett fájl változott"] }
     ],
     why: [
-      "A G4 (`PurityGuard`) két kérdést tesz fel. Illik-e a változtatás a feladat típusához: szerkezeti feladat a tesztfájlban csak importot változtathat, jellemző teszt nem nyúlhat termelő kódhoz, meglévő elvárás (assert) csak a feladat feltételének tesztjében változhat. És van-e csalás: kevesebb teszt, új `Skip`, törölt teszt, `NotImplementedException` vagy `TODO`, védett fájl, a gép fájljai, saját commit.",
+      "A G4 (`PurityGuard`) két kérdést tesz fel. Illik-e a változtatás a feladat típusához: szerkezeti feladat a tesztfájlban csak importot változtathat, jellemző teszt nem nyúlhat termelő kódhoz, meglévő elvárás (assert) csak a feladat feltételének tesztjében változhat (vagy ahol a döntésed engedi, 26. állomás). És van-e csalás: kevesebb teszt, új `Skip`, törölt teszt, `NotImplementedException` vagy `TODO`, védett fájl, a gép fájljai, saját commit.",
       "A `szamlazas` szállításban mindkét csalás itt bukott el. A T-001 első próbálkozása `Skip`-pel kikapcsolta a meglévő tesztet. Ez két lelet: új kihagyott teszt, és szerkezeti feladatban a tesztfájl érdemi változása. A T-002 első próbálkozása maga commitolt, így a HEAD elmozdult a kör eleje óta. Az ágens összegzése szerint mindkét kör rendben volt."
     ],
     key: "A G4 nem az ágens szándékát találgatja, hanem a gitet nézi: tesztszám, Skip, assert, helykitöltő, védett fájl, HEAD. Mindegyik olcsó csalás, és mindegyik olcsón mérhető."
@@ -20425,7 +20432,7 @@ public IReadOnlyList<string> Commits(string from, string to) =>
         { id: "cap", kind: "box", title: "körplafon", sub: "rounds_per_run (alap: 5)", w: 190, x: 110, y: 95, tone: "current",
           lines: ["kimutatás: 3", bad("8. kör után: 11")] },
         { id: "budget", kind: "box", title: "költségkeret", sub: "szállításonként", w: 190, x: 320, y: 95,
-          lines: ["30 futás", "240 ágensperc"] },
+          lines: ["30 futás", "120 ágensperc"] },
         { id: "lock", kind: "box", title: "RepoLock", sub: "locks/<hash>.lock", w: 200, x: 530, y: 95,
           lines: ["egy repón egy szállítás", bad("második: kilépés 3")] },
         { id: "resume", kind: "actor", label: "brigade resume", x: 110, y: 250, at: 900 },
@@ -20489,7 +20496,7 @@ leáll     {"code":11,"message":"Felfüggesztve: elérte a körplafont (3 kör /
       { nodes: ["runs"], match: ["$\"Felfüggesztve: elérte a futások keretét ({c.AgentRuns}).\")"] }
     ],
     why: [
-      "A körplafon futásonként számol: frissen átvett repón 5 építő vagy tervező kör, utána a szállítás felfüggeszti magát (11), és a `brigade resume` folytatja. Te emeled, ha a commitok és a `changes.md` rendben vannak. A kimutatás terve 3-at kért (`rounds_per_run: 3`), és a 8. kör után valóban megállt. A költségkeret a szállítás egészére szól: 30 ágensfutás és 240 ágensperc, a tervező és az ellenőrző futásával együtt.",
+      "A körplafon futásonként számol: frissen átvett repón 5 építő vagy tervező kör, utána a szállítás felfüggeszti magát (11), és a `brigade resume` folytatja. Te emeled, ha a commitok és a `changes.md` rendben vannak. A kimutatás terve 3-at kért (`rounds_per_run: 3`), és a 8. kör után valóban megállt. A költségkeret a szállítás egészére szól: 30 ágensfutás és 120 ágensperc (a valódi próbák után 240-ről), a tervező és az ellenőrző futásával együtt.",
       "Egy repón egyszerre egy szállítás fut. A `RepoLock` kizárólagos zárat nyit a Brigade mappájában; a második `deliver` vagy `resume` 3-mal lép ki. A zárat az operációs rendszer a folyamattal együtt engedi el, így `kill -9` után sem marad beragadt zár. Ha futás közben válaszolsz (`brigade decide`), a válasz a bejövő sorba kerül, és a következő kör elején olvassa be a gép."
     ],
     key: "A keret a te figyelmed határa: a gép megáll, mielőtt többet csinálna, mint amennyit át tudsz nézni, és két szállítás sosem dolgozik ugyanazon a repón."
@@ -21742,6 +21749,10 @@ public sealed class Statements(IReadOnlyList<InvoiceRecord> invoices)
     },
     code: [
       { file: "DeliveryRunner.Handoff.cs (HandoffAsync, rövidítve)", code: raw`
+// Elfogadott átadás után a folytatás csak visszaadja az ítéletet. Elutasított után … újra ítél.
+if (state.Verdict is { Accepted: true } done && done.Head == Work.Head())
+    return Stop(ExitCodes.Done, done.Message);
+// …
 var conditions = HandoffConditions(cx);
 File.WriteAllText(ConditionsFile(number), JsonSerializer.Serialize(conditions, Report));
 paths.Note("átadás: a gép feltételei", conditions);
@@ -21780,18 +21791,19 @@ A_new_violation_rejects_the_handoff
 A_criterion_without_a_green_test_rejects_the_handoff
 An_expired_waiver_rejects_the_handoff
 Code_changed_outside_the_machine_leaves_a_stale_state_and_rejects_the_handoff
-The_final_review_can_reject_the_handoff` }
+The_final_review_can_reject_the_handoff
+A_rejected_handoff_is_judged_again_on_resume` }
     ],
     pairs: [
       { nodes: ["conds", "e_c"], match: ["new(\"A teljes tesztkészlet zöld\"", "new(\"0 új sértés a kezdethez képest\"", "new(\"Minden elfogadási feltételhez", "new(\"Nincs döntés nélküli lejárt eltérés\"", "new(\"Friss állapot (architecture/state/)\""], on: true },
       { nodes: ["hc"], match: ["var run = tools.Test(state.Worktree, TestSelection.All);", "var conditions = HandoffConditions(cx);"] },
       { nodes: ["n_stop"], match: ["if (conditions.Any(c => !c.Ok))", "\"nem futott: a gép feltételei nem teljesültek\")]);"] },
-      { nodes: ["n_tests"], match: ["A_red_full_suite_rejects_the_handoff", "The_final_review_can_reject_the_handoff"] }
+      { nodes: ["n_tests"], match: ["A_red_full_suite_rejects_the_handoff", "The_final_review_can_reject_the_handoff", "A_rejected_handoff_is_judged_again_on_resume"] }
     ],
     why: [
       "Az utolsó kör nem feladat, hanem az átadás: a szállítás definition of done-ja (21. állomás). A gép öt feltételt mér. Egy: a teljes tesztkészlet zöld; ami már a kezdetkor is piros volt, az javaslat, nem bukás. Kettő: nincs új sértés a szállítás kezdetéhez képest; a racsni (8. állomás) itt az egész szállításra fut. Három: minden elfogadási feltételhez pontosan egy teszt, és az zöld (24. állomás).",
       "Négy: nincs döntés nélkül lejárt eltérés. Öt: az `architecture/state/` friss; a gép újraszámolja, és ha eltér a commitolttól, a kód a gép commitjain kívül változott. Ha ezek közül bármelyik bukik, a hatodik, a záró ítélet el sem indul: kár ágensidőt költeni egy biztosan bukó átadásra. A kilépési kód ilyenkor 1.",
-      "Mind a hat feltételre van egy bukó teszt a `HandoffTests`-ben. A végső terv szerint ez volt a 9. szakasz kész-jele."
+      "Mind a hat feltételre van egy bukó teszt a `HandoffTests`-ben. A végső terv szerint ez volt a 9. szakasz kész-jele. Elutasítás után a `brigade resume` új commit nélkül is újra ítél: a nagy próbán (30. állomás) a Brigade egy hibája buktatta az átadást, és a javítás után így lett elfogadva."
     ],
     key: "Az átadás nem érzés: öt mért feltétel és egy kötött alakú ítélet, és mindegyiknek van bukó tesztje."
   },
@@ -22399,7 +22411,7 @@ OOP.station({
 
 </script>
 <script>/* s30.js */
-/* 30. állomás: Végig, és a valódi próba */
+/* 30. állomás: Végig, és a valódi próbák */
 (function () {
 "use strict";
 const { bad, ok, mut } = OOP.h;
@@ -22921,7 +22933,7 @@ static bool Skipped(string relativePath) =>
         { id: "m", kind: "box", title: "kimutatas", sub: "e2e, álágens", w: 260, x: 480, y: 95,
           lines: ["8 építő kör", "16 ágensfutás (keret: 30)", "a gép: 310 mp, ~39 mp / kör"] },
         { id: "calib", kind: "box", title: "kiinduló számok", sub: "Calibration.cs", w: 300, x: 320, y: 265, tone: "current", at: 900,
-          lines: ["3 próbálkozás · körplafon 5 / futás", "240 ágensperc, 30 futás", mut("változatlan: becslések")] },
+          lines: ["3 próbálkozás · körplafon 5 / futás", "120 ágensperc, 30 futás", mut("a valódi próbák után: 240 → 120")] },
         { id: "n_fake", kind: "note", tone: "accent", text: "az álágens másodpercek alatt végez: az ágensperc itt nem mér semmit", x: 320, y: 385, at: 1500 }
       ],
       edges: [
@@ -22946,25 +22958,26 @@ PY` },
    kedvezmeny: 4 építő kör, 8 ágensfutás (keret: 30), a gép ideje 167 mp (körönként ~42 mp)
    kimutatas: 8 építő kör, 16 ágensfutás (keret: 30), a gép ideje 310 mp (körönként ~39 mp)` },
       { file: "Calibration.cs (rövidítve)", code: raw`
-// Becslések, nem mérések: az első valódi próba után állítjuk őket.
+// Kiinduló becslések; az ágensperc-keretet a valódi próbák mérése után állítottuk
+// (2026-10-14: 240 → 120).
 public sealed record Calibration
 {
     public int Attempts { get; init; } = 3;       // próbálkozás feladatonként
     public int RoundsPerRun { get; init; } = 5;   // körplafon futásonként (frissen átvett repón)
     // …
-    public int AgentMinutes { get; init; } = 240; // költségkeret szállításonként: ágensperc
+    public int AgentMinutes { get; init; } = 120; // költségkeret szállításonként: ágensperc
     public int AgentRuns { get; init; } = 30;     // költségkeret szállításonként: futás
     // …
 }` }
     ],
     pairs: [
       { nodes: ["k", "m"], match: ["kedvezmeny: 4 építő kör, 8 ágensfutás (keret: 30)", "kimutatas: 8 építő kör, 16 ágensfutás (keret: 30)"], on: true },
-      { nodes: ["calib", "e_k", "e_m"], match: ["// Becslések, nem mérések: az első valódi próba után állítjuk őket.", "public int AgentMinutes { get; init; } = 240;", "public int RoundsPerRun { get; init; } = 5;"] },
+      { nodes: ["calib", "e_k", "e_m"], match: ["// (2026-10-14: 240 → 120).", "public int AgentMinutes { get; init; } = 120;", "public int RoundsPerRun { get; init; } = 5;"] },
       { nodes: ["n_fake"], match: ["continue   # a gazda válaszára vagy az ágensre várt"] }
     ],
     why: [
       "A forgatókönyv végén a gép a saját naplójából számol: építő körök, ágensfutások, és a gép saját ideje (fordítás, tesztek, háló, fedettségmérés), a várakozások nélkül. A kedvezmény 4 építő kör és 8 ágensfutás, a kimutatás 8 és 16; a keret szállításonként 30 futás. A gép körönként kb. 40 mp-et dolgozik a mintán; valódi repón ez a fordítás és a tesztek idejével nő.",
-      "A kiinduló számok mégsem változtak. Az álágens másodpercek alatt végez, ezért az ágensperc itt semmit nem mér: a 240 perces keretről csak valódi ágens mondhat valamit. A kód megjegyzése szerint a számok becslések, és az első valódi próba után kellene állítani őket. A próba után is változatlanok: ez nyitott kérdés."
+      "A kiinduló számok a végigfutás után nem változtak: az álágens másodpercek alatt végez, az ágensperc itt semmit nem mér. A valódi próbák mérték meg (lent): egy ágensfutás 1,3–2,5 perc, ezért az ágensperc-keret 240-ről 120 lett, a 30 futás maradt. A többi szám kiinduló becslés, és további valódi szállítások állítják."
     ],
     key: "A végigfutás a gép idejét és a futások számát méri; az ágens idejét csak valódi ágens mérheti."
   },
@@ -23157,13 +23170,76 @@ return [.. reported.Where(m => !m.Value.Full)
   },
 
   {
+    title: "Két újabb próba: Codex és egy új funkció",
+    scene: {
+      nodes: [
+        { id: "cx", kind: "box", title: "Codex · kis próba", sub: "üres tétellista → kivétel", w: 290, x: 165, y: 95, tone: "ok",
+          lines: [ok("elfogadott átadás"), "5 futás · kb. 6 ágensperc", bad("J1: 3 feltétel egy feladaton")] },
+        { id: "cl", kind: "box", title: "Claude Code · nagy próba", sub: "ügyfélkimutatás, 6 feladat", w: 290, x: 480, y: 95, tone: "ok", at: 600,
+          lines: [ok("elfogadott átadás"), "17 futás · kb. 39 ágensperc", bad("T-010: G4, aztán döntés")] },
+        { id: "found", kind: "box", title: "a próbák leletei", w: 290, x: 165, y: 260, at: 1200,
+          lines: ["egy feladat, egy feltétel", "„változhat: <teszt>” döntésből", "a bizalmi kérdés nem ágensperc"] },
+        { id: "trx", kind: "box", title: "az első átadás: elutasítva", sub: "két tesztprojekt, egy run.trx", w: 290, x: 480, y: 260, tone: "bad", at: 1600,
+          lines: [bad("a Reporting tesztjei kimaradtak"), ok("TRX projektenként, összefésülve"), ok("újraítélés: elfogadva")] },
+        { id: "n_brig", kind: "note", tone: "accent", text: "a valódi ágensek az álágens útját járták; a hibák a Brigade-ben voltak", x: 320, y: 390, at: 2000 }
+      ],
+      edges: [
+        { id: "e_cx", from: "cx", to: "found", kind: "muted", at: 1200 },
+        { id: "e_cl", from: "cl", to: "trx", kind: "bad", at: 1600 }
+      ]
+    },
+    code: [
+      { file: "trial-codex: rounds/001/report.md és a commitok (rövidítve)", lang: "text", code: raw`
+# Kapu-jelentés: tervező kör (J1), 1. próbálkozás
+- T-001: nem létező elfogadási feltétel: AC-001-01, AC-001-02, AC-001-03
+[BRIGADE] J1 javaslat: szándék és feladattábla
+[VISELKEDÉSI] T-001 Üres tétellistájú számla elutasítása
+[BRIGADE] átadás: elfogadva` },
+      { file: "trial-kimutatas: a commitok tárgysora (rövidítve)", lang: "text", code: raw`
+[JELLEMZŐ-TESZT] T-006 Jellemző tesztek: Invoicing/InvoiceStore.cs::ReadAll
+[BRIGADE] D-002: elmarad T-007
+…
+[VISELKEDÉSI] T-005 Egyedi számla-sorszám
+[BRIGADE] záró hézagkeresés (tervező): T-010
+[BRIGADE] T-010: 1. próbálkozás bukott (G4)
+[BRIGADE] T-010: döntésre vár (D-005): az építő döntést kér
+[BRIGADE] D-005: elmarad T-010
+[BRIGADE] átadás: elutasítva (2 feltétel nem teljesült)
+[BRIGADE] záró hézagkeresés (tervező): nincs hézag
+[BRIGADE] átadás: elfogadva` },
+      { file: "DotnetTest.cs (Run, rövidítve)", code: raw`
+// Tesztprojektenként külön TRX-fájl (run_<keretrendszer>_<időbélyeg>.trx): egy közös
+// fájlnévnél a projektek felülírnák egymás eredményét.
+string[] arguments = ["test", target, "--nologo", "--results-directory", resultsDir,
+    "--logger", "trx;LogFilePrefix=run"];
+// …
+return new TestRun(finished ? process.ExitCode : -1, !finished,
+    Trx.Merge(Directory.GetFiles(resultsDir, "*.trx").Order(StringComparer.Ordinal)
+        .Select(File.ReadAllText)),
+    // …` }
+    ],
+    pairs: [
+      { nodes: ["cx", "e_cx"], match: ["- T-001: nem létező elfogadási feltétel: AC-001-01, AC-001-02, AC-001-03", "[VISELKEDÉSI] T-001 Üres tétellistájú számla elutasítása"], on: true },
+      { nodes: ["cl"], match: ["[BRIGADE] T-010: 1. próbálkozás bukott (G4)", "[BRIGADE] T-010: döntésre vár (D-005): az építő döntést kér"] },
+      { nodes: ["trx", "e_cl"], match: ["[BRIGADE] átadás: elutasítva (2 feltétel nem teljesült)", "\"--logger\", \"trx;LogFilePrefix=run\"];", "Trx.Merge(Directory.GetFiles(resultsDir, \"*.trx\").Order(StringComparer.Ordinal)"] },
+      { nodes: ["found"], match: ["[BRIGADE] D-005: elmarad T-010"] }
+    ],
+    why: [
+      "Előbb egy kis próba Codexszel (Codex CLI 0.162.1, minden szerep Codex): üres tétellistánál a számlaírás dobjon kivételt. Elfogadott átadás, 5 futás, kb. 6 ágensperc. A lelet: a tervező egy feladathoz három elfogadási feltételt írt, és a gép „nem létező feltétel” üzenettel dobta vissza. Most a tervező leírása kimondja, hogy egy feladathoz egy feltétel tartozik, és a gép ezt az okot írja vissza.",
+      "A nagy próba Claude Code-dal a fenti kimutatás terve volt, valódi ágenssel: 17 futás, kb. 39 ágensperc a 120-ból. Az építő egyenként, `--dry-run`-nal futtatta az őr parancsait. A záró hézagkeresés észrevette, hogy a legutóbbi sorszám nem a kimutatás rekordjában van. A javítás egy másik feltétel tesztjét bővítette volna, ezt a G4 elbuktatta, és a második próbálkozás döntést kért (D-005).",
+      "Az első átadás a Brigade hibáján bukott: két tesztprojektnél a TRX-eredmény ugyanabba a fájlba íródott, és a gép a Reporting.Tests 3 tesztjét nem látta. A javítás után (külön TRX tesztprojektenként, és a G2 szól, ha egy feltétel tesztje le sem futott) az újraítélés elfogadta. A D-005-ből lett a „változhat: <teszt>” döntés (26. állomás)."
+    ],
+    key: "A valódi ágensek az álágens útját járták. Amit a próbák találtak, az a Brigade-ben volt: egy hiányzó mondat a tervezőnek, egy felülírt eredményfájl, és egy szabály, amely a szigorítást nem tudta a gyengítéstől megkülönböztetni."
+  },
+
+  {
     title: "Mérleg",
     scene: {
       nodes: [
         { id: "proven", kind: "box", title: "bizonyított", w: 290, x: 160, y: 130, tone: "ok",
-          lines: [ok("két szállítás végig, betűre a várt"), ok("minden megállás: 10, 11, kill -9"), ok("G2-, G3-, G5-bukás és folytatás"), ok("valódi Claude Code: elfogadva")] },
+          lines: [ok("két szállítás végig, betűre a várt"), ok("minden megállás: 10, 11, kill -9"), ok("G2-, G3-, G4-, G5-bukás és folytatás"), ok("valódi próbák: 2 Claude, 1 Codex")] },
         { id: "open", kind: "box", title: "nyitott", w: 270, x: 480, y: 130, tone: "accent",
-          lines: ["tesztszint: 3 szállítás kell", "kiinduló számok: becslések", "nagyobb valódi próba"] },
+          lines: ["tesztszint: 3 szállítás kell", "a többi kiinduló szám: becslés", "valódi repó: csak engedéllyel"] },
         { id: "n_next", kind: "note", tone: "accent", text: "a Z állomás: a Brigade egyben", x: 320, y: 330 }
       ],
       edges: [
@@ -23171,38 +23247,41 @@ return [.. reported.Where(m => !m.Value.Full)
       ]
     },
     code: raw`
-amit a végigfutás és a próba bizonyít
+amit a végigfutás és a próbák bizonyítanak
   két teljes szállítás a mintán; a commitok, a futások és a jelentések betűre a vártak
   minden megállás: döntés (10), körplafon (11), kill -9 és resume, G2-, G3-, G5-bukás
   a mérőszámok összeadódnak: 2 szállítás, jellemző teszt 1 / 0, usecase 1 / 0
-  valódi Claude Code: 8 futás, kb. 24 ágensperc, elfogadott átadás
-  a végigfutás 5 hibája és a próba 4 hibája megtalálva és javítva
+  valódi próbák, mind elfogadott átadással:
+    Claude Code, kedvezmény: 8 futás, kb. 24 ágensperc
+    Codex, üres tétellista: 5 futás, kb. 6 ágensperc
+    Claude Code, ügyfélkimutatás: 17 futás, kb. 39 ágensperc
+  a végigfutás és a próbák hibái megtalálva és javítva; ágensperc-keret: 240 → 120
 
 ami nyitott
   tesztszint: a fogás és a vaklárma mérése 3 szállítás után kerül eléd (az e2e-ben 2 van)
-  kiinduló számok: becslések; a próba után is változatlanok
-  nagyobb valódi próba: csak a te engedélyeddel`,
+  a többi kiinduló szám: becslés, további valódi szállítások állítják
+  valódi, nem minta repó: csak a te engedélyeddel`,
     lang: "text",
     file: "összegzés",
     pairs: [
-      { nodes: ["proven"], match: ["két teljes szállítás a mintán; a commitok, a futások és a jelentések betűre a vártak", "valódi Claude Code: 8 futás, kb. 24 ágensperc, elfogadott átadás"], on: true },
-      { nodes: ["open", "e_to"], match: ["tesztszint: a fogás és a vaklárma mérése", "kiinduló számok: becslések; a próba után is változatlanok", "nagyobb valódi próba: csak a te engedélyeddel"] },
-      { nodes: ["n_next"], match: ["a végigfutás 5 hibája és a próba 4 hibája megtalálva és javítva"] }
+      { nodes: ["proven"], match: ["két teljes szállítás a mintán; a commitok, a futások és a jelentések betűre a vártak", "valódi próbák, mind elfogadott átadással:"], on: true },
+      { nodes: ["open", "e_to"], match: ["tesztszint: a fogás és a vaklárma mérése", "a többi kiinduló szám: becslés, további valódi szállítások állítják", "valódi, nem minta repó: csak a te engedélyeddel"] },
+      { nodes: ["n_next"], match: ["a végigfutás és a próbák hibái megtalálva és javítva; ágensperc-keret: 240 → 120"] }
     ],
     why: [
-      "Mi bizonyított: két teljes szállítás fut végig a mintán, valódi dotnet-tel, és a commitok, a futások és a jelentések betűre a vártak. Minden megállás működik: döntés (10), körplafon (11), `kill -9` és folytatás, G2-, G3- és G5-bukás. Egy valódi Claude Code-szállítás elfogadott átadással zárult, és a végigfutás meg a próba hibái javítva vannak.",
-      "Mi nyitott: a tesztszint (a mérés három szállítás után kerül eléd; az e2e-ben kettő van), a kiinduló számok (becslések, a próba után is változatlanok), és egy nagyobb valódi próba, csak a te engedélyeddel. A Z állomás az egészet egyben mutatja."
+      "Mi bizonyított: két teljes szállítás fut végig a mintán, valódi dotnet-tel, és a commitok, a futások és a jelentések betűre a vártak. Minden megállás működik: döntés (10), körplafon (11), `kill -9` és folytatás, G2-, G3- és G5-bukás. Három valódi szállítás (kettő Claude Code-dal, egy Codexszel) elfogadott átadással zárult, és a végigfutás meg a próbák hibái javítva vannak.",
+      "Mi nyitott: a tesztszint (a mérés három szállítás után kerül eléd; az e2e-ben kettő van), a kiinduló számok közül azok, amelyeket még nem mért valódi ágens, és egy valódi, nem minta repó, csak a te engedélyeddel. A Z állomás az egészet egyben mutatja."
     ],
-    key: "A Brigade végigment: álágenssel két szállításon, valódi ágenssel egyen. Ami nyitott, az mérés kérdése, és több szállítás kell hozzá."
+    key: "A Brigade végigment: álágenssel két szállításon, valódi ágenssel háromon. Ami nyitott, az mérés kérdése, és több szállítás kell hozzá."
   }
 ];
 
 OOP.station({
-  id: "s30", num: "30", title: "Végig, és a valódi próba",
-  goal: "A végére látod, hogyan fut végig két teljes szállítás álágenssel és valódi dotnet-tel, mit talált a végigfutás, mit mutatnak a mért számok, és mi derült ki az első valódi Claude Code-próbán.",
-  map: ["qa"], mapNote: "ezen az állomáson: a minőségbiztosítás egyben (e2e-scenario.sh, kalibráció, a valódi próba)",
+  id: "s30", num: "30", title: "Végig, és a valódi próbák",
+  goal: "A végére látod, hogyan fut végig két teljes szállítás álágenssel és valódi dotnet-tel, mit talált a végigfutás, mit mutatnak a mért számok, és mi derült ki a valódi próbákon (Claude Code, Codex).",
+  map: ["qa"], mapNote: "ezen az állomáson: a minőségbiztosítás egyben (e2e-scenario.sh, kalibráció, a valódi próbák)",
   tracks: [
-    { id: "main", name: "Fő vonal · két szállítás és egy valódi próba", sub: "e2e-scenario.sh, kalibráció, Claude Code", steps: MAIN }
+    { id: "main", name: "Fő vonal · két szállítás és három valódi próba", sub: "e2e-scenario.sh, kalibráció, Claude Code, Codex", steps: MAIN }
   ]
 });
 })();
@@ -23395,7 +23474,7 @@ resources:
     owner: Claude` },
       { file: "brigade-guard a Brigade-en (valódi futás, a saját mappánkban, rövidítve)", lang: "text", code: raw`
 v1:   Összesen: 0 új, 0 elfogadott sértés.
-ma:   Állapot: 2327 csomópont, 3947 él, 0 sértés
+ma:   Állapot: 2345 csomópont, 3999 él, 0 sértés
       Összesen: 0 új, 0 elfogadott sértés.
 próba: a Delivery a port helyett a WorkerManager-t kéri (Shortcut.cs)
       ÚJ SÉRTÉS dep:Delivery->Orchestration (dependency.md): Nem engedett függés: …
@@ -23411,7 +23490,7 @@ próba: a Delivery a port helyett a WorkerManager-t kéri (Shortcut.cs)
       { nodes: ["delivery", "e_da", "n_port"], match: ["Delivery: [Architecture]", "ÚJ SÉRTÉS dep:Delivery->Orchestration"] },
       { nodes: ["arch", "cs", "e_ca"], match: ["Architecture: []", "ArchitectureCSharp: [Architecture]"] },
       { nodes: ["guard", "e_ga", "e_gc"], match: ["Guard: [Architecture, ArchitectureCSharp]"] },
-      { nodes: ["n_zero"], match: ["v1:   Összesen: 0 új, 0 elfogadott sértés.", "ma:   Állapot: 2327 csomópont, 3947 él, 0 sértés"] }
+      { nodes: ["n_zero"], match: ["v1:   Összesen: 0 új, 0 elfogadott sértés.", "ma:   Állapot: 2345 csomópont, 3999 él, 0 sértés"] }
     ],
     why: [
       "A **dependency rule** egy irányt ad: kifelé a technika (tmux, Claude, Codex, runner), befelé a mag (Core, a Runtime-absztrakciók, Orchestration). A Host a kompozíciós gyökér, ezért mindent használhat. A Runtime semmit nem használ. Külön ág a minőségbiztosítás: az Architecture semmit, a `.CSharp` csak őt, a Guard mindkettőt, a Delivery csak az Architecture-t. Ami nincs a listán, tilos; kör nem lehet.",
@@ -24383,8 +24462,8 @@ történetírás             a gép a commitok trailereiből olvas (27.)      a 
         { id: "qa", kind: "box", title: "a Brigade ma", sub: "minőségbiztosítás · 21–30.", w: 440, x: 320, y: 300, tone: "ok", at: 1000,
           lines: [{ t: "szállítás: körök, kapuk G1–G6", chip: "26–29.", chipTone: "ok" },
             { t: "őr a Brigade-en, 48 modulhatár-kapu", chip: "0 sértés", chipTone: "ok" },
-            { t: "tesztek", chip: "251", chipTone: "ok" },
-            { t: "két szállítás + egy valódi próba", chip: "30.", chipTone: "ok" }] },
+            { t: "tesztek", chip: "258", chipTone: "ok" },
+            { t: "két szállítás + három valódi próba", chip: "30.", chipTone: "ok" }] },
         { id: "n_rule", kind: "note", tone: "accent", text: "Előbb elemezni. Megőrizni a működést. Határt húzni.\nCsak a bizonyítottat általánosítani. A Codex a végén.", x: 320, y: 393, at: 1800 }
       ],
       edges: [
@@ -24403,12 +24482,12 @@ Codex                 19–20.   három rétegű beállítás, CodexAdapter
 A terv betartatása    21.      hat elv, szereplők; az őr könyvtár lesz
 A gép szeme           22–25.   teljes háló, öt szabályrendszer, viselkedési láb, lap és kapuk
 A szállítás           26–29.   feladattábla, döntési sor, kör G1–G6, tervező, ítélet, átadás
-Végig                 30.      két szállítás álágenssel, az első valódi Claude Code-próba
+Végig                 30.      két szállítás álágenssel, három valódi próba (Claude Code, Codex)
 Zárás                 Z        egyben: futtató és szállítás, két láb, ADR-ek, nem-célok
 
 v0: 8 sértés, 3 jellemző teszt
 v1: 0 sértés, 57 teszt; a Codex egy projekt, két sor a hostban, egy sor a beállításban
-ma: 0 sértés, 251 teszt; 2327 csomópont, 3947 él, 48 modulhatár-kapu, 138 ismeretlen él` },
+ma: 0 sértés, 258 teszt; 2345 csomópont, 3999 él, 48 modulhatár-kapu, 142 ismeretlen él` },
       { file: "ismert korlátok a futtatóban (kódolvasásból, nem futtattuk)", lang: "text", code: raw`
 brigade start     nem nézi, létezik-e már a futás mappája: kétszeri indításnál két panel
                  kapja ugyanazt a címkét, és a brigade recover elhasal
@@ -24419,21 +24498,21 @@ határidő         ha a futás a kemény határidején végez, és a supervisor 
                  Terminated lesz, pedig a result.json megvan` },
       { file: "nyitott a szállításban (a 30. állomás mérlegéből)", lang: "text", code: raw`
 tesztszint       a fogás és a vaklárma mérése 3 szállítás után kerül eléd
-kiinduló számok  becslések; a próba után is változatlanok
-valódi próba     eddig egy, Claude Code-dal; nagyobb csak a te engedélyeddel` }
+kiinduló számok  az ágensperc-keret a próbák után 120; a többi becslés
+valódi próba     eddig három (kettő Claude Code-dal, egy Codexszel); valódi repón csak engedéllyel` }
     ],
     pairs: [
       { nodes: ["v0"], match: ["v0: 8 sértés, 3 jellemző teszt", "Ahol tartunk          1–4."], on: true },
       { nodes: ["v1", "e_v"], match: ["v1: 0 sértés, 57 teszt", "Kiemelés              9–13."] },
       { nodes: ["n_rule"], match: ["Architektúra-őrzés    5–8.", "Codex                 19–20."] },
-      { nodes: ["qa", "e_q"], match: ["ma: 0 sértés, 251 teszt", "A gép szeme           22–25.", "A szállítás           26–29.", "Végig                 30."] },
+      { nodes: ["qa", "e_q"], match: ["ma: 0 sértés, 258 teszt", "A gép szeme           22–25.", "A szállítás           26–29.", "Végig                 30."] },
       { nodes: ["v1"], match: ["Reconciler       csak a futásmappákon megy végig"] },
-      { nodes: ["qa"], match: ["tesztszint       a fogás és a vaklárma mérése", "valódi próba     eddig egy, Claude Code-dal"] }
+      { nodes: ["qa"], match: ["tesztszint       a fogás és a vaklárma mérése", "valódi próba     eddig három (kettő Claude Code-dal, egy Codexszel)"] }
     ],
     why: [
       "A kiindulás egy működő, Claude-hoz nőtt orchestrator volt: értékes viselkedés, nem eldobható örökség. Előbb láthatóvá tettük és rögzítettük (1–8.), kiemeltük a határokat (9–13.), felügyeletet kapott (14–18.), és csak a végén jött a Codex (19–20.). A racsni nyolc sértésről nullára ment. A célkép teljesült: szolgáltatófüggetlen orchestrator, két adapter a saját képességeivel, közös futtatón és felügyelettel.",
-      "A második rész erre a futtatóra szállítást épített (21–29.). Egy kör, egy feladat, friss ágens; a gép a gitből mér, csak a zöldet commitolja, és ahol mérni nem tud, független ellenőrző ítél. Két szállítás ment végig álágenssel, egy valódi Claude Code-dal (30.). Ma 251 teszt, és az őr a Brigade-en 0 sértést talál, 48 modulhatár-kapuval.",
-      "Ami nyitva maradt, ki van mondva. A futtatóban: a Codex `queue`-ja és hookjai, a munkamenet-folytatás, a cgroup a szökő unokákhoz és a négy ismert korlát. A szállításban: a tesztszint, a kiinduló számok és egy nagyobb valódi próba. Mindegyik egy-egy következő lépés, előbb bukó teszttel (7.)."
+      "A második rész erre a futtatóra szállítást épített (21–29.). Egy kör, egy feladat, friss ágens; a gép a gitből mér, csak a zöldet commitolja, és ahol mérni nem tud, független ellenőrző ítél. Két szállítás ment végig álágenssel, három valódi ágenssel: kettő Claude Code-dal, egy Codexszel (30.). Ma 258 teszt, és az őr a Brigade-en 0 sértést talál, 48 modulhatár-kapuval.",
+      "Ami nyitva maradt, ki van mondva. A futtatóban: a Codex `queue`-ja és hookjai, a munkamenet-folytatás, a cgroup a szökő unokákhoz és a négy ismert korlát. A szállításban: a tesztszint, a még nem mért kiinduló számok és egy valódi, nem minta repó. Mindegyik egy-egy következő lépés, előbb bukó teszttel (7.)."
     ],
     key: "A közös pont nem a Claude és a Codex viselkedése, hanem a szerződés, amelyen át az orchestrator kezeli őket. Fölötte a szállítás: az ágens dolgozik, a gép mér és commitol, te jóváhagysz és döntesz."
   }
