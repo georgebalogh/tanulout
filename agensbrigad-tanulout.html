@@ -15195,9 +15195,9 @@ catch (Exception e) when (e is IOException or InvalidDataException or YamlExcept
     error.WriteLine($"brigade-guard: {e.Message}");
     return 2;
 }` },
-      { file: "Brigade.Host/DeliveryPorts.cs (DotnetRepoTools.Graph)", code: raw`
+      { file: "Brigade.Host/DotnetRepoTools.cs (Graph)", code: raw`
 public Graph Graph(string dir, Rules rules, Acceptance acceptance) =>
-    Targeting.Mark(Architecture.Coverage.Merge(
+    Targeting.Mark(Architecture.Graphs.Coverage.Merge(
         GraphBuilder.Build(GraphBuilder.ReadSources(dir), rules, acceptance),
         CoverageMap.Load(Path.Combine(dir, "architecture", "state", "coverage-map.json"))).Graph);` },
       { file: "a projektek hivatkozásai (csproj, rövidítve)", lang: "text", code: raw`
@@ -15393,10 +15393,10 @@ using (var guard = RepoLock.TryAcquire(home, repo))
     // …
 }` },
       { file: "Brigade.Delivery/DeliveryRunner.cs (Start, rövidítve)", code: raw`
-var worktree = System.IO.Path.Combine(dir, "work");
+var worktree = Path.Combine(dir, "work");
 Directory.CreateDirectory(dir);
 git.Run("worktree", "add", "--quiet", "-b", $"brigade/{number}", worktree, head);` },
-      { file: "Brigade.Delivery/DeliveryRunner.cs (ExitCodes)", code: raw`
+      { file: "Brigade.Delivery/ExitCodes.cs", code: raw`
 public static class ExitCodes
 {
     public const int Done = 0;       // átadva, elfogadva
@@ -15691,7 +15691,7 @@ public sealed record Edge(string From, string To, string Kind, string Source = "
       ]
     },
     code: [
-      { file: "Graph.cs (Brigade.Architecture, tördelve)", code: raw`
+      { file: "Graphs/NodeKind.cs (Brigade.Architecture, tördelve)", code: raw`
 // A módszertan nyolc csomópontfajtája: modul, függvény (Member), adattár, konfigurációs kulcs,
 // külső szolgáltatás, esemény, teszt, folyamat. Segédfajták: a típus (a függvények gazdája),
 // a szövegkonstans (összehasonlításhoz) és az ismeretlen cél (a fel nem oldott dinamikus
@@ -15723,7 +15723,7 @@ folyamat             architecture/acceptance/<folyamat>.md (workflow, criteria)`
     ],
     why: [
       "A gazda módszertana nyolc csomópontfajtát sorol: modul, függvény, adattár, konfigurációs kulcs, külső szolgáltatás, esemény, teszt és folyamat. A `Brigade.Architecture` mindet ismeri, és mindhez megmondja, miből lesz C#-ban. Három segédfajta is van: a típus a függvények gazdája, a szövegkonstans az összehasonlításhoz kell, az ismeretlen cél a fel nem oldott kötések közös végpontja.",
-      "A mintában ebből négy fajta van: 3 modul, 15 függvény (a tulajdonságokkal és a konstruktorokkal), 1 adattár és 2 tesztcsomópont, a tesztosztály és a metódusa. Hozzájön 4 típus, ez a 25. A többi fajtát a Brigade önmagán mutatja: 10 konfigurációs kulcs, 5 külső program, 1 csatorna. A folyamat az elfogadási feltételekből jön; a kimutatás szállításán ez az `Ügyfélkimutatás` (24. állomás)."
+      "A mintában ebből négy fajta van: 3 modul, 15 függvény (a tulajdonságokkal és a konstruktorokkal), 1 adattár és 2 tesztcsomópont, a tesztosztály és a metódusa. Hozzájön 4 típus, ez a 25. A többi fajtát a Brigade önmagán mutatja: 11 konfigurációs kulcs, 5 külső program, 1 csatorna. A folyamat az elfogadási feltételekből jön; a kimutatás szállításán ez az `Ügyfélkimutatás` (24. állomás)."
     ],
     key: "A háló nem csak kód: adat, beállítás, külső program, esemény és folyamat is csomópont. Ezek kötnek össze import nélkül is két modult."
   },
@@ -15766,7 +15766,7 @@ folyamat             architecture/acceptance/<folyamat>.md (workflow, criteria)`
       ]
     },
     code: [
-      { file: "Graph.cs (EdgeKind, EdgeSource; rövidítve)", code: raw`
+      { file: "Graphs/Edge.cs, EdgeKind.cs és EdgeSource.cs (rövidítve)", code: raw`
 // Source: honnan tudjuk az élt. Note: kiegészítés (a közvetett írás útja, a dinamikus kötés
 // leírása, a feltétel azonosítója).
 public sealed record Edge(string From, string To, string Kind, string Source = EdgeSource.Static,
@@ -15989,7 +15989,7 @@ void ResolveIndirectWrites()
       ]
     },
     code: [
-      { file: "Targeting.cs (rövidítve)", code: raw`
+      { file: "Changes/Targeting.cs (rövidítve)", code: raw`
 // Célzott függvény: adattárba ír (közvetve is: egy hívásnyira egy író függvénytől), külső
 // szolgáltatást hív, vagy nyilvános felületet valósít meg: másik modulból hívják, vagy (ezt
 // a nyelvi olvasó jelöli) másik modul interfészét valósítja meg. Gép számolja, nem kézzel
@@ -16041,8 +16041,8 @@ public static Graph Mark(Graph g)
         { id: "u_proc", kind: "box", title: "külső program", sub: "a neve futáskor dől el", w: 240, x: 140, y: 325 },
         { id: "q", kind: "box", title: "?", sub: "dynamic:? · marked", w: 150, x: 430, y: 190, tone: "bad" },
         { id: "n_never", kind: "note", tone: "accent", text: "nem tüntetjük el:\nkiírjuk, és számít", x: 500, y: 60, at: 1300 },
-        { id: "count", kind: "box", title: "a Brigade önmagán: 142", w: 250, x: 500, y: 330, at: 900,
-          lines: ["139 írás, olvasás ? célba", "3 jelölt dinamikus kötés"] }
+        { id: "count", kind: "box", title: "a Brigade önmagán: 147", w: 250, x: 500, y: 330, at: 900,
+          lines: ["144 írás, olvasás ? célba", "3 jelölt dinamikus kötés"] }
       ],
       edges: [
         { id: "e_refl", from: "u_refl", to: "q", kind: "bad" },
@@ -16080,12 +16080,12 @@ void Unknown(Node from, string note) =>
     edges.Add(new(from.Id, Add(new Node(Graph.UnknownTarget, NodeKind.Unknown, "?")).Id,
         EdgeKind.Unknown, EdgeSource.Marked, note));` },
       { file: "architecture/state/view.md (a Brigade önmagán, rövidítve)", lang: "md", code: raw`
-## Ismeretlen élek (142)
+## Ismeretlen élek (147)
 
 A gép látja, hogy itt kötés van, de nem tudja, mivel. Nem tüntetjük el.
 
-- ApprovalLog.Append -> ? (írás)
-- ApprovalLog.Read -> ? (olvasás)
+- AgentSession.Stored -> ? (olvasás)
+- AgentSession.Track -> ? (írás)
 - …
 - RunnerTests.Runner -> ? (külső folyamat: a program neve futáskor dől el)
 - …
@@ -16097,11 +16097,11 @@ A gép látja, hogy itt kötés van, de nem tudja, mivel. Nem tüntetjük el.
       { nodes: ["u_dyn", "e_dyn"], match: ["Unknown(from, $\"dynamic hívás: {dynamicAccess}\");"] },
       { nodes: ["u_proc", "e_proc"], match: ["Unknown(from, \"külső folyamat: a program neve futáskor dől el\");", "- RunnerTests.Runner -> ?"] },
       { nodes: ["q"], match: ["void Unknown(Node from, string note) =>", "EdgeKind.Unknown, EdgeSource.Marked, note));"] },
-      { nodes: ["count", "n_never"], match: ["## Ismeretlen élek (142)", "A gép látja, hogy itt kötés van, de nem tudja, mivel. Nem tüntetjük el."] }
+      { nodes: ["count", "n_never"], match: ["## Ismeretlen élek (147)", "A gép látja, hogy itt kötés van, de nem tudja, mivel. Nem tüntetjük el."] }
     ],
     why: [
       "Van kötés, amit egyik forrás sem old fel: reflexió (`Type.GetType`, `Activator.CreateInstance`, `Invoke`), kulcsos szolgáltatás-feloldás, `dynamic` hívás, és külső program, amelynek a neve csak futáskor dől el. Ezekből `unknown` él lesz `marked` címkével, egy közös `?` célba, és a megjegyzés leírja, mi állt a kódban.",
-      "A Brigade saját alapnézetében 142 ilyen sor van. 139 olyan fájlírás vagy -olvasás, amelynek a célját a szabályfájl mintái nem ismerik (például a szállítás naplói és a tesztek ideiglenes fájljai), 3 jelölt dinamikus kötés. Az egyik a 10. állomás kulcsos feloldása: a `WorkerManager` a szolgáltató nevével kéri el az adaptert, és ezt a gép nem tudja végigkövetni.",
+      "A Brigade saját alapnézetében 147 ilyen sor van. 144 olyan fájlírás vagy -olvasás, amelynek a célját a szabályfájl mintái nem ismerik (például a szállítás naplói és a tesztek ideiglenes fájljai), 3 jelölt dinamikus kötés. Az egyik a 10. állomás kulcsos feloldása: a `WorkerManager` a szolgáltató nevével kéri el az adaptert, és ezt a gép nem tudja végigkövetni.",
       "Az ismeretlen él sosem tűnik el: a fedettség nem törli, a nézet és a hatástérkép kiírja. A módosítási lap meg is számolja: ha az érintett területen van ilyen, a teljes tesztkészlet fut, 5 fölött döntési tétel lesz belőle (25. állomás)."
     ],
     key: "Amit a gép nem tud, azt is tudja: megjelöli, és nem tesz úgy, mintha ott semmi nem volna."
@@ -16147,7 +16147,7 @@ Fedettség: 1 tesztosztály → …/w-start/architecture/state/coverage-map.json
   },
   "calls": []
 }` },
-      { file: "Coverage.cs (Merge, rövidítve)", code: raw`
+      { file: "Graphs/Coverage.cs (Merge, rövidítve)", code: raw`
 // A statikus és a futásidejű élek uniója: a futásidejű élek hozzáadódnak, a statikusak
 // (az ismeretleneket is) maradnak.
 public static (Graph Graph, int Skipped) Merge(Graph graph, CoverageMap map)
@@ -16242,7 +16242,7 @@ $ brigade-guard state detail --area Billing
       { nodes: ["n_plan", "n_build"], match: ["## Konfigurációs kulcsok, külső szolgáltatások, események · ## Célzott függvények"] }
     ],
     why: [
-      "A teljes háló nagy: a mintán 25 csomópont és 28 él, a Brigade-en 2345 csomópont és 3999 él. Ezért két nézete van, ahogy a gazda módszertana hibridként leírja: a gép mindig mindent kiszámol, de az alapnézet szűrt. A `view.md` modulokat, adattárakat a gazdájukkal, íróikkal és olvasóikkal, erőforrásokat, célzott függvényeket, teszteket, folyamatokat, ismeretlen éleket és sértéseket mutat.",
+      "A teljes háló nagy: a mintán 25 csomópont és 28 él, a Brigade-en 2655 csomópont és 4926 él. Ezért két nézete van, ahogy a gazda módszertana hibridként leírja: a gép mindig mindent kiszámol, de az alapnézet szűrt. A `view.md` modulokat, adattárakat a gazdájukkal, íróikkal és olvasóikkal, erőforrásokat, célzott függvényeket, teszteket, folyamatokat, ismeretlen éleket és sértéseket mutat.",
       "A részlet kérésre jön, egy területre: a `state detail --area` egy modul vagy útvonal minden típusát, függvényét és kimenő élét kiírja; egy függvény nem statikus élénél a forráscímkét is. A tervező feladatleírása a `view.md`-t nevezi meg. Az építő a módosítási lapot kapja, amely ugyanebből a hálóból készül (25. állomás)."
     ],
     key: "A gép mindent kiszámol, de nem mindent mutat egyszerre. Az alapnézet a döntéshez kell, a részlet a kérdéshez."
@@ -16299,7 +16299,7 @@ public static Graph Build(IEnumerable<SourceFile> files, Rules rules, Acceptance
 -Modulon kívül (10): InvoiceLine, InvoiceWriter, InvoiceWriterTests, FakeArgs, FakeClaude,
 -                    FakeCodex, Program, InvoiceRecord, InvoiceStore, Program
 +Modulon kívül (5): FakeArgs, FakeClaude, FakeCodex, Program, Program` },
-      { file: "GraphKindTests.cs (rövidítve)", code: raw`
+      { file: "Graphs/GraphKindTests.cs (rövidítve)", code: raw`
 [Fact]
 public void Build_output_and_hidden_folders_are_not_sources()
 {
@@ -16465,7 +16465,7 @@ $ brigade-guard rules check
       ]
     },
     code: [
-      { file: "Checks.cs (rövidítve)", code: raw`
+      { file: "RuleSystem/Checks.cs (rövidítve)", code: raw`
 // Sértés = a szándék (szabályok) és az állapot (háló) eltérése. A jelentés fontossági sorrendben:
 // adat-tulajdon, határok és függés, hibakezelés, szerződés
 // (a mérce: mennyibe kerül utólag kijavítani).
@@ -16554,7 +16554,7 @@ $ brigade-guard rules check
     InvoiceWriter.Correct
 Összesen: 1 új, 0 elfogadott sértés.
 [kilépési kód: 1]` },
-      { file: "Checks.cs (Writers)", code: raw`
+      { file: "RuleSystem/Checks.cs (Writers)", code: raw`
 // data-ownership.md: erőforrásonként egy író. A közvetett írást a háló egy szinten feloldja
 // (Note: közvetve).
 static IEnumerable<Violation> Writers(Graph g, OwnershipRule rule) =>
@@ -16694,7 +16694,7 @@ forbidden_calls:
   - from: [Orchestration]
     members: [SendKeys, SendTextAsync, SendKeyAsync, CapturePane, CaptureAsync]
     in: [Tmux, Runtime]` },
-      { file: "RuleTests.cs (a Brigade tesztje, rövidítve)", code: raw`
+      { file: "RuleSystem/RuleTests.cs (a Brigade tesztje, rövidítve)", code: raw`
 public void Nudge() => terminal.SendTextAsync("%16", "Most futtasd le a teszteket.");
 // …
 Assert.Equal(["io:Orchestrator.Nudge->ITerminalRuntime.SendTextAsync"], ids);` }
@@ -16827,7 +16827,7 @@ szerződés bővült (nem sértés, ítéletet kér): Invoicing.InvoiceStore.Cou
 szerződés bővült (nem sértés, ítéletet kér): Invoicing.InvoiceStore.ReadLines
 Összesen: 2 új, 0 elfogadott sértés.
 [kilépési kód: 1]` },
-      { file: "Contracts.cs (Diff)", code: raw`
+      { file: "Behaviors/Contracts.cs (Diff)", code: raw`
 public static ContractDiff Diff(IReadOnlyDictionary<string, string> before,
     IReadOnlyDictionary<string, string> after) => new(
     Removed: [.. before.Keys.Where(id => !after.ContainsKey(id)).Order(StringComparer.Ordinal)],
@@ -16879,7 +16879,7 @@ használható.
 public:
   Discount: [DiscountRules]
 \`\`\`` },
-      { file: "Rules.cs (rövidítve)", code: raw`
+      { file: "RuleSystem/Rules.cs (rövidítve)", code: raw`
 // Szándék: a kézzel írt szabályfájlok. Mindegyikben egy \`\`\`yaml blokk, a többi emberi magyarázat.
 // … Csak a dependency.md kötelező: ami nincs, az nem ellenőrzött szándék.
 public static Rules Parse(IReadOnlyDictionary<string, string> files)
@@ -16937,12 +16937,12 @@ public static Rules Parse(IReadOnlyDictionary<string, string> files)
       ]
     },
     code: [
-      { file: "Checks.cs", code: raw`
+      { file: "RuleSystem/Violation.cs", code: raw`
 // Rule: a szabályfájl neve. Az azonosítóban nincs sorszám,
 // így független módosítástól nem változik.
 public sealed record Violation(
     string Id, string Rule, string Message, IReadOnlyList<string> Evidence);` },
-      { file: "RuleTests.cs (a Brigade tesztje, rövidítve)", code: raw`
+      { file: "RuleSystem/RuleTests.cs (a Brigade tesztje, rövidítve)", code: raw`
 [Fact]
 public void Violation_ids_do_not_change_under_unrelated_edits()
 {
@@ -16953,13 +16953,13 @@ public void Violation_ids_do_not_change_under_unrelated_edits()
     Assert.Equal(Fixture.Violations(Fixture.Tmux, code), Fixture.Violations(Fixture.Tmux, edited),
         new ViolationComparer());
 }` },
-      { file: "Calibration.cs és DeliveryRunner.Planning.cs (J0, részlet)", code: raw`
+      { file: "Planning/Calibration.cs és Planning/Onboarding.cs (J0, részlet)", code: raw`
 public int WaiverDays { get; init; } = 90;        // elfogadott eltérés lejárata
 // …
 var expires = Today.AddDays(c.WaiverDays);
 var waivers = Ratchet.Baseline([.. violations, .. Behavior.Check(graph, Acceptance.None)], [],
     Today, expires, "alapvonal (bevezetés)");` },
-      { file: "GapFinder.cs (részlet)", code: raw`
+      { file: "Planning/GapFinder.cs (részlet)", code: raw`
 if (expired.TryGetValue(v.Id, out var waiver))
     tasks.Add(new NewTask($"Lejárt eltérés: {v.Message.TrimEnd('.')}", TaskType.Structural,
         TaskSource.ExpiredWaiver, Origin(v), Rule: RuleOf(v), Finding: v.Id,
@@ -17013,7 +17013,7 @@ Válasz:   igen` },
 {"kind":"döntés","id":"D-001","sha256":"05879c83…","text":"igen"}
 {"kind":"szándék","id":"architecture/rules/boundaries.md","sha256":"822b32f0…","text":"J1 (D-001)"}
 {"kind":"szándék","id":"architecture/rules/dependency.md","sha256":"7c2f8bfc…","text":"J1 (D-001)"}` },
-      { file: "Purity.cs (részlet)", code: raw`
+      { file: "Review/PurityGuard.cs (részlet)", code: raw`
 static readonly string[] ProtectedPrefixes =
     ["architecture/rules/", "architecture/acceptance/", "architecture/state/"];
 static readonly string[] ProtectedFiles =
@@ -17021,7 +17021,7 @@ static readonly string[] ProtectedFiles =
 // …
 problems.AddRange(input.Changes.Where(c => IsProtected(c.Path))
     .Select(c => $"védett fájl változott: {c.Path}"));` },
-      { file: "Intent.cs (komment)", code: raw`
+      { file: "Planning/Intent.cs (komment)", code: raw`
 // A szándék: a szabályok, az elfogadási feltételek és a kiinduló számok.
 // Jóváhagyás után ujjlenyomat zárja őket a Brigade saját naplójában; módosítani
 // csak a döntési soron át lehet: a gazda a munkapéldányban javít, és egy döntésre válaszol.` }
@@ -17204,7 +17204,7 @@ criteria:
     text: "Ugyanazzal a sorszámmal második számla nem írható."
   - id: AC-D-003
     text: "A kimutatás a legutóbbi számla sorszámát is mutatja."` },
-      { file: "Acceptance.cs (rövidítve)", code: raw`
+      { file: "Behaviors/Criterion.cs és Behaviors/WorkflowSpec.cs (rövidítve)", code: raw`
 public sealed record Criterion
 {
     public string Id { get; init; } = "";
@@ -17333,7 +17333,7 @@ HIBA ac:unknown:AC-3@StatementTests.An_unknown_customer_is_flagged: A teszt nem 
 HIBA ac:untested:AC-2: A feltételhez nincs teszt: AC-2 (Ismeretlen ügyfél kimutatása …).
 Összesen: 3 hiba a feltételek és a tesztek kötésében; gyanús teszt: 0.
 [kilépési kód: 1]` },
-      { file: "Behavior.cs (Check, rövidítve)", code: raw`
+      { file: "Behaviors/Behavior.cs (Check, rövidítve)", code: raw`
 foreach (var criterion in acceptance.Workflows.SelectMany(w => w.Criteria))
 {
     var tests = verifies.Where(e => e.Note == criterion.Id).Select(e => g[e.From].Label)
@@ -17403,7 +17403,7 @@ $ brigade-guard tests count --json
 
 - G4: új kihagyott teszt (Skip): Billing.Tests.InvoiceWriterTests.Written_invoice_is_stored
 - G4: szerkezeti feladat a tesztfájlban nem csak importot változtatott: tests/Billing.Tests/…` },
-      { file: "Behavior.cs (Inventory)", code: raw`
+      { file: "Behaviors/Behavior.cs (Inventory)", code: raw`
 public static TestInventory Inventory(Graph g)
 {
     var tests = g.Nodes.Where(n => n.Kind == NodeKind.Test && n.Parent is not null).ToList();
@@ -17411,7 +17411,7 @@ public static TestInventory Inventory(Graph g)
         [.. tests.Where(t => t.Skip is not null).Select(t => (t.Id, t.Skip!))],
         [.. tests.Where(t => t.Suspect == true).Select(t => t.Id)]);
 }` },
-      { file: "Purity.cs (G4, részlet)", code: raw`
+      { file: "Review/PurityGuard.cs (G4, részlet)", code: raw`
 var (was, now) = (Behavior.Inventory(before), Behavior.Inventory(after));
 if (now.Tests < was.Tests)
     problems.Add($"csökkent a tesztek száma: {was.Tests} → {now.Tests}");
@@ -17527,7 +17527,7 @@ Forrás:   T-041 jellemző teszt, gyanúsnak jelölve: Billing.Tests.DiscountTes
 Javaslat: a teszt a mai viselkedést rögzíti; ha hiba, írd le a helyeset, …
 Kérdés:   Hiba ez? Ha igen, írd le a helyes viselkedést egy mondatban: …
 Válasz:` },
-      { file: "Decisions.cs (Append, részlet)", code: raw`
+      { file: "DecisionLog/Decisions.cs (Append, részlet)", code: raw`
 // Hozzáfűzi azokat a tételeket, amelyek kulcsa még nincs a fájlban;
 // visszaadja az új tételek azonosítóit.
 var keys = KeyLine().Matches(text).Select(m => m.Groups[1].Value.Trim()).ToHashSet();
@@ -17566,14 +17566,14 @@ foreach (var item in items.Where(i => keys.Add(i.Key)))` }
     code: [
       { file: "DotnetTest.cs (Run, részlet)", code: raw`
 string[] arguments = ["test", target, "--nologo", "--results-directory", resultsDir,
-    "--logger", "trx;LogFileName=run.trx"];
+    "--logger", "trx;LogFilePrefix=run"];
 // …
 if (coverage)
 {
     start.ArgumentList.Add("--collect");
     start.ArgumentList.Add("Code Coverage;Format=cobertura");
 }` },
-      { file: "DotnetTest.cs (CoverageRun.Measure, rövidítve)", code: raw`
+      { file: "CoverageRun.cs (Measure, rövidítve)", code: raw`
 foreach (var (testClass, index) in classes.Select((c, i) => (c, i)))
 {
     // …
@@ -17649,7 +17649,7 @@ public static decimal CalcDiscount(InvoiceLine line) =>
       { file: "tests/Billing.Tests/InvoiceWriterTests.cs (a minta egyetlen tesztje, részlet)", code: raw`
 var record = new InvoiceWriter(store).Write("SZ-001", "Kovács Kft.",
     [new InvoiceLine("Toll", 200m, 2)]);` },
-      { file: "Coverage.cs (LineCoverage)", code: raw`
+      { file: "Graphs/LineCoverage.cs", code: raw`
 // Egy tag sor- és elágazás-fedettsége egy tesztfutásban. Teljes, ha minden sora lefutott,
 // és minden elágazása mindkét irányban.
 public sealed record LineCoverage(int Lines, int LinesHit, int Branches, int BranchesHit)
@@ -17718,7 +17718,7 @@ if (line.Flag("rerun-failed") && failed.Count > 0 && !first.TimedOut)
 }
 // …
 return failed.Count > 0 || first.TimedOut ? 1 : 0;` },
-      { file: "Behavior.cs (FlakyDecision)", code: raw`
+      { file: "Behaviors/Behavior.cs (FlakyDecision)", code: raw`
 public static DecisionItem FlakyDecision(string test, string first, string second) => new(
     Key: $"flaky:{test}",
     Title: $"Billegő teszt: {test}",
@@ -17773,7 +17773,7 @@ Assert.Contains("Döntési tétel: D-001 (billegő teszt)", text);` }
       ]
     },
     code: [
-      { file: "Acceptance.cs (komment)", code: raw`
+      { file: "Behaviors/Criterion.cs (komment)", code: raw`
 // Level: a teszt szintje (például usecase vagy surface). Csak feljegyzés, kapu nem nézi:
 // a tesztszint nyitott kérdés, a gép méri, mennyit ér egy szint.` },
       { file: "architecture/handoff.md (a kimutatás, részlet, tördelve)", lang: "md", code: raw`
@@ -18065,7 +18065,7 @@ public static IReadOnlyList<MatrixRow> Rows(Graph before, Graph after)
             Hit(8, id);
     // …
 }`,
-    file: "ChangeMatrix.cs (rövidítve)",
+    file: "Changes/ChangeMatrix.cs (rövidítve)",
     pairs: [
       { nodes: ["table"], match: ["public static readonly IReadOnlyList<(int Number, string Change, string[] Rules)> Table ="], on: true },
       { nodes: ["e1d", "e1b", "r_dep", "r_bound"], match: ["(1, \"új vagy módosult import\", [\"dependency.md\", \"boundaries.md\"]),", "// 1. import: típusszintű használat jött vagy ment"] },
@@ -18124,7 +18124,7 @@ $ brigade-guard change sheet --goal "Számlázás: kedvezményszámítás kiemel
 - **Tesztek:** futtatandó: Billing.Tests.DiscountTests, Billing.Tests.InvoiceWriterTests |
   változnia kell: nincs | új: nincs | jellemző teszt: …
 [kilépési kód: 0]` },
-      { file: "ChangeSheet.cs (ChangeSheets.Build, részlet)", code: raw`
+      { file: "Changes/ChangeSheets.cs (Build, részlet)", code: raw`
 var matrix = ChangeMatrix.Rows(before, after);
 IReadOnlyList<string> affected = matrix.Count > 0
     ? [.. matrix.SelectMany(r => r.Rules).Distinct().OrderBy(Checks.Severity)
@@ -18182,7 +18182,7 @@ var obligations = Gates.Compare(Gates.Of(before, rules), Gates.Of(after, rules))
     "edges": [ "InvoiceStore.Append -> invoices.json" ],
     "crossed": [ "Billing.Tests.InvoiceWriterTests" ] }
 ]` },
-      { file: "Gates.cs (rövidítve)", code: raw`
+      { file: "Changes/Gate.cs és Changes/Gates.cs (rövidítve)", code: raw`
 // Kapu egy modulhatáron (mod:A→B) vagy egy erőforrás-élen (res:M→R ír/olvas/hív): a rá vonatkozó
 // szabályok, a tesztek, amelyek őrzik (fedettségből, ha van; különben a teszt típushasználatából),
 // és az él, amiből áll. Crossed: a tesztek, amelyek át is mennek rajta: hívásláncuk eléri az
@@ -18240,7 +18240,7 @@ gates.Add(new Gate($"res:{group.Key.Module}→{group.Key.To} ({verb})", gateRule
       ]
     },
     code: [
-      { file: "Gates.cs (Compare)", code: raw`
+      { file: "Changes/Gates.cs (Compare)", code: raw`
 public static Obligations Compare(IReadOnlyList<Gate> before, IReadOnlyList<Gate> after)
 {
     var old = before.ToDictionary(g => g.Id);
@@ -18272,7 +18272,7 @@ public static Obligations Compare(IReadOnlyList<Gate> before, IReadOnlyList<Gate
         [.. items.Distinct().Order(StringComparer.Ordinal)];
     return new(Sorted(run), Sorted(mustChange), Sorted(fresh), Sorted(changed));
 }` },
-      { file: "ChangeMatrixTests.cs (rövidítve)", code: raw`
+      { file: "Changes/ChangeMatrixTests.cs (rövidítve)", code: raw`
 public void A_changed_gate_runs_its_tests_and_a_removed_gate_asks_its_tests_to_change()
 {
     // …
@@ -18382,7 +18382,7 @@ public static class DiscountRules
       ]
     },
     code: [
-      { file: "Gates.cs (Of, rövidítve)", code: raw`
+      { file: "Changes/Gates.cs (Of, rövidítve)", code: raw`
 // Visszafelé a hívásláncon: mely tesztek érik el a tagokat (a teszt közvetlenül vagy termelő
 // tagokon át hívja őket).
 var callers = g.Edges.Where(e => e.Kind is EdgeKind.Calls or EdgeKind.RuntimeCalls)
@@ -18442,7 +18442,7 @@ var calls = g.Edges.Where(e => e.Kind is EdgeKind.Calls or EdgeKind.RuntimeCalls
           lines: ["6 metódus, mindegyikben:", "Type.GetType(n)", "Activator.CreateInstance"] },
         { id: "flags", kind: "box", title: "módosítási lap", w: 300, x: 470, y: 200, tone: "current",
           lines: [bad("Ismeretlen élek (12)"), "→ a teljes tesztkészlet fut", "→ döntési tétel kell (5)"] },
-        { id: "runner", kind: "box", title: "DeliveryRunner", sub: "a kör elején", w: 260, x: 150, y: 345, at: 1300,
+        { id: "runner", kind: "box", title: "BuildRound", sub: "a kör elején", w: 260, x: 150, y: 345, at: 1300,
           lines: ["Park: unknown:T-xxx:N"] },
         { id: "st_wait", kind: "state", label: "döntésre vár", tone: "bad", x: 470, y: 345, at: 1700 }
       ],
@@ -18453,7 +18453,7 @@ var calls = g.Edges.Where(e => e.Kind is EdgeKind.Calls or EdgeKind.RuntimeCalls
       ]
     },
     code: [
-      { file: "ChangeSheet.cs (rövidítve)", code: raw`
+      { file: "Changes/SheetRequest.cs és Changes/ChangeSheet.cs (rövidítve)", code: raw`
 // Files: a változott (vagy a feladat szerint érintett) fájlok. UnknownThreshold: e fölött
 // döntési tétel kell.
 public sealed record SheetRequest(IReadOnlyList<string> Files, string? Goal = null,
@@ -18465,7 +18465,7 @@ public sealed record ChangeSheet(/* … */)
     public bool FullSuite => UnknownCount >= 1;
     public bool NeedsDecision => UnknownCount > Request.UnknownThreshold;
 }` },
-      { file: "ChangeMatrixTests.cs (rövidítve)", code: raw`
+      { file: "Changes/ChangeMatrixTests.cs (rövidítve)", code: raw`
 public void The_sheet_has_the_seven_fields_and_flags_unknown_edges()
 {
     var dynamic = "namespace Shop.Orders; public sealed class Loader { "
@@ -18480,19 +18480,23 @@ public void The_sheet_has_the_seven_fields_and_flags_unknown_edges()
     Assert.True(sheet.NeedsDecision);
     Assert.Contains("→ a teljes tesztkészlet fut → döntési tétel kell (küszöb: 5)", text);
 }` },
-      { file: "DeliveryRunner.cs (a kör eleje és a kapuk, rövidítve)", code: raw`
-if (sheet.NeedsDecision && !Decided(task, "unknown:"))
-    return Park(board, task, number, new($"unknown:{task.Id}:{number}",
-        $"Túl sok ismeretlen kapcsolat: {task.Title}", /* … */
-        "Mehet-e a feladat így, a teljes tesztkészlettel?"), "túl sok ismeretlen kapcsolat");
-// …
+      { file: "Rounds/BuildRound.cs (Held, a kör eleje, rövidítve)", code: raw`
+if (sheet.NeedsDecision && !desk.Decided(task, DecisionKey.Unknown))
+{
+    desk.Park(board, task, number,
+        new(DecisionKey.ForTask(DecisionKey.Unknown, task.Id, number).ToString(),
+            $"Túl sok ismeretlen kapcsolat: {task.Title}", /* … */
+            "Mehet-e a feladat így, a teljes tesztkészlettel?"), "túl sok ismeretlen kapcsolat");
+    return true;
+}` },
+      { file: "Review/RoundJudge.cs (Judge, a kapuk, részlet)", code: raw`
 var full = m.Sheet.FullSuite
     || (cx.Rules.Contracts is not null && m.Sheet.Matrix.Any(r => r.Number == 8));` }
     ],
     pairs: [
       { nodes: ["flags", "e_unk"], match: ["public bool FullSuite => UnknownCount >= 1;", "public bool NeedsDecision => UnknownCount > Request.UnknownThreshold;"], on: true },
       { nodes: ["loader"], match: ["Assert.Equal(12, sheet.UnknownCount);", "+ \"Activator.CreateInstance(Type.GetType(n)!)!; \")) + \"}\";"] },
-      { nodes: ["runner", "st_wait", "e_park", "e_st"], match: ["if (sheet.NeedsDecision && !Decided(task, \"unknown:\"))", "\"Mehet-e a feladat így, a teljes tesztkészlettel?\"), \"túl sok ismeretlen kapcsolat\");"] },
+      { nodes: ["runner", "st_wait", "e_park", "e_st"], match: ["if (sheet.NeedsDecision && !desk.Decided(task, DecisionKey.Unknown))", "\"Mehet-e a feladat így, a teljes tesztkészlettel?\"), \"túl sok ismeretlen kapcsolat\");"] },
       { nodes: ["tl"], match: ["Assert.Contains(\"→ a teljes tesztkészlet fut → döntési tétel kell (küszöb: 5)\", text);", "var full = m.Sheet.FullSuite"] }
     ],
     why: [
@@ -18578,8 +18582,8 @@ if (untraceable.Count > 0)
           { f: 0.06, label: "kör eleje" }, { f: 0.37, label: "építés" },
           { f: 0.66, label: "kapuk" }, { f: 0.94, label: "zöld commit", strong: true }
         ] },
-        { id: "runner", kind: "box", title: "DeliveryRunner", sub: "gép", w: 190, x: 110, y: 160,
-          lines: ["2. módosítási lap", "6. kapuk: lap a gitből"] },
+        { id: "runner", kind: "box", title: "BuildRound", sub: "gép", w: 190, x: 110, y: 160,
+          lines: ["2. módosítási lap", "6. kapuk: RoundJudge"] },
         { id: "brief", kind: "box", title: "brief.md", sub: "rounds/005", w: 190, x: 330, y: 160,
           lines: ["## Módosítási lap", "él-kapuk: nincs"] },
         { id: "builder", kind: "actor", label: "építő", x: 540, y: 160 },
@@ -18597,7 +18601,7 @@ if (untraceable.Count > 0)
       ]
     },
     code: [
-      { file: "DeliveryRunner.cs (RoundAsync, rövidítve)", code: raw`
+      { file: "Rounds/BuildRound.cs (RunAsync és BuildAsync, rövidítve)", code: raw`
 // 2. Módosítási lap.
 var c = cx.Calibration;
 var sheet = ChangeSheets.Build(head, head, cx.Rules,
@@ -18607,10 +18611,10 @@ board.SetSheet(task.Id, SheetLines(sheet, scopes.Of(task)));
 // …
 // 5. Építés: friss ágens a feladattal, a lappal és az érintett szabályok szövegével.
 File.WriteAllText(brief, Texts.Brief(task, attempt, sheet, cx.Rules, cx.Acceptance,
-    PreviousReport(task.Id), c.Lessons));` },
-      { file: "DeliveryRunner.cs (Measure, rövidítve)", code: raw`
-var before = GraphAt(round.Start, cx);
-var after = tools.Graph(state.Worktree, cx.Rules, cx.Acceptance);
+    paths.PreviousReport(store.State, task.Id), cx.Calibration.Lessons));` },
+      { file: "Review/RoundJudge.cs (Measure, rövidítve)", code: raw`
+var before = work.GraphAt(round.Start, cx);
+var after = tools.Graph(store.State.Worktree, cx.Rules, cx.Acceptance);
 // …
 var sheet = ChangeSheets.Build(before, after, cx.Rules, new SheetRequest(code, /* … */));` },
       { file: "rounds/005/brief.md (részlet)", lang: "md", code: raw`
@@ -18794,7 +18798,7 @@ Kiindulópont:   Billing/Invoice.cs::CalcDiscount
 Előfeltétel:    –
 Elfogadási feltétel: AC-D-002
 …` },
-      { file: "TaskBoard.cs (TaskField, rövidítve)", code: raw`
+      { file: "Tasks/TaskField.cs (rövidítve)", code: raw`
 public static class TaskField
 {
     public const string Type = "Típus";
@@ -18808,6 +18812,7 @@ public static class TaskField
     public const string Origin = "Kiindulópont";
     public const string Prerequisites = "Előfeltétel";
     public const string Acceptance = "Elfogadási feltétel";
+    public const string MayChange = "Változhat";
     public const string Attempts = "Próbálkozások";
     public const string Sheet = "Módosítási lap";
     // …
@@ -18851,7 +18856,7 @@ JELLEMZŐ-TESZT   nem          igen, új tesztek     nem
 HIBAJAVÍTÁS      igen         igen                 a feltétel tesztje; döntésből más is bővülhet
 minden típusnál: rules/, acceptance/, waivers.md nem; tanulság (AGENTS.md) igen;
 a tesztszám nem csökken, új Skip nem kerül be` },
-      { file: "Purity.cs (PurityGuard.Check, rövidítve)", code: raw`
+      { file: "Review/PurityGuard.cs (Check, rövidítve)", code: raw`
 var own = task.Type is TaskType.Behavioral or TaskType.Bugfix && task.Acceptance is { } ac
     ? after.Edges.Where(e => e.Kind == EdgeKind.Verifies && e.Note == ac)
         .Select(e => e.From).ToHashSet()
@@ -18918,7 +18923,7 @@ switch (task.Type)
       ]
     },
     code: [
-      { file: "TaskBoard.cs (rövidítve)", code: raw`
+      { file: "Tasks/TaskState.cs, TaskWords.cs, TaskBoard.cs és NewTask.cs (rövidítve)", code: raw`
 public enum TaskState { Open, AwaitingDecision, Blocked, Done }
 
 static readonly (TaskState, string)[] States =
@@ -18985,7 +18990,7 @@ Próbálkozások:  2` }
       ]
     },
     code: [
-      { file: "TaskBoard.cs (rövidítve)", code: raw`
+      { file: "Tasks/TaskBoard.cs (rövidítve)", code: raw`
 // A feladattábla: IMPLEMENTATION_PLAN.md. A fájl sorait megtartja, és csak azt a sort írja át,
 // amelyiket a gép változtat: beolvasva és változtatás nélkül visszaírva bájtra azonos.
 public sealed partial class TaskBoard
@@ -19014,7 +19019,7 @@ public sealed partial class TaskBoard
     }
     // …
 }` },
-      { file: "TaskBoardTests.cs (rövidítve)", code: raw`
+      { file: "Tasks/TaskBoardTests.cs (rövidítve)", code: raw`
 public static TheoryData<string> Variants => new()
 {
     Example,
@@ -19027,10 +19032,12 @@ public static TheoryData<string> Variants => new()
 [Theory]
 [MemberData(nameof(Variants))]
 public void Read_and_written_back_it_is_byte_identical(string text)
-    => Assert.Equal(text, TaskBoard.Parse(text).Text);` }
+{
+    Assert.Equal(text, TaskBoard.Parse(text).Text);
+}` }
     ],
     pairs: [
-      { nodes: ["plan", "n_eq"], match: ["=> Assert.Equal(text, TaskBoard.Parse(text).Text);", "public string Text => string.Join('\\n', lines);"], on: true },
+      { nodes: ["plan", "n_eq"], match: ["Assert.Equal(text, TaskBoard.Parse(text).Text);", "public string Text => string.Join('\\n', lines);"], on: true },
       { nodes: ["board", "e_g"], match: ["lines[at] = WithValue(lines[at], value);", "public void Save(string file) => File.WriteAllText(file, Text, new UTF8Encoding(bom));"] },
       { nodes: ["planner", "you", "e_pl", "e_you"], match: ["Example.ReplaceLineEndings(", "# Függelék"] }
     ],
@@ -19061,7 +19068,7 @@ public void Read_and_written_back_it_is_byte_identical(string text)
       ]
     },
     code: [
-      { file: "TaskPicker.cs (rövidítve)", code: raw`
+      { file: "Tasks/TaskPicker.cs (rövidítve)", code: raw`
 public static readonly IReadOnlyList<string> Levels =
 [
     "",
@@ -19121,7 +19128,7 @@ var chosen = runnable.OrderBy(Level).ThenBy(t => Level(t) == 4 ? 0 : Severity(t)
       ]
     },
     code: [
-      { file: "TaskPicker.cs (WaitReasons, rövidítve)", code: raw`
+      { file: "Tasks/TaskPicker.cs (WaitReasons, rövidítve)", code: raw`
 var parked = tasks.Where(t => t.State == TaskState.AwaitingDecision).ToList();
 
 IEnumerable<string> WaitReasons(BoardTask task)
@@ -19207,9 +19214,9 @@ brigade resume <repo>` },
       { file: "git log brigade/1 (részlet)", lang: "text", code: raw`
 863634d [BRIGADE] döntés beolvasva: D-002
 ee36a8d [BRIGADE] D-002 feloldva: T-043, elfogadási feltétel: AC-D-002` },
-      { file: "DecisionQueue.cs (Collect)", code: raw`
+      { file: "Approvals/DecisionQueue.cs (Collect)", code: raw`
 // A nyitott, de már kitöltött válaszú tételek: ujjlenyomat a naplóba, a jelző
-// [megválaszolva] lesz.
+// [megválaszolva] lesz. Visszaadja a beolvasott tételek azonosítóit.
 public static IReadOnlyList<string> Collect(string file, string log, TimeProvider time)
 {
     List<string> collected = [];
@@ -19270,19 +19277,20 @@ unknown:T-xxx:N         túl sok ismeretlen kapcsolat                           
 attempts:T-xxx:N        háromszor bukott feladat                                 27.
 agent:, split:          az építő kérdez („DÖNTÉS: …”) vagy bontást kér           27.
 review:, plan-question  az ellenőrző vagy a tervező kérdez                       28–29.` },
-      { file: "DeliveryRunner.cs (Park, rövidítve)", code: raw`
+      { file: "Approvals/DecisionDesk.cs (Park)", code: raw`
 // A feladat félreáll: döntési tétel a sorban, a feladat „döntésre vár”.
-DeliveryOutcome? Park(TaskBoard board, BoardTask task, int round, DecisionItem item, string reason,
-    int? attempt = null)
+public DeliveryOutcome? Park(TaskBoard board, BoardTask task, int round, DecisionItem item,
+    string reason, int? attempt = null)
 {
     var withTask = item with { Task = $"{task.Id} ({TaskWords.Text(task.Type)}, döntésre vár)" };
-    Decisions.Append(DecisionsFile, [withTask]);
-    var id = DecisionQueue.Read(DecisionsFile).First(e => e.Key == item.Key).Id;
+    Decisions.Append(work.DecisionsPath, [withTask]);
+    var id = DecisionQueue.Read(work.DecisionsPath).First(e => e.Key == item.Key).Id;
     board.SetState(task.Id, TaskState.AwaitingDecision, reason);
     board.SetDecision(task.Id, id);
-    board.Save(BoardFile);
-    // …
-    return Commit(round, task, $"{task.Id}: döntésre vár ({id}): {reason}", attempt);
+    board.Save(work.Board);
+    paths.Note("döntésre vár", new { round, task = task.Id, decision = id, reason });
+    work.Bookkeep(round, task, $"{task.Id}: döntésre vár ({id}): {reason}", attempt);
+    return null;
 }` },
       { file: "rounds/NNN/brief.md (Hogyan dolgozz, részlet)", lang: "md", code: raw`
 - Ha a feladathoz tiltott kapcsolat kellene (például egy tiltott import), ne írd meg:
@@ -19293,13 +19301,13 @@ DeliveryOutcome? Park(TaskBoard board, BoardTask task, int round, DecisionItem i
     ],
     pairs: [
       { nodes: ["keys", "you", "e_you"], match: ["gyanús jellemző teszt: hiba ez?", "bevezetés, szándék: jóváhagyod?"], on: true },
-      { nodes: ["machine"], match: ["board.SetState(task.Id, TaskState.AwaitingDecision, reason);", "Decisions.Append(DecisionsFile, [withTask]);"] },
+      { nodes: ["machine"], match: ["board.SetState(task.Id, TaskState.AwaitingDecision, reason);", "Decisions.Append(work.DecisionsPath, [withTask]);"] },
       { nodes: ["n_never"], match: ["  az összegzésed kezdődjön így: „DÖNTÉS: <a kérdés>”.", "agent:, split:"] }
     ],
     why: [
       "A döntési sorba az kerül, amit csak te dönthetsz el: a szándék (J0, J1), új vagy módosított elfogadási feltétel, egy gyanús viselkedés helyes formája, billegő teszt, túl sok ismeretlen kapcsolat, háromszor bukott feladat, és ha egy ágens kérdez. A tétel kulcsa megmondja, honnan jött; egy kérdés, egy tétel.",
       "A gép sem dönt helyetted: szabályt nem lazít, eltérést nem vesz fel, feltételt nem talál ki. Amit eldönthet, az a menet: választ, mér, commitol, és a megválaszolt tételt feloldja (a válaszból feltétel lesz, a feladat újranyílik vagy elmarad, „változhat: <teszt>” válasznál egy másik teszt elvárása is bővülhet; a bontást a tervező végzi, 28. állomás).",
-      "Az ágens sem dönt, és nem is vár. Ha az építőnek tiltott kapcsolat kellene, az összegzését így kezdi: „DÖNTÉS: <a kérdés>”. A gép visszaállítja a munkát, tételt nyit, a feladatot félreteszi (`Park`), és jön a következő. Ez a válasz az 1. lépés panelben váró kérdésére."
+      "Az ágens sem dönt, és nem is vár. Ha az építőnek tiltott kapcsolat kellene, az összegzését így kezdi: „DÖNTÉS: <a kérdés>”. A gép visszaállítja a munkát, tételt nyit, a feladatot félreteszi (`DecisionDesk.Park`), és jön a következő. Ez a válasz az 1. lépés panelben váró kérdésére."
     ],
     key: "A kérdés útja mindig ugyanaz: tétel a sorban, a feladat félreáll, a munka megy tovább. A döntés a tiéd, a menet a gépé."
   },
@@ -19345,7 +19353,7 @@ A kilépési kódot a hívás eredménye mutatja, nem kell kiírni.
 
 # Tanulságok   (az építő írhatja, legfeljebb 10 sor)
 <!-- brigade:end -->` },
-      { file: "AgentsFile.cs (Review)", code: raw`
+      { file: "Planning/AgentsFile.cs (Review)", code: raw`
 // Az építő változtatása az AGENTS.md-n: csak a tanulság-szakasz változhat, legfeljebb limit sorig.
 public static AgentsReview Review(string before, string after, int limit = Limit)
 {
@@ -19625,10 +19633,10 @@ git add --all && git -c user.name=Ágens -c user.email=agent@localhost commit --
           { f: 0.82, label: "kapuk" }, { f: 0.94, label: "eredmény" }
         ] },
         { id: "m1", kind: "box", title: "gép · DeliveryRunner", w: 300, x: 175, y: 150, tone: "current",
-          lines: ["EnterAsync, TaskPicker", "lap, típuskapu", "alapvonal: build, tesztek"] },
+          lines: ["EnterAsync, TaskPicker", "BuildRound: lap, típuskapu", "alapvonal: build, tesztek"] },
         { id: "builder", kind: "box", title: "építő", sub: "friss ágens", w: 120, x: 410, y: 150, at: 600,
           lines: ["brief.md"] },
-        { id: "m2", kind: "box", title: "gép", sub: "Judge, Apply", w: 140, x: 555, y: 150, at: 1000,
+        { id: "m2", kind: "box", title: "gép", sub: "RoundJudge, Apply", w: 140, x: 555, y: 150, at: 1000,
           lines: ["G1–G6", "commit / vissza"] },
         { id: "djson", kind: "box", title: "delivery.json · RoundState", w: 300, x: 175, y: 300, tone: "new",
           lines: ["Number · Task · Attempt", "Phase: prepare → build → measure"] },
@@ -19645,35 +19653,42 @@ git add --all && git -c user.name=Ágens -c user.email=agent@localhost commit --
 // Egy szállítás futtatója. … Minden kör: belépés, választás, módosítási lap, típuskapu,
 // alapvonal, építés, kapuk (G1–G6), eredmény. Minden lépés előtt a delivery.json-ba írja,
 // hol tart, így kill -9 után a folytatás ugyanoda jut. …
-public sealed partial class DeliveryRunner(DeliveryPaths paths, IAgentRunner agents,
-    IRepoTools tools, TimeProvider time, TextWriter log)
+public sealed class DeliveryRunner(DeliveryPaths paths, IAgentRunner agents, IRepoTools tools,
+    TimeProvider time, TextWriter log)
 {
+    // A szállítás a következő megállásig; a megállás oka a naplóba és a konzolra, egy helyen.
     public async Task<DeliveryOutcome> RunAsync(CancellationToken ct)
+    {
+        var outcome = await RunUntilStopAsync(ct);
+        paths.Note("leáll", new { code = outcome.Code, message = outcome.Message });
+        log.WriteLine(outcome.Message);
+        return outcome;
+    }
+
+    async Task<DeliveryOutcome> RunUntilStopAsync(CancellationToken ct)
     {
         if (await EnterAsync(ct) is { } entered)
             return entered;
-        ResumeStep();
+        Desk.ResumeStep();
         while (true)
         {
             ct.ThrowIfCancellationRequested();
             if (Housekeeping() is { } stop)
                 return stop;
-            // … bevezetés (J0), tervező kör, J1: a 28. állomás
-            var cx = Load(Work.Head());
-            // … jóváhagyott bontás
-            var head = GraphAt(Work.Head(), cx);
+            // … bevezetés (J0), tervező kör, J1, jóváhagyott bontás: a 28. állomás
+            var cx = Work.ContextAt(Work.Head());
+            var head = Work.GraphAt(Work.Head(), cx);
             var scopes = new TaskScopes(head, cx.Rules);
-            var entries = DecisionQueue.Read(DecisionsFile);
-            var pick = TaskPicker.Choose(TaskBoard.Load(BoardFile), scopes.Of,
+            var entries = DecisionQueue.Read(Work.DecisionsPath);
+            var pick = TaskPicker.Choose(TaskBoard.Load(Work.Board), scopes.Of,
                 id => DecisionQueue.IsAnswered(entries, id));
-            // … a bukott munka csak a saját feladatáé; a tábla állapotai a választás szerint
             switch (pick.Outcome)
             {
                 // … Invalid (1), Stuck (12), WaitingForDecision (10), Finished: G6, hézag, átadás
                 default:
-                    if (Budget(cx.Calibration) is { } suspended)
+                    if (Session.Budget(cx.Calibration) is { } suspended)
                     { Commit(0, null, "felfüggesztve"); return suspended; }
-                    if (await RoundAsync(pick.Task!, cx, head, scopes, ct) is { } outcome)
+                    if (await Builds.RunAsync(pick.Task!, cx, head, scopes, ct) is { } outcome)
                         return outcome;
                     break;
             }
@@ -19684,12 +19699,12 @@ public sealed partial class DeliveryRunner(DeliveryPaths paths, IAgentRunner age
     pairs: [
       { nodes: ["tl"], match: ["// Egy szállítás futtatója. … Minden kör: belépés, választás", "// alapvonal, építés, kapuk (G1–G6), eredmény."], on: true },
       { nodes: ["m1"], match: ["if (await EnterAsync(ct) is { } entered)", "var pick = TaskPicker.Choose("] },
-      { nodes: ["builder", "e_start", "e_done", "m2"], match: ["if (await RoundAsync(pick.Task!, cx, head, scopes, ct) is { } outcome)"] },
+      { nodes: ["builder", "e_start", "e_done", "m2"], match: ["if (await Builds.RunAsync(pick.Task!, cx, head, scopes, ct) is { } outcome)"] },
       { nodes: ["djson", "e_save"], match: ["// hol tart, így kill -9 után a folytatás ugyanoda jut. …"] },
-      { nodes: ["n_stop"], match: ["if (Housekeeping() is { } stop)", "if (Budget(cx.Calibration) is { } suspended)"] }
+      { nodes: ["n_stop"], match: ["if (Housekeeping() is { } stop)", "if (Session.Budget(cx.Calibration) is { } suspended)", "paths.Note(\"leáll\""] }
     ],
     why: [
-      "A Brigade a hosszú futást körökre vágja. Egy kör egy feladat és egy friss ágens, nyolc lépésben: belépés, választás, módosítási lap, típuskapu, alapvonal, építés, kapuk, eredmény. Ebből csak az építés az ágensé, a többi a gépé (`DeliveryRunner`). A kör végén a gép commitol vagy visszaállít, és a ciklus a következő választással megy tovább.",
+      "A Brigade a hosszú futást körökre vágja. Egy kör egy feladat és egy friss ágens, nyolc lépésben: belépés, választás, módosítási lap, típuskapu, alapvonal, építés, kapuk, eredmény. Ebből csak az építés az ágensé, a többi a gépé: a `DeliveryRunner` választ, a kört a `BuildRound` vezeti. A kör végén a gép commitol vagy visszaállít, és a ciklus a következő választással megy tovább.",
       "A ciklus magától áll le: ha döntésre vár (10), ha keretet ér (11), ha átadta a munkát (0), vagy ha riaszt (12). Nem háttérszolgáltatás. Minden lépés előtt a `delivery.json`-ba írja, hol tart (`RoundState`: kör, feladat, próbálkozás, fázis), így egy leállás után a folytatás ugyanoda jut. A választás sorrendje a 26. állomásé, a módosítási lapé a 25. állomásé."
     ],
     key: "A kör a Ralph loop egy lépése a gép kezében: az ágens csak épít, a választás, a mérés és a commit a gépé."
@@ -19712,7 +19727,7 @@ public sealed partial class DeliveryRunner(DeliveryPaths paths, IAgentRunner age
         { id: "djson", kind: "box", title: "delivery.json", w: 200, x: 110, y: 360,
           lines: ["Round 3 · T-001", "Phase: build"] },
         { id: "lost", kind: "box", title: "ha elveszett (Lost)", w: 210, x: 330, y: 360, tone: "muted",
-          lines: ["Work.Reset(\"HEAD\")", "a próbálkozás nem nő"] },
+          lines: ["vissza a kör elejére", "a próbálkozás nem nő"] },
         { id: "runs", kind: "box", title: "runs/", w: 180, x: 535, y: 360, at: 1500,
           lines: ["r002-T-003", ok("r003-T-001 (egyszer)"), "r005-T-004 …"] }
       ],
@@ -19722,41 +19737,43 @@ public sealed partial class DeliveryRunner(DeliveryPaths paths, IAgentRunner age
       ]
     },
     code: [
-      { file: "DeliveryRunner.cs (rövidítve)", code: raw`
+      { file: "DeliveryRunner.cs (EnterAsync, rövidítve)", code: raw`
 // 0. Belépés: ha egy kör félbemaradt, onnan folytatja, ahol abbamaradt.
 async Task<DeliveryOutcome?> EnterAsync(CancellationToken ct)
 {
-    if (state.Round is not { } round)
+    if (State.Round is not { } round)
         return null;
+    // a kör commitja már elkészült: a lezárása, ahogy a körfajta maga is lezárja
     if (Work.Trailer("HEAD", "Brigade-Round") == round.Number.ToString())
-    {
-        // a kör commitja már elkészült
-        // …
-    }
+    { /* … */ return null; }
     paths.Note("folytatás", round);
-    // … tervező kör, átadás
-    switch (round.Phase)
+    return round.Kind switch
     {
-        case RoundState.Prepare:
-            RestoreMachineFiles();
-            Save(state with { Round = null });
+        RoundState.Building => await Builds.EnterAsync(round, ct),
+        // … tervező kör, átadás
+    };
+}` },
+      { file: "Rounds/BuildRound.cs (EnterAsync, rövidítve)", code: raw`
+switch (round.Phase)
+{
+    case RoundState.Build:
+        var result = await session.ResumeAsync(round.Run!, ct);
+        if (result.Outcome == AgentOutcome.Lost)
+        {
+            // A leállt futás félkész munkát hagyott: vissza a kör elejére (a megtartott munkával,
+            // ha volt); a próbálkozás nem számít, nem az ágens bukott.
+            paths.Note("elveszett futás", new { round = round.Number, round.Task, round.Run });
+            if (round.KeptTree is { } kept)
+                work.Restore(kept);
+            else
+                work.Reset("HEAD");
+            // … a kör lezárva (Round = null)
             return null;
-        case RoundState.Build:
-            var result = await agents.ResumeAsync(round.Run!, ct);
-            if (result.Outcome == AgentOutcome.Lost)
-            {
-                // A leállt futás félkész munkát hagyott: vissza az utolsó commitra; a próbálkozás
-                // nem számít, nem az ágens bukott.
-                paths.Note("elveszett futás", new { round = round.Number, round.Task, round.Run });
-                Work.Reset("HEAD");
-                Save(state with { Round = null, KeptFor = null });
-                return null;
-            }
-            return await AfterAgentAsync(round, result, ct);
-        case RoundState.Measure:
-            return await MeasureAsync(round, LoadAgentResult(round), ct);
-        // … ellenőrzés (G5), ítélet
-    }
+        }
+        return await AfterAgentAsync(round, result, ct);
+    case RoundState.Measure:
+        return await MeasureAsync(round, session.Stored(round), ct);
+    // … Prepare (a kör elölről), ellenőrzés (G5), ítélet
 }` },
       { file: "act2: log.jsonl (rövidítve, UTC) és a runs/ mappa", lang: "text", code: raw`
 18:44:11  építő indul    {"round":3,"task":"T-001","attempt":1,"run":"r003-T-001"}
@@ -19767,14 +19784,14 @@ async Task<DeliveryOutcome?> EnterAsync(CancellationToken ct)
 runs/: r002-T-003 r003-T-001 r005-T-004 r006-T-002 r007-zaro-itelet` }
     ],
     pairs: [
-      { nodes: ["new", "e_attach", "pane"], match: ["var result = await agents.ResumeAsync(round.Run!, ct);", "18:44:12  folytatás"], on: true },
-      { nodes: ["lost"], match: ["if (result.Outcome == AgentOutcome.Lost)", "Work.Reset(\"HEAD\");", "// nem számít, nem az ágens bukott."] },
-      { nodes: ["djson"], match: ["if (state.Round is not { } round)", "switch (round.Phase)"] },
+      { nodes: ["new", "e_attach", "pane"], match: ["var result = await session.ResumeAsync(round.Run!, ct);", "18:44:12  folytatás"], on: true },
+      { nodes: ["lost"], match: ["if (result.Outcome == AgentOutcome.Lost)", "work.Reset(\"HEAD\");", "// ha volt); a próbálkozás nem számít, nem az ágens bukott."] },
+      { nodes: ["djson"], match: ["if (State.Round is not { } round)", "switch (round.Phase)"] },
       { nodes: ["old", "e_started", "tl"], match: ["18:44:11  építő indul", "… kill -9 a Brigade-re"] },
       { nodes: ["runs"], match: ["runs/: r002-T-003 r003-T-001"] }
     ],
     why: [
-      "Minden kör a belépéssel kezdődik: a gép a `delivery.json`-ból megnézi, maradt-e félbe kör. Ha az építő még fut, visszacsatlakozik hozzá; ehhez a 17. állomás egyeztetése ad alapot. Ha a futás közben végzett, az eredményét veszi át, és mér. Ha elveszett (nincs panel, nincs eredmény), a félkész munkát visszaállítja az utolsó commitra, és a próbálkozás nem nő, mert nem az ágens bukott.",
+      "Minden kör a belépéssel kezdődik: a gép a `delivery.json`-ból megnézi, maradt-e félbe kör. Ha az építő még fut, visszacsatlakozik hozzá; ehhez a 17. állomás egyeztetése ad alapot. Ha a futás közben végzett, az eredményét veszi át, és mér. Ha elveszett (nincs panel, nincs eredmény), a félkész munkát eldobja, és a kör elejére áll vissza (az utolsó commitra, vagy ha volt, a megtartott munkára); a próbálkozás nem nő, mert nem az ágens bukott.",
       "A `delivery-scenario.sh` 2. felvonása (álágenssel) ezt mutatja: `kill -9` a Brigade-re, miközben a T-001 építője dolgozik. A `brigade resume` visszacsatlakozott, megvárta, megmérte, és commitolt; a `runs/` alatt a `r003-T-001` egyszer szerepel. Ha a gép a commit után, de a mentés előtt halt meg, a HEAD `Brigade-Round` trailere mutatja, hogy a commit kész, így nem commitol kétszer (**idempotency**)."
     ],
     key: "A kör állapota fájlban van, nem a folyamatban. A gép halála nem viszi magával a munkát, és nem rója fel az ágensnek."
@@ -19807,18 +19824,22 @@ runs/: r002-T-003 r003-T-001 r005-T-004 r006-T-002 r007-zaro-itelet` }
       ]
     },
     code: [
-      { file: "DeliveryRunner.cs (RoundAsync, rövidítve)", code: raw`
-// 3. Típuskapu.
+      { file: "Rounds/BuildRound.cs (Held, rövidítve)", code: raw`
+// 3. Típuskapu: a feladat döntésre vár, vagy előbb jellemző teszt kell.
 if (task.Type is TaskType.Behavioral or TaskType.Bugfix && !task.IsRed
     && (task.Acceptance is null || cx.Acceptance.WorkflowOf(task.Acceptance) is null))
-    return Park(board, task, number, new($"acceptance:{task.Id}:{number}",
+{
+    desk.Park(board, task, number, new(
+        DecisionKey.ForTask(DecisionKey.Acceptance, task.Id, number).ToString(),
         $"Elfogadási feltétel kell: {task.Title}", $"{task.Id} ({TaskWords.Text(task.Type)})",
         "a válaszod szövege lesz a jóváhagyott elfogadási feltétel",
         "Mi a helyes viselkedés, egy mondatban? (vagy: nem kell, és a feladat elmarad)"),
         "nincs jóváhagyott elfogadási feltétel");
+    return true;
+}
 if (task.Type == TaskType.Structural
     && !task.Prerequisites.Any(p => board.Contains(p) && board[p].Type == TaskType.Characterization)
-    && Uncovered(head, scopes.Start(task), sheet.RunTests) is { Count: > 0 } gaps)
+    && coverage.Uncovered(head, scopes.Start(task), sheet.RunTests) is { Count: > 0 } gaps)
 {
     var characterization = board.Add(new NewTask($"Jellemző tesztek: {task.Origin}",
         TaskType.Characterization, task.Source, task.Origin,
@@ -19829,8 +19850,9 @@ if (task.Type == TaskType.Structural
             + "[Trait(\"characterization\", \"suspect\")]."));
     board.AddPrerequisite(task.Id, characterization);
     // …
-    return Commit(number, task,
+    work.Bookkeep(number, task,
         $"{task.Id}: fedetlen kód, előbb jellemző teszt ({characterization})");
+    return true;
 }` },
       { file: "act1: git log és IMPLEMENTATION_PLAN.md; a kimutatás (scenario-e2e)", lang: "text", code: raw`
 [BRIGADE] T-001: fedetlen kód, előbb jellemző teszt (T-003)
@@ -19844,10 +19866,10 @@ nem futtatják végig): InvoiceWriter.CalcDiscount: sor 1/1, elágazás 1/2. …
 [BRIGADE] T-004: döntésre vár (D-002): nincs jóváhagyott elfogadási feltétel` }
     ],
     pairs: [
-      { nodes: ["cov", "e_char", "t003"], match: ["Uncovered(head, scopes.Start(task), sheet.RunTests)", "nem futtatják végig): InvoiceWriter.CalcDiscount: sor 1/1, elágazás 1/2."], on: true },
+      { nodes: ["cov", "e_char", "t003"], match: ["coverage.Uncovered(head, scopes.Start(task), sheet.RunTests)","nem futtatják végig): InvoiceWriter.CalcDiscount: sor 1/1, elágazás 1/2."], on: true },
       { nodes: ["s_blocked", "e_block"], match: ["board.AddPrerequisite(task.Id, characterization);", "[BRIGADE] T-001: fedetlen kód, előbb jellemző teszt (T-003)"] },
       { nodes: ["t004", "ac", "e_ac"], match: ["if (task.Type is TaskType.Behavioral or TaskType.Bugfix && !task.IsRed", "cx.Acceptance.WorkflowOf(task.Acceptance) is null"] },
-      { nodes: ["d002", "e_park", "s_exit", "e_exit"], match: ["return Park(board, task, number,", "[BRIGADE] T-004: döntésre vár (D-002)"] },
+      { nodes: ["d002", "e_park", "s_exit", "e_exit"], match: ["desk.Park(board, task, number, new(","[BRIGADE] T-004: döntésre vár (D-002)"] },
       { nodes: ["t001"], match: ["if (task.Type == TaskType.Structural"] }
     ],
     why: [
@@ -19871,7 +19893,7 @@ nem futtatják végig): InvoiceWriter.CalcDiscount: sor 1/1, elágazás 1/2. …
           lines: [bad("blokkolt: piros teszt")] },
         { id: "t_other", kind: "box", title: "ami nem érinti", w: 220, x: 430, y: 310, at: 1200,
           lines: [ok("halad")] },
-        { id: "n_build", kind: "note", tone: "bad", text: "ha nem fordul: „A kód nem fordul”,\nés minden feladat vár", x: 420, y: 60, at: 1500 },
+        { id: "n_build", kind: "note", tone: "bad", text: "ha nem fordul, vagy a tesztek le sem\nfutnak: javító feladat, minden más vár", x: 420, y: 60, at: 1500 },
         { id: "n_kept", kind: "note", text: "megtartott munkájú ismétlésnél nincs új alapvonal", x: 320, y: 395 }
       ],
       edges: [
@@ -19881,38 +19903,41 @@ nem futtatják végig): InvoiceWriter.CalcDiscount: sor 1/1, elágazás 1/2. …
       ]
     },
     code: [
-      { file: "DeliveryRunner.cs (RoundAsync, rövidítve)", code: raw`
-// 4. Alapvonal (a megtartott munkájú ismétlésnél nem: annak a kiinduló kódja ugyanaz).
-if (!kept && !(task.Source == TaskSource.RedBaseline && task.Origin == TaskWords.BuildBroken))
+      { file: "Rounds/BuildRound.cs (RedBaseline, rövidítve)", code: raw`
+// 4. Alapvonal (a megtartott munkájú ismétlésnél nincs: a kiinduló kód ugyanaz). Ha nem fordul,
+// vagy a tesztek le sem futnak, javító feladat jön („A kód nem fordul”, „A tesztek nem futnak le”).
+var build = tools.Build(store.State.Worktree);
+if (!build.Ok)
 {
-    var build = tools.Build(state.Worktree);
-    if (!build.Ok)
-    {
-        // … ha még nincs: „A kód nem fordul”, HIBAJAVÍTÁS, a fordító első hibájával
-        return Commit(number, task, "piros alapvonal: a kód nem fordul");
-    }
-    var expected = RedTests(task);
-    var baseline = tools.Test(state.Worktree, Selection(sheet.RunTests, expected));
-    var red = baseline.Ran ? baseline.Failed.Except(expected).ToList()
-        : ["(a tesztek nem futottak le)"];
-    if (red.Count > 0)
-    {
-        foreach (var test in red.Where(t => !board.Tasks.Any(r => r.Source == TaskSource.RedBaseline
-                     && r.Origin == t && r.State != TaskState.Done)))
-            board.Add(new NewTask($"Piros alapvonal: {test}", TaskType.Bugfix,
-                TaskSource.RedBaseline, test,
-                Description: "A teszt a munka előtt is piros. Javítsd a kódot úgy, hogy zöld "
-                    + "legyen; a tesztet ne gyengítsd."));
-        board.Save(BoardFile);
-        return Commit(number, task, $"piros alapvonal: {string.Join(", ", red)}");
-    }
-}` },
-      { file: "TaskPicker.cs (WaitReasons, rövidítve)", code: raw`
-// … A piros teszt csak az őt érintő feladatokat állítja meg, a fordítási hiba mindet.
+    work.Bookkeep(number, task, "piros alapvonal: a kód nem fordul");
+    return true;
+}
+var expected = RoundJudge.RedTests(task);
+var baseline = tools.Test(store.State.Worktree, RoundJudge.Selection(sheet.RunTests, expected));
+if (!baseline.Ran)
+{
+    work.Bookkeep(number, task, "piros alapvonal: a tesztek nem futnak le");
+    return true;
+}
+var red = baseline.Failed.Except(expected).ToList();
+if (red.Count == 0)
+    return false;
+foreach (var test in red.Where(t => !board.Tasks.Any(r => r.Source == TaskSource.RedBaseline
+             && r.Origin == t && r.State != TaskState.Done)))
+    board.Add(new NewTask($"Piros alapvonal: {test}", TaskType.Bugfix,
+        TaskSource.RedBaseline, test,
+        Description: "A teszt a munka előtt is piros. Javítsd a kódot úgy, hogy zöld "
+            + "legyen; a tesztet ne gyengítsd."));
+board.Save(work.Board);
+work.Bookkeep(number, task, $"piros alapvonal: {string.Join(", ", red)}");
+return true;` },
+      { file: "Tasks/TaskPicker.cs (WaitReasons, rövidítve)", code: raw`
+// … A piros teszt csak az őt érintő feladatokat állítja meg, a mérhetetlen alapvonal mindet.
 if (!task.IsRed)
 {
-    if (buildBroken is not null)
-        yield return $"a kód nem fordul ({buildBroken.Id})";
+    if (unmeasurable is not null)
+        yield return $"{(unmeasurable.Origin == TaskWords.BuildBroken ? "a kód nem fordul"
+            : TaskWords.TestsNotRun)} ({unmeasurable.Id})";
     else
         foreach (var r in red)
             foreach (var test in RedTests(r).Where(Scope(task).Tests.Contains))
@@ -19924,15 +19949,15 @@ if (!task.IsRed)
 [SZERKEZETI] T-001 T-001 feladat` }
     ],
     pairs: [
-      { nodes: ["tests", "e_red", "fix"], match: ["var baseline = tools.Test(state.Worktree, Selection(sheet.RunTests, expected));", "board.Add(new NewTask($\"Piros alapvonal: {test}\"", "[HIBAJAVÍTÁS] T-002 Piros alapvonal"], on: true },
-      { nodes: ["build", "e_bt", "n_build"], match: ["var build = tools.Build(state.Worktree);", "yield return $\"a kód nem fordul ({buildBroken.Id})\";"] },
+      { nodes: ["tests", "e_red", "fix"], match: ["var baseline = tools.Test(store.State.Worktree, RoundJudge.Selection(sheet.RunTests, expected));", "board.Add(new NewTask($\"Piros alapvonal: {test}\"", "[HIBAJAVÍTÁS] T-002 Piros alapvonal"], on: true },
+      { nodes: ["build", "e_bt", "n_build"], match: ["var build = tools.Build(store.State.Worktree);", "if (!baseline.Ran)", "if (unmeasurable is not null)"] },
       { nodes: ["t_touch", "e_wait"], match: ["foreach (var test in RedTests(r).Where(Scope(task).Tests.Contains))", "yield return $\"piros teszt: {test} ({r.Id})\";"] },
       { nodes: ["t_other"], match: ["// … A piros teszt csak az őt érintő feladatokat állítja meg"] },
-      { nodes: ["n_kept"], match: ["// 4. Alapvonal (a megtartott munkájú ismétlésnél nem"] }
+      { nodes: ["n_kept"], match: ["// 4. Alapvonal (a megtartott munkájú ismétlésnél nincs: a kiinduló kód ugyanaz)."] }
     ],
     why: [
       "Az alapvonal a munka előtti mérés: a gép lefordítja a kódot, és lefuttatja a lap tesztjeit. Pirosról nem indul építés. Ha egy érintett teszt már most piros, az nem az építő hibája, mégis az ő körében bukna el. Ilyenkor a gép hibajavító feladatot vesz fel a piros tesztre (`Piros alapvonal: …`), és az jön előbb: a választási sorrend első szintje (26. állomás).",
-      "A piros teszt csak azokat a feladatokat állítja meg, amelyek ezt a tesztet érintik; a többi halad. Ha a kód le sem fordul, minden vár, mert semmit nem lehet mérni. A megtartott munkájú ismétlésnél nincs új alapvonal, mert a kiinduló kód ugyanaz. A példa a Brigade saját tesztjéből jön (`RoundTests`, álágens, a teszt kis `Shop` repója): a piros alapvonal javítása a szerkezeti feladat elé került."
+      "A piros teszt csak azokat a feladatokat állítja meg, amelyek ezt a tesztet érintik; a többi halad. Ha a kód le sem fordul, vagy a tesztek le sem futnak, javító feladat jön, és minden más vár, mert semmit nem lehet mérni. A megtartott munkájú ismétlésnél nincs új alapvonal, mert a kiinduló kód ugyanaz. A példa a Brigade saját tesztjéből jön (`RoundTests`, álágens, a teszt kis `Shop` repója): a piros alapvonal javítása a szerkezeti feladat elé került."
     ],
     key: "Ami a munka előtt is törött, az külön feladat, és csak azt állítja meg, akit érint. Így a kör bukása mindig a kör munkájáról szól."
   },
@@ -19941,8 +19966,8 @@ if (!task.IsRed)
     title: "Az építő feladatleírása és kerete",
     scene: {
       nodes: [
-        { id: "runner", kind: "box", title: "DeliveryRunner", w: 170, x: 100, y: 55,
-          lines: ["RoundAsync"] },
+        { id: "runner", kind: "box", title: "BuildRound", w: 170, x: 100, y: 55,
+          lines: ["BuildAsync"] },
         { id: "task", kind: "box", title: "AgentTask", w: 170, x: 100, y: 200,
           lines: ["Brief, Prompt", "Protected, Forbidden", "Commands"] },
         { id: "settings", kind: "box", title: "claude-settings.json", w: 230, x: 125, y: 345, tone: "current", at: 600,
@@ -19992,18 +20017,20 @@ if (!task.IsRed)
     "Bash(git commit)", "Bash(git commit *)", "Bash(git push)", "Bash(git push *)", …
   ]
 }` },
-      { file: "DeliveryRunner.cs (RoundAsync) és ClaudeCodeAdapter.cs", code: raw`
-var result = await agents.RunAsync(new AgentTask(run, task.Id, task.Title, state.Worktree, brief,
+      { file: "Rounds/BuildRound.cs (BuildAsync) és ClaudeCodeAdapter.cs", code: raw`
+var result = await session.StartAsync(round, new AgentTask(run, task.Id, task.Title,
+    store.State.Worktree, brief,
     $"A feladatod leírása itt van: {brief} — olvasd el, és végezd el a benne leírt "
         + "egyetlen feladatot.",
-    [.. PurityGuard.ProtectedPatterns.Select(p => System.IO.Path.Combine(state.Worktree, p))],
-    Forbidden) { Commands = AgentsCommands.DotNet.Allowed }, ct);
+    [.. PurityGuard.ProtectedPatterns.Select(p => Path.Combine(store.State.Worktree, p))],
+    AgentSession.Forbidden) { Commands = AgentsCommands.DotNet.Allowed }, counted: true,
+    "építő indul", new { round = number, task = task.Id, attempt, run }, ct);
 // …
 "--permission-mode", "dontAsk",` }
     ],
     pairs: [
       { nodes: ["brief", "e_write", "e_read"], match: ["# Feladat: T-043  Hibás viselkedés?", "- **Elfogadási feltétel:** AC-D-002", "$\"A feladatod leírása itt van: {brief}"], on: true },
-      { nodes: ["task", "e_task"], match: ["var result = await agents.RunAsync(new AgentTask(", "Forbidden) { Commands = AgentsCommands.DotNet.Allowed }, ct);"] },
+      { nodes: ["task", "e_task"], match: ["var result = await session.StartAsync(round, new AgentTask(", "AgentSession.Forbidden) { Commands = AgentsCommands.DotNet.Allowed }, counted: true,"] },
       { nodes: ["settings", "e_set"], match: ["\"Edit(//…/deliveries/szamlazas/work/**)\",", "\"Bash(dotnet build *)\"", "\"Edit(//…/work/architecture/rules/**)\"", "\"Bash(git commit)\""] },
       { nodes: ["builder", "e_flag", "n_dont"], match: ["\"--permission-mode\", \"dontAsk\","] },
       { nodes: ["runner"], match: ["[.. PurityGuard.ProtectedPatterns.Select("] }
@@ -20019,8 +20046,8 @@ var result = await agents.RunAsync(new AgentTask(run, task.Id, task.Title, state
     title: "A kapuk a gitből dolgoznak",
     scene: {
       nodes: [
-        { id: "git", kind: "box", title: "a gitből", w: 230, x: 140, y: 75, tone: "current",
-          lines: ["Work.Changed(round.Start)", "két háló: előtte, utána", "tools.Build, tools.Test"] },
+        { id: "git", kind: "box", title: "a gitből", w: 246, x: 140, y: 75, tone: "current",
+          lines: ["work.ChangesSince(round.Start)", "két háló: előtte, utána", "tools.Build, tools.Test"] },
         { id: "builder", kind: "actor", label: "építő", x: 85, y: 175 },
         { id: "summary", kind: "box", title: "összegzés", sub: "agent.json", w: 230, x: 140, y: 262, tone: "muted",
           lines: ["„A kedvezmény küszöbe", "nevesített állandó lett.”"] },
@@ -20048,31 +20075,31 @@ RoundVerdict Judge(RoundState round, AgentResult result)
     if (result.Outcome != AgentOutcome.Completed)
         return new(false, [$"az ágens nem fejezte be: {result.Summary}"], true, false);
     var summary = result.Summary.Trim();
-    if (summary.StartsWith("DÖNTÉS:", StringComparison.Ordinal)
-        || summary.StartsWith("BONTÁS:", StringComparison.Ordinal))
+    if (AgentReply.Parse(summary).Kind is AgentReplyKind.Decision or AgentReplyKind.Split)
         return new(false, [summary], true, false);
 
-    var cx = Load(round.Start);
-    var task = SnapshotBoard(round)[round.Task];
+    var cx = work.ContextAt(round.Start);
+    var task = work.SnapshotBoard(round)[round.Task];
     var m = Measure(round, cx, task);
-    var purity = PurityGuard.Check(new(task, m.Before, m.After, m.Changes, MachineDrift(round),
-        Work.Head() != round.Start, cx.Calibration.Lessons));
+    var purity = PurityGuard.Check(new(task, m.Before, m.After, m.Changes,
+        work.MachineDrift(round), work.Head() != round.Start, cx.Calibration.Lessons));
     if (purity.Problems.Count > 0)
         return new(false, [.. purity.Problems.Select(p => $"G4: {p}")], true, false);
     if (m.Changes.All(c => PurityGuard.MachineFiles.Contains(c.Path)))
         return new(false, ["G4: a kör nem hozott változást"], false, false);
 
-    var build = tools.Build(state.Worktree);
+    var build = tools.Build(store.State.Worktree);
     if (!build.Ok)
         return new(false, [$"G1: a kód nem fordul: {FirstError(build.Output)}"], false, false);
-    if (m.Sheet.NeedsDecision && !Decided(task, "unknown:"))
+    if (m.Sheet.NeedsDecision
+        && !DecisionQueue.Decided(work.DecisionsPath, task.Decision, DecisionKey.Unknown))
         return new(false,
             [$"G3: túl sok ismeretlen kapcsolat a változás körül ({m.Sheet.UnknownCount})"],
             true, false);
 
     List<string> problems = [];
     // … a lap tesztjei (teljes készlet, ha a lap kéri) és a feladat saját tesztjei
-    var tests = tools.Test(state.Worktree,
+    var tests = tools.Test(store.State.Worktree,
         full ? TestSelection.All : Selection(m.Sheet.RunTests, [.. own, .. RedTests(task)]));
     // … nem futottak le: „G2: a tesztek nem futottak le”
     problems.AddRange(tests.Failed.Select(t => $"G2: piros teszt: {t}"));
@@ -20080,18 +20107,18 @@ RoundVerdict Judge(RoundState round, AgentResult result)
     problems.AddRange(m.New.Select(v => $"G3: új sértés: {v.Id} — {v.Message}"));
     problems.AddRange(Obligations(m));
     return problems.Count > 0 ? new(false, problems, false, full)
-        : new(true, [], false, full, ReviewQuestions(m, purity.Lessons));
+        : new(true, [], false, full, ReviewQuestions(m, purity.Lessons, task));
 }`,
-    file: "DeliveryRunner.cs (Judge, rövidítve)",
+    file: "Review/RoundJudge.cs (Judge, rövidítve)",
     pairs: [
       { nodes: ["g4"], match: ["var purity = PurityGuard.Check(", "return new(false, [.. purity.Problems.Select(p => $\"G4: {p}\")], true, false);"], on: true },
-      { nodes: ["summary", "n_word", "builder", "e_sum"], match: ["if (summary.StartsWith(\"DÖNTÉS:\", StringComparison.Ordinal)", "|| summary.StartsWith(\"BONTÁS:\", StringComparison.Ordinal))"] },
+      { nodes: ["summary", "n_word", "builder", "e_sum"], match: ["if (AgentReply.Parse(summary).Kind is AgentReplyKind.Decision or AgentReplyKind.Split)"] },
       { nodes: ["git", "e_git"], match: ["var m = Measure(round, cx, task);"] },
-      { nodes: ["g1", "e_41"], match: ["var build = tools.Build(state.Worktree);", "G1: a kód nem fordul"] },
-      { nodes: ["g3u", "e_13"], match: ["if (m.Sheet.NeedsDecision && !Decided(task, \"unknown:\"))"] },
+      { nodes: ["g1", "e_41"], match: ["var build = tools.Build(store.State.Worktree);", "G1: a kód nem fordul"] },
+      { nodes: ["g3u", "e_13"], match: ["if (m.Sheet.NeedsDecision", "!DecisionQueue.Decided(work.DecisionsPath, task.Decision, DecisionKey.Unknown))"] },
       { nodes: ["g2", "e_32"], match: ["problems.AddRange(tests.Failed.Select(t => $\"G2: piros teszt: {t}\"));", "// … viselkedés, hibajavítás: a feltétel tesztje a régi kódon piros legyen"] },
       { nodes: ["g3", "e_23"], match: ["problems.AddRange(m.New.Select(v => $\"G3: új sértés: {v.Id} — {v.Message}\"));", "problems.AddRange(Obligations(m));"] },
-      { nodes: ["g5", "e_35"], match: ["ReviewQuestions(m, purity.Lessons)"] }
+      { nodes: ["g5", "e_35"], match: ["ReviewQuestions(m, purity.Lessons, task)"] }
     ],
     why: [
       "Az építő végzett, és egy mondatban összegezte a munkát. A gép ebből csak két dolgot néz: befejezte-e, és nem `DÖNTÉS:` vagy `BONTÁS:` kéréssel kezdődik-e. Minden mást újramér a gitből: a kör eleji commit óta változott fájlokat, a két hálót (előtte és utána), a fordítást, a teszteket. Az ágens saját tesztfutása csak az ő visszajelzése volt.",
@@ -20121,7 +20148,7 @@ RoundVerdict Judge(RoundState round, AgentResult result)
       ]
     },
     code: [
-      { file: "Purity.cs (rövidítve)", code: raw`
+      { file: "Review/PurityGuard.cs (rövidítve)", code: raw`
 // G4: a változtatás illik a feladat típusához, és nincs csalás. A gitből és a két hálóból dolgozik,
 // az ágens szava nem számít.
 //   SZERKEZETI      termelő kód: igen | tesztfájl: csak import (using) | meglévő assert: nem
@@ -20184,7 +20211,7 @@ public static PurityResult Check(PurityInput input)
       nodes: [
         { id: "fail", kind: "box", title: "bukott kör", w: 160, x: 320, y: 45, tone: "bad",
           lines: ["report.md"] },
-        { id: "reset", kind: "box", title: "G4 · sok ismeretlen", sub: "Work.Reset(round.Start)", w: 240, x: 140, y: 150,
+        { id: "reset", kind: "box", title: "G4 · sok ismeretlen", sub: "work.Reset(round.Start)", w: 240, x: 140, y: 150,
           lines: [bad("a munka eldobva")] },
         { id: "kept", kind: "box", title: "G1 · G2 · G3 · G5", sub: "KeptFor = a feladat", w: 240, x: 500, y: 150,
           lines: [ok("a munka megmarad")] },
@@ -20203,43 +20230,43 @@ public static PurityResult Check(PurityInput input)
       ]
     },
     code: [
-      { file: "DeliveryRunner.cs (Apply, rövidítve)", code: raw`
-// 7. Eredmény: zöld kör → gépi commit; bukott kör → új kör friss ágenssel, a harmadik után
-// döntésre vár.
-DeliveryOutcome? Apply(RoundState round, RoundVerdict verdict)
+      { file: "Rounds/BuildRound.cs (Apply és FailedRound, rövidítve)", code: raw`
+// 7. Eredmény (Apply): zöld → Green; az ágens döntést vagy bontást kér → desk.Park; különben
+// bukott kör: kapu-jelentés, a munka eldobva vagy megtartva, a harmadik után döntésre vár.
+DeliveryOutcome? FailedRound(RoundState round, IntentContext cx, BoardTask task,
+    RoundVerdict verdict)
 {
-    // … zöld: Green; az ágens döntést vagy bontást kér: Park
-    File.WriteAllText(System.IO.Path.Combine(dir, "report.md"),
+    File.WriteAllText(Path.Combine(dir, DeliveryPaths.ReportFile),
         $"# Kapu-jelentés: {task.Id}, {round.Attempt}. próbálkozás\n\n"
         + $"{string.Join("\n", verdict.Problems.Select(p => $"- {p}"))}\n");
     var last = round.Attempt >= cx.Calibration.Attempts;
     if (verdict.Reset || last)
-        Work.Reset(round.Start);
+        work.Reset(round.Start);
     else
-        RestoreMachineFiles(round);
+        work.RestoreMachineFiles(round);
     // … a próbálkozás a táblába
     foreach (var signature in verdict.Problems.Distinct())
         failures[signature] =
             [.. failures.GetValueOrDefault(signature, []).Append(task.Id).Distinct()];
-    state = state with
+    store.Keep(store.State with
     {
         KeptFor = verdict.Reset || last ? null : task.Id,
-        Reports = new(state.Reports) { [task.Id] = round.Number },
+        Reports = new(store.State.Reports) { [task.Id] = round.Number },
         Failures = failures,
-    };
-    // …
+    });
     if (last)
-        Park(board, task, round.Number, new($"attempts:{task.Id}:{round.Number}",
+        desk.Park(board, task, round.Number, new(
+            DecisionKey.ForTask(DecisionKey.Attempts, task.Id, round.Number).ToString(),
             $"Háromszor bukott: {task.Title}",
-            $"{task.Id}, az utolsó kapu-jelentés: {System.IO.Path.Combine(dir, "report.md")}",
+            $"{task.Id}, az utolsó kapu-jelentés: {Path.Combine(dir, DeliveryPaths.ReportFile)}",
             "a feladat szűkítése vagy bontása", "Hogyan folytassuk ezt a feladatot?"),
             $"{round.Attempt} bukott kör: {verdict.Problems[0]}", round.Attempt);
     else
-        Commit(round.Number, task, $"{task.Id}: {round.Attempt}. próbálkozás bukott ({gates})",
-            round.Attempt);
+        work.Bookkeep(round.Number, task,
+            $"{task.Id}: {round.Attempt}. próbálkozás bukott ({gates})", round.Attempt);
     if (failures.FirstOrDefault(f => f.Value.Count >= 2) is { Key: not null } repeated)
-        return Stop(ExitCodes.Alarm, "Riasztás: ugyanaz a hiba több feladaton ismétlődik "
-            + $"({string.Join(", ", repeated.Value)}): {repeated.Key}");
+        return new DeliveryOutcome(ExitCodes.Alarm, "Riasztás: ugyanaz a hiba több feladaton "
+            + $"ismétlődik ({string.Join(", ", repeated.Value)}): {repeated.Key}");
     return null;
 }` },
       { file: "scenario-e2e: kedvezmeny/rounds/005/brief.md (rövidítve, tördelve)", lang: "md", code: raw`
@@ -20251,11 +20278,11 @@ DeliveryOutcome? Apply(RoundState round, RoundVerdict verdict)
 - G3: a modulhatár-kapuhoz új teszt kell: mod:Discount→Billing (új kapu)` }
     ],
     pairs: [
-      { nodes: ["kept", "e_kept", "e_kn"], match: ["RestoreMachineFiles(round);", "KeptFor = verdict.Reset || last ? null : task.Id,"], on: true },
-      { nodes: ["reset", "e_reset", "e_rn"], match: ["if (verdict.Reset || last)", "Work.Reset(round.Start);"] },
-      { nodes: ["fail", "next"], match: ["File.WriteAllText(System.IO.Path.Combine(dir, \"report.md\"),", "- **Próbálkozás:** 2. Az előző kör kapu-jelentése lent van.", "## Az előző kör kapu-jelentése"] },
+      { nodes: ["kept", "e_kept", "e_kn"], match: ["work.RestoreMachineFiles(round);", "KeptFor = verdict.Reset || last ? null : task.Id,"], on: true },
+      { nodes: ["reset", "e_reset", "e_rn"], match: ["if (verdict.Reset || last)", "work.Reset(round.Start);"] },
+      { nodes: ["fail", "next"], match: ["File.WriteAllText(Path.Combine(dir, DeliveryPaths.ReportFile),", "- **Próbálkozás:** 2. Az előző kör kapu-jelentése lent van.", "## Az előző kör kapu-jelentése"] },
       { nodes: ["park", "e_park"], match: ["var last = round.Attempt >= cx.Calibration.Attempts;", "$\"Háromszor bukott: {task.Title}\""] },
-      { nodes: ["alarm", "e_alarm"], match: ["if (failures.FirstOrDefault(f => f.Value.Count >= 2) is { Key: not null } repeated)", "return Stop(ExitCodes.Alarm, \"Riasztás: ugyanaz a hiba több feladaton ismétlődik \""] }
+      { nodes: ["alarm", "e_alarm"], match: ["if (failures.FirstOrDefault(f => f.Value.Count >= 2) is { Key: not null } repeated)", "return new DeliveryOutcome(ExitCodes.Alarm, \"Riasztás: ugyanaz a hiba több feladaton \""] }
     ],
     why: [
       "Bukásnál a gép kapu-jelentést ír (`report.md`), és a feladat új kört kap friss ágenssel; a jelentés a következő feladatleírás végére kerül. A munka sorsa a kaputól függ. A G4 után teljes visszaállítás, mert csaló munkára nem építünk. A G1, G2, G3 és G5 után a munka megmarad (`KeptFor`), és a következő ágens onnan folytatja; csak a gép saját fájljai állnak vissza.",
@@ -20288,7 +20315,7 @@ DeliveryOutcome? Apply(RoundState round, RoundVerdict verdict)
       ]
     },
     code: [
-      { file: "Texts.cs", code: raw`
+      { file: "Rounds/Texts.cs", code: raw`
 public static string TaskCommit(BoardTask task, string delivery, int attempt, int round,
     string gates, IEnumerable<string> rules) => $"""
     [{TaskWords.Text(task.Type)}] {task.Id} {task.Title}
@@ -20298,17 +20325,17 @@ public static string TaskCommit(BoardTask task, string delivery, int attempt, in
     Brigade-Attempt: {attempt}
     Brigade-Round: {round}
     Brigade-Gates: {gates}
-    Brigade-Rules: {string.Join(", ", rules.Where(r => !r.Contains(' ')).Select(Stem).Distinct())}
+    Brigade-Rules: {string.Join(", ", RuleFiles(rules))}
     """;` },
-      { file: "DeliveryRunner.cs (Green, rövidítve)", code: raw`
+      { file: "Rounds/BuildRound.cs (Green, rövidítve)", code: raw`
 board.SetState(task.Id, TaskState.Done);
 // …
-StateWriter.Write(Path("architecture/state"), m.After, m.Violations, cx.Rules);
+StateWriter.Write(work.PathOf(StateDir), m.After, m.Violations, cx.Rules);
 var gates = $"G1 ok, G2 ok, G3 ok, G4 ok, G5 {(verdict.Review == "ok" ? "ok" : "nem kell")}, "
     + $"G6 {(full ? "ok" : "kihagyva")}";
 // … a changes.md új bejegyzése (Texts.Change)
-var head = Work.Commit(Texts.TaskCommit(task, state.Id, round.Attempt, round.Number, gates,
-    m.Sheet.Rules));` },
+var head = work.Commit(Texts.TaskCommit(task, store.State.Id, round.Attempt, round.Number,
+    gates, m.Sheet.Rules));` },
       { file: "scenario-e2e: git log brigade/1 és architecture/changes.md", lang: "text", code: raw`
 [SZERKEZETI] T-042 Számlázás: kedvezményszámítás kiemelése külön modulba
 
@@ -20328,7 +20355,7 @@ Brigade-Rules: boundaries, dependency
     ],
     pairs: [
       { nodes: ["commit", "e_green"], match: ["Brigade-Task: {task.Id}", "Brigade-Attempt: {attempt}", "Brigade-Task: T-042", "Brigade-Gates: G1 ok, G2 ok, G3 ok, G4 ok, G5 ok, G6 kihagyva"], on: true },
-      { nodes: ["state", "e_state"], match: ["StateWriter.Write(Path(\"architecture/state\"), m.After, m.Violations, cx.Rules);"] },
+      { nodes: ["state", "e_state"], match: ["StateWriter.Write(work.PathOf(StateDir), m.After, m.Violations, cx.Rules);"] },
       { nodes: ["changes", "e_changes"], match: ["// … a changes.md új bejegyzése (Texts.Change)", "## 2026-10-13 20:26  [SZERKEZETI] T-042", "- Él-kapuk: mod:Billing→Discount (új)"] },
       { nodes: ["board", "e_board"], match: ["board.SetState(task.Id, TaskState.Done);"] },
       { nodes: ["n_trailer"], match: ["Brigade-Delivery: {delivery}", "Brigade-Rules: boundaries, dependency"] },
@@ -20369,41 +20396,42 @@ Brigade-Rules: boundaries, dependency
       ]
     },
     code: [
-      { file: "DeliveryRunner.cs (Housekeeping és FullSuite, rövidítve)", code: raw`
-if (TaskCommitsSince(state.FullGreen ?? state.Base) >= cx.Calibration.FullSuiteEvery)
-    return FullSuite(cx);
-// …
+      { file: "DeliveryRunner.cs (Housekeeping, rövidítve)", code: raw`
+if (Work.TaskCommitsSince(State.FullGreen ?? State.Base) >= cx.Calibration.FullSuiteEvery)
+    return FullSuite();` },
+      { file: "Review/FullSuiteCheck.cs (rövidítve)", code: raw`
 // G6: a teljes tesztkészlet. Bukásnál a gép a legutóbbi zöld teljes futás utáni feladat-commitokon,
 // a legrégebbitől haladva megkeresi az elsőt, amelyen a bukott teszt már piros (a törő commitot),
 // és annak a feladatát nyitja újra; a javítás új commit lesz. …
-DeliveryOutcome? FullSuite(Context cx)
+public string? Run()
 {
-    var head = Work.Head();
-    var result = tools.Test(state.Worktree, TestSelection.All);
+    var head = work.Head();
+    var result = tools.Test(store.State.Worktree, TestSelection.All);
     // … nem futott le: riasztás (12); ami a kiinduló ponton is piros, az régi hiba
     if (failed.Count == 0)
     {
-        Save(state with { FullGreen = head });
+        store.Save(store.State with { FullGreen = head });
         paths.Note("G6 zöld", new { head });
         return null;
     }
-    foreach (var commit in Work.Commits(reference, head).Where(IsTaskCommit))
+    foreach (var commit in work.Commits(reference, head).Where(work.IsTaskCommit))
     {
-        using var at = Work.At(commit, paths.Temp);
+        using var at = work.At(commit, paths.Temp);
         var run = tools.Test(at.Dir, new TestSelection([], failed));
         var broken = run.Ran ? run.Failed.Intersect(failed).ToList() : failed;
         if (broken.Count == 0)
             continue;
-        var taskId = Work.Trailer(commit, "Brigade-Task")!;
-        // … a feladat újra nyitva, a piros tesztekkel (Reopened)
-        Commit(0, board[taskId],
+        var taskId = work.Trailer(commit, "Brigade-Task")!;
+        // … a gép lépése (Begin/Done): a feladat újra nyitva, a piros tesztekkel (Reopened)
+        work.Bookkeep(0, board[taskId],
             $"G6: a teljes tesztkészletben piros: {string.Join(", ", broken)}; "
             + $"a törő commit {commit[..8]}, a(z) {taskId} újra nyitva");
+        // …
         return null;
     }
     // … egyik commiton sem piros: billegő teszt, döntési tétel
 }` },
-      { file: "Git.cs", code: raw`
+      { file: "Infrastructure/Git.cs", code: raw`
 // A két commit közötti commitok, a régebbitől az újabbig.
 public IReadOnlyList<string> Commits(string from, string to) =>
     [.. Run("rev-list", "--reverse", $"{from}..{to}")
@@ -20413,10 +20441,10 @@ public IReadOnlyList<string> Commits(string from, string to) =>
 18:41:22  G6 zöld   {"head":"1c0359d7…"}` }
     ],
     pairs: [
-      { nodes: ["ok6", "tl"], match: ["if (TaskCommitsSince(state.FullGreen ?? state.Base) >= cx.Calibration.FullSuiteEvery)", "paths.Note(\"G6 zöld\", new { head });", "18:41:22  G6 zöld"], on: true },
-      { nodes: ["red6", "c1", "c2", "c3", "e_12", "e_23"], match: ["foreach (var commit in Work.Commits(reference, head).Where(IsTaskCommit))", "// A két commit közötti commitok, a régebbitől az újabbig.", "var broken = run.Ran ? run.Failed.Intersect(failed).ToList() : failed;"] },
-      { nodes: ["reopen", "e_task"], match: ["var taskId = Work.Trailer(commit, \"Brigade-Task\")!;", "+ $\"a törő commit {commit[..8]}, a(z) {taskId} újra nyitva\");"] },
-      { nodes: ["n_bisect"], match: ["using var at = Work.At(commit, paths.Temp);"] }
+      { nodes: ["ok6", "tl"], match: ["if (Work.TaskCommitsSince(State.FullGreen ?? State.Base) >= cx.Calibration.FullSuiteEvery)", "paths.Note(\"G6 zöld\", new { head });", "18:41:22  G6 zöld"], on: true },
+      { nodes: ["red6", "c1", "c2", "c3", "e_12", "e_23"], match: ["foreach (var commit in work.Commits(reference, head).Where(work.IsTaskCommit))", "// A két commit közötti commitok, a régebbitől az újabbig.", "var broken = run.Ran ? run.Failed.Intersect(failed).ToList() : failed;"] },
+      { nodes: ["reopen", "e_task"], match: ["var taskId = work.Trailer(commit, \"Brigade-Task\")!;", "+ $\"a törő commit {commit[..8]}, a(z) {taskId} újra nyitva\");"] },
+      { nodes: ["n_bisect"], match: ["using var at = work.At(commit, paths.Temp);"] }
     ],
     why: [
       "A G2 csak a lap tesztjeit futtatja. Ami a hálón kívül törik el (például egy típus nélküli fájlban), azt a teljes készlet fogja meg, a G6: minden 3. feladat-commit után, átadás előtt, és a körben is, ha a lap kéri (ismeretlen kapcsolat, szerződés-érintés). A `szamlazas` szállításban a T-004 volt a 3. feladat-commit; utána a naplóban „G6 zöld”. A trailerében ezért áll „G6 kihagyva”.",
@@ -20447,19 +20475,23 @@ public IReadOnlyList<string> Commits(string from, string to) =>
       ]
     },
     code: [
-      { file: "DeliveryRunner.cs (Budget)", code: raw`
-// A körplafon (futásonként) és a költségkeret (szállításonként); a záró ítéletnek csak a
-// költségkeret számít.
-DeliveryOutcome? Budget(Calibration c, bool rounds = true) =>
-    rounds && runsThisProcess >= c.RoundsPerRun ? Stop(ExitCodes.Suspended,
-        $"Felfüggesztve: elérte a körplafont ({c.RoundsPerRun} kör / futás). "
-            + "Folytatás: brigade resume.")
-    : state.AgentRuns >= c.AgentRuns ? Stop(ExitCodes.Suspended,
-        $"Felfüggesztve: elérte a futások keretét ({c.AgentRuns}).")
-    : state.AgentMinutes >= c.AgentMinutes ? Stop(ExitCodes.Suspended,
-        $"Felfüggesztve: elérte az ágensperc-keretet ({c.AgentMinutes}).")
-    : null;` },
-      { file: "RepoLock.cs és DeliveryCommands.cs (rövidítve)", code: raw`
+      { file: "Rounds/AgentSession.cs (Exhausted, Budget)", code: raw`
+// Elfogyott-e a keret, és ha igen, miért; rounds: a körplafon is számít (a záró ítéletnél csak
+// a költségkeret).
+public string? Exhausted(Calibration c, bool rounds = true) =>
+    rounds && _runsThisProcess >= c.RoundsPerRun
+        ? $"Felfüggesztve: elérte a körplafont ({c.RoundsPerRun} kör / futás). "
+            + "Folytatás: brigade resume."
+    : store.State.AgentRuns >= c.AgentRuns
+        ? $"Felfüggesztve: elérte a futások keretét ({c.AgentRuns})."
+    : store.State.AgentMinutes >= c.AgentMinutes
+        ? $"Felfüggesztve: elérte az ágensperc-keretet ({c.AgentMinutes})."
+    : null;
+
+// A keret elfogyott: felfüggesztés (kilépés 11).
+public DeliveryOutcome? Budget(Calibration c, bool rounds = true) =>
+    Exhausted(c, rounds) is { } why ? new DeliveryOutcome(ExitCodes.Suspended, why) : null;` },
+      { file: "Infrastructure/RepoLock.cs és DeliveryCommands.cs (rövidítve)", code: raw`
 // Egy repón egyszerre egy szállítás: kizárólagos zár a Brigade saját mappájában. A zárat az
 // operációs rendszer a folyamattal együtt engedi el, kill -9 után is.
 public static RepoLock? TryAcquire(string home, string repo)
@@ -20488,12 +20520,12 @@ zöld kör  {"round":8,"task":"T-003",…}
 leáll     {"code":11,"message":"Felfüggesztve: elérte a körplafont (3 kör / futás). …"}` }
     ],
     pairs: [
-      { nodes: ["cap", "e_resume", "resume"], match: ["rounds && runsThisProcess >= c.RoundsPerRun ? Stop(ExitCodes.Suspended,", "leáll     {\"code\":11"], on: true },
-      { nodes: ["budget"], match: ["state.AgentRuns >= c.AgentRuns", "state.AgentMinutes >= c.AgentMinutes"] },
+      { nodes: ["cap", "e_resume", "resume"], match: ["rounds && _runsThisProcess >= c.RoundsPerRun", "leáll     {\"code\":11"], on: true },
+      { nodes: ["budget"], match: [": store.State.AgentRuns >= c.AgentRuns", ": store.State.AgentMinutes >= c.AgentMinutes"] },
       { nodes: ["lock"], match: ["var stream = new FileStream(file, FileMode.OpenOrCreate, FileAccess.ReadWrite,", "return ExitCodes.Busy;"] },
       { nodes: ["kill"], match: ["// operációs rendszer a folyamattal együtt engedi el, kill -9 után is."] },
       { nodes: ["inbox"], match: ["// … deliver, resume:"] },
-      { nodes: ["runs"], match: ["$\"Felfüggesztve: elérte a futások keretét ({c.AgentRuns}).\")"] }
+      { nodes: ["runs"], match: ["? $\"Felfüggesztve: elérte a futások keretét ({c.AgentRuns}).\""] }
     ],
     why: [
       "A körplafon futásonként számol: frissen átvett repón 5 építő vagy tervező kör, utána a szállítás felfüggeszti magát (11), és a `brigade resume` folytatja. Te emeled, ha a commitok és a `changes.md` rendben vannak. A kimutatás terve 3-at kért (`rounds_per_run: 3`), és a 8. kör után valóban megállt. A költségkeret a szállítás egészére szól: 30 ágensfutás és 120 ágensperc (a valódi próbák után 240-ről), a tervező és az ellenőrző futásával együtt.",
@@ -20514,7 +20546,7 @@ leáll     {"code":11,"message":"Felfüggesztve: elérte a körplafont (3 kör /
       ]
     },
     code: raw`
-                     naiv: egy hosszú futás             kör (DeliveryRunner)
+                     naiv: egy hosszú futás             kör (DeliveryRunner, BuildRound)
 -------------------  ---------------------------------  ----------------------------------------
 ki választ           az ágens                           a gép: TaskPicker, egy feladat / kör
 mikor indulhat       mindig                             típuskapu: feltétel vagy végigfutott kód
@@ -20546,7 +20578,7 @@ keret                nincs                              körplafon (11), költs�
 OOP.station({
   id: "s27", num: "27", title: "Egy kör",
   goal: "A végére látod, hogyan vezet a gép egyetlen kört: belépés, típuskapu és alapvonal, friss építő feladatleírással és tiltólistával, a kapuk a gitből G4-gyel kezdve, bukásnál jelentés és visszaállítás, zöldnél trailerekkel ellátott gépi commit, G6 a törő commit keresésével, és a keretek.",
-  map: ["round"], mapNote: "ezen az állomáson: a DeliveryRunner köre, a kapuk és a gépi commit",
+  map: ["round"], mapNote: "ezen az állomáson: a kör (DeliveryRunner, BuildRound), a kapuk és a gépi commit",
   tracks: [
     { id: "main", name: "Fő vonal · egy kör a gép kezében", sub: "belépés, típuskapu, alapvonal, építés, G1–G6, commit", steps: MAIN }
   ]
@@ -20640,7 +20672,7 @@ $ brigade-guard rules check
     scene: {
       nodes: [
         { id: "repo", kind: "box", title: "act3/repo", sub: "architecture/: nincs", w: 200, x: 115, y: 55 },
-        { id: "onboard", kind: "box", title: "Onboard()", sub: "J0 javaslat", w: 200, x: 115, y: 200, tone: "current",
+        { id: "onboard", kind: "box", title: "Onboarding.Run()", sub: "J0 javaslat", w: 200, x: 115, y: 200, tone: "current",
           lines: ["RuleSkeleton.Modules", "RuleSkeleton.Allow", "Ratchet.Baseline", "tools.Coverage"] },
         { id: "dep", kind: "box", title: "rules/dependency.md", w: 240, x: 400, y: 60, tone: "new", at: 300,
           lines: ["Billing: [Billing]", "Invoicing: [Invoicing]", "allowed: Billing → Invoicing"] },
@@ -20665,26 +20697,26 @@ $ brigade-guard rules check
       ]
     },
     code: [
-      { file: "DeliveryRunner.Planning.cs (Onboard, rövidítve)", code: raw`
+      { file: "Planning/Onboarding.cs (Run, rövidítve)", code: raw`
 // A mostani szerkezetből: szabályváz, alapvonal, fedettség, kiinduló számok; a gazda
 // jóváhagyja (J0).
-DeliveryOutcome Onboard()
+public DeliveryOutcome Run()
 {
     // …
     var modules = RuleSkeleton.Modules(
-        tools.Graph(state.Worktree, RuleSkeleton.Empty, Acceptance.None));
+        tools.Graph(store.State.Worktree, RuleSkeleton.Empty, Acceptance.None));
     var dependency = RuleSkeleton.Allow(modules,
-        tools.Graph(state.Worktree, RuleSkeleton.Of(modules), Acceptance.None));
-    Write("architecture/rules/dependency.md",
-        RuleSkeleton.Format(dependency, PlanTexts.SkeletonIntro(Today)));
-    if (!File.Exists(Path(Intent.CalibrationFile)))
-        Write(Intent.CalibrationFile, PlanTexts.CalibrationDefaults);
+        tools.Graph(store.State.Worktree, RuleSkeleton.Of(modules), Acceptance.None));
+    work.Write(DependencyRules, RuleSkeleton.Format(dependency, PlanTexts.SkeletonIntro(Today)));
+    if (!File.Exists(work.PathOf(Intent.CalibrationFile)))
+        work.Write(Intent.CalibrationFile, PlanTexts.CalibrationDefaults);
     // … a háló a vázzal; fedettség (coverage-map.json); a teljes tesztkészlet
     var waivers = Ratchet.Baseline([.. violations, .. Behavior.Check(graph, Acceptance.None)], [],
         Today, expires, "alapvonal (bevezetés)");
     // …
-    Decisions.Append(DecisionsFile, [PlanTexts.Onboarding(
-        NextKey(DecisionQueue.Read(DecisionsFile), "J0"), summary, state.Worktree, null)]);
+    Decisions.Append(work.DecisionsPath, [PlanTexts.Onboarding(DecisionKey.Next(
+        DecisionKey.Onboarding, DecisionQueue.Read(work.DecisionsPath)).ToString(),
+        summary, store.State.Worktree, null)]);
     // …
 }` },
       { file: "act3: architecture/rules/dependency.md a J0 javaslatban (tördelve)", lang: "md", code: raw`
@@ -20712,11 +20744,11 @@ Javaslat: szabályváz: architecture/rules/dependency.md; alapvonal: 0 elfogadot
     ],
     pairs: [
       { nodes: ["dep", "e_dep"], match: ["var modules = RuleSkeleton.Modules(", "var dependency = RuleSkeleton.Allow(modules,", "  Billing: [Invoicing]"], on: true },
-      { nodes: ["repo", "e_ro", "onboard"], match: ["DeliveryOutcome Onboard()", "// A mostani szerkezetből: szabályváz, alapvonal"] },
+      { nodes: ["repo", "e_ro", "onboard"], match: ["public DeliveryOutcome Run()", "// A mostani szerkezetből: szabályváz, alapvonal"] },
       { nodes: ["waivers", "e_wai"], match: ["var waivers = Ratchet.Baseline(", "(architecture/waivers.md, lejár: 2027-01-11)"] },
       { nodes: ["cov", "e_cov"], match: ["// … a háló a vázzal; fedettség (coverage-map.json)", "fedettség: 14/15 függvény"] },
       { nodes: ["cal", "e_cal"], match: ["Write(Intent.CalibrationFile, PlanTexts.CalibrationDefaults);"] },
-      { nodes: ["j0", "e_j0", "owner", "e_yes"], match: ["Decisions.Append(DecisionsFile, [PlanTexts.Onboarding(", "## D-001  [nyitott]  Bevezetés:"] }
+      { nodes: ["j0", "e_j0", "owner", "e_yes"], match: ["Decisions.Append(work.DecisionsPath, [PlanTexts.Onboarding(DecisionKey.Next(", "## D-001  [nyitott]  Bevezetés:"] }
     ],
     why: [
       "Ha a repóban nincs szabály (`architecture/rules/dependency.md`), a szállítás bevezetéssel indul. A gép a mostani szerkezetből szabályvázat ír (`RuleSkeleton`): a modul a névterek közös gyökere utáni első tag, a tesztek névterei a Tests modulba kerülnek, és minden mostani modulközi függés engedett. A módszertan szerint a szándék első változata a mostani szerkezetből indul, nem egy ideálból.",
@@ -20758,7 +20790,7 @@ Javaslat: szabályváz: architecture/rules/dependency.md; alapvonal: 0 elfogadot
       ]
     },
     code: [
-      { file: "PlanGuard.cs (rövidítve)", code: raw`
+      { file: "Planning/PlanGuard.cs (rövidítve)", code: raw`
 // A tervező kör kimenete a gép szemével, a gitből. A tervező nem implementál: kódhoz, teszthez
 // nem nyúl.
 //   szándék-javaslat (J1): a feladattábla, a szabályok, az elfogadási feltételek és a kiinduló
@@ -20784,9 +20816,9 @@ static bool Allowed(string kind, string path) =>
     path == TaskBoard.FileName
     || kind == RoundState.Intent && Intent.IsIntent(path)
         && (path.EndsWith(".md", StringComparison.Ordinal) || path == Intent.CalibrationFile);` },
-      { file: "DeliveryRunner.Planning.cs (PlannerRoundAsync): a tervező tiltólistája", code: raw`
-var protectedFiles = new[] { "architecture/state/**", Intent.WaiversFile,
-    "architecture/" + Decisions.FileName, AgentsFile.FileName };` },
+      { file: "Planning/PlannerRound.cs (RunAsync): a tervező tiltólistája", code: raw`
+var protectedFiles = new[] { StateDir + "/**", Intent.WaiversFile, DecisionsQueue,
+    AgentsFile.FileName };` },
       { file: "scenario-e2e, kimutatás: calibration.yaml a tervező J1-javaslatában", lang: "yaml", code: raw`
 # Kiinduló számok. A terv kérésére futásonként legfeljebb 3 kör.
 rounds_per_run: 3` }
@@ -20794,7 +20826,7 @@ rounds_per_run: 3` }
     pairs: [
       { nodes: ["g_ok", "rules", "acc", "cal", "board", "e_rules", "e_acc", "e_cal", "e_board"], match: ["static bool Allowed(string kind, string path) =>", "path == TaskBoard.FileName", "|| kind == RoundState.Intent && Intent.IsIntent(path)"], on: true },
       { nodes: ["g_no", "code"], match: ["// A tervező kör kimenete a gép szemével, a gitből. A tervező nem implementál: kódhoz, teszthez", "problems.Add($\"a tervező nem írhat ide: {change.Path}\");"] },
-      { nodes: ["prot"], match: ["var protectedFiles = new[] { \"architecture/state/**\", Intent.WaiversFile,", "\"architecture/\" + Decisions.FileName, AgentsFile.FileName };"] },
+      { nodes: ["prot"], match: ["var protectedFiles = new[] { StateDir + \"/**\", Intent.WaiversFile, DecisionsQueue,", "    AgentsFile.FileName };"] },
       { nodes: ["guard"], match: ["problems.Add($\"a tervező meglévő feladatot változtatott: {old.Id}\");", "// … az új feladat: nyitott; próbálkozás, lap, döntés, forrás, lelet nélkül"] },
       { nodes: ["cal", "plan", "planner", "e_read"], match: ["rounds_per_run: 3", "# Kiinduló számok. A terv kérésére futásonként legfeljebb 3 kör."] }
     ],
@@ -20920,7 +20952,7 @@ Válasz:   igen` },
 
 - A javaslatra (D-001): nem: előbb jellemző tesztek a kedvezményszámításra, a 0 Ft alatti
   kedvezményt gyanúsként jelölve` },
-      { file: "DeliveryRunner.Planning.cs (rövidítve)", code: raw`
+      { file: "Approvals/DecisionDesk.cs (ResolveIntent és Finalize, rövidítve)", code: raw`
 void ResolveIntent(DecisionEntry entry)
 {
     if (!PlanTexts.Yes(entry.Answer))
@@ -20934,12 +20966,12 @@ void ResolveIntent(DecisionEntry entry)
 }
 // Finalize: a commit utáni rész
 case StepKinds.Rejected:
-    Save(state with { Stage = Stages.Planning,
-        PlanNotes = [.. state.PlanNotes, $"A javaslatra ({id}): {entry?.Answer}"] });
+    store.Save(store.State with { Stage = Stages.Planning,
+        PlanNotes = [.. store.State.PlanNotes, $"A javaslatra ({id}): {entry?.Answer}"] });
     break;` }
     ],
     pairs: [
-      { nodes: ["notes", "e_notes"], match: ["PlanNotes = [.. state.PlanNotes, $\"A javaslatra ({id}): {entry?.Answer}\"] });", "- A javaslatra (D-001): nem: előbb jellemző tesztek a kedvezményszámításra, a 0 Ft alatti"], on: true },
+      { nodes: ["notes", "e_notes"], match: ["PlanNotes = [.. store.State.PlanNotes, $\"A javaslatra ({id}): {entry?.Answer}\"] });", "- A javaslatra (D-001): nem: előbb jellemző tesztek a kedvezményszámításra, a 0 Ft alatti"], on: true },
       { nodes: ["p1"], match: ["## D-001  [lezárva]", "Válasz:   nem: előbb jellemző tesztek a kedvezményszámításra, a 0 Ft alatti kedvezményt", "if (!PlanTexts.Yes(entry.Answer))"] },
       { nodes: ["p2", "e_again"], match: ["## D-002  [lezárva]", "feladatok (2): T-001 JELLEMZŐ-TESZT, T-002 SZERKEZETI", "Válasz:   igen"] },
       { nodes: ["tl"], match: ["Close(entry, $\"J1: nincs jóváhagyva ({entry.Id}), a tervező újra javasol\");"] }
@@ -20973,7 +21005,7 @@ case StepKinds.Rejected:
       ]
     },
     code: [
-      { file: "Intent.cs (rövidítve)", code: raw`
+      { file: "Planning/Intent.cs (rövidítve)", code: raw`
 // A szándék: a szabályok, az elfogadási feltételek és a kiinduló számok. Jóváhagyás után
 // ujjlenyomat zárja őket a Brigade saját naplójában; módosítani csak a döntési soron át lehet:
 // a gazda a munkapéldányban javít, és egy döntésre válaszol.
@@ -21000,10 +21032,10 @@ public static class Intent
         IReadOnlyDictionary<string, string> files)
     // …
 }` },
-      { file: "DeliveryRunner.cs (Housekeeping, minden kör elején)", code: raw`
-if (Intent.Changed(paths.Approvals, Intent.At(Work, "HEAD")) is { Count: > 0 } changed)
-    return Stop(ExitCodes.Alarm, "Riasztás: a szándék a jóváhagyás után, döntés nélkül változott: "
-        + string.Join(", ", changed));` },
+      { file: "Approvals/DecisionDesk.cs (Housekeep, minden kör elején)", code: raw`
+if (Intent.Changed(paths.Approvals, Intent.At(work.Git, "HEAD")) is { Count: > 0 } changed)
+    return new DeliveryOutcome(ExitCodes.Alarm, "Riasztás: a szándék a jóváhagyás után, "
+        + $"döntés nélkül változott: {string.Join(", ", changed)}");` },
       { file: "scenario-e2e: kedvezmeny/approvals.jsonl (a mezők oszlopban, idő nélkül)", lang: "text", code: raw`
 szándék  architecture/rules/data-ownership.md   5f9bf36e…  kiinduló: a repó saját szándéka
 szándék  architecture/rules/dependency.md       be8e8877…  kiinduló: a repó saját szándéka
@@ -21015,8 +21047,8 @@ szándék  architecture/acceptance/decisions.md   5cbac0c9…  D-002: a gazda v�
     ],
     pairs: [
       { nodes: ["log", "e_approve", "files"], match: ["public static IReadOnlyList<string> Approve(", "new(time.GetUtcNow(), Kind, path, ApprovalLog.Sha256(text), source));", "szándék  architecture/rules/dependency.md       7c2f8bfc…  J1 (D-001)"], on: true },
-      { nodes: ["cmp", "e_f", "e_l"], match: ["public static IReadOnlyList<string> Changed(", "if (Intent.Changed(paths.Approvals, Intent.At(Work, \"HEAD\")) is { Count: > 0 } changed)"] },
-      { nodes: ["alarm", "e_alarm"], match: ["return Stop(ExitCodes.Alarm, \"Riasztás: a szándék a jóváhagyás után, döntés nélkül változott: \""] },
+      { nodes: ["cmp", "e_f", "e_l"], match: ["public static IReadOnlyList<string> Changed(", "if (Intent.Changed(paths.Approvals, Intent.At(work.Git, \"HEAD\")) is { Count: > 0 } changed)"] },
+      { nodes: ["alarm", "e_alarm"], match: ["return new DeliveryOutcome(ExitCodes.Alarm, \"Riasztás: a szándék a jóváhagyás után, \""] },
       { nodes: ["n_host", "same", "e_same"], match: ["// a gazda a munkapéldányban javít, és egy döntésre válaszol."] }
     ],
     why: [
@@ -21053,10 +21085,10 @@ A típus dönti el, mihez nyúlhat a változtatás. Az állapotot és a próbál
 írja. A Brigade magától felvehet szerkezeti, jellemzőteszt- és bontási feladatot; új viselkedés vagy
 hibajavítás csak „döntésre vár” állapotban kerülhet a táblára, mert ahhoz a te jóváhagyott
 feltételed kell.` },
-      { file: "DeliveryRunner.Planning.cs (Suspects, rövidítve)", code: raw`
+      { file: "Approvals/DecisionDesk.cs (Suspects, rövidítve)", code: raw`
 // A jellemző teszt gyanúsnak jelölt viselkedést rögzített: „hiba ez?” döntési tétel és döntésre
 // váró hibajavító feladat.
-void Suspects(TaskBoard board, BoardTask task, Measurement m, int round)
+public void Suspects(TaskBoard board, BoardTask task, Measurement m, int round)
 {
     var before = Behavior.Inventory(m.Before).Suspects.ToHashSet();
     foreach (var test in Behavior.Inventory(m.After).Suspects.Where(t => !before.Contains(t)))
@@ -21115,17 +21147,17 @@ Elfogadási feltétel: –` }
       ]
     },
     code: [
-      { file: "DeliveryRunner.Planning.cs (ResolveTask, rövidítve)", code: raw`
+      { file: "Approvals/DecisionDesk.cs (ResolveTask, rövidítve)", code: raw`
 // A döntésre váró feladat feloldása a válasz szerint. Feltétel-kérdésnél (acceptance, suspect)
 // a válasz lesz a jóváhagyott elfogadási feltétel, „nem” esetén a feladat elmarad. A többinél
 // a válasz útmutatás a következő építőnek, a próbálkozás újraindul; „elmarad” esetén a feladat
-// elmarad.
+// elmarad; „változhat: <teszt>” esetén a teszt elvárása a feladatban bővülhet.
 void ResolveTask(DecisionEntry entry)
 {
     // …
     foreach (var id in tasks)
     {
-        if (kind is "acceptance" or "suspect")
+        if (key.Kind is DecisionKey.Acceptance or DecisionKey.Suspect)
         {
             if (PlanTexts.No(answer) || PlanTexts.Withdraws(answer))
                 board.Withdraw(id, $"elmarad a döntés szerint ({entry.Id}): {answer}");
@@ -21140,6 +21172,8 @@ void ResolveTask(DecisionEntry entry)
             board.Withdraw(id, $"elmarad a döntés szerint ({entry.Id}): {answer}");
         else
         {
+            if (PlanTexts.Changeable(answer) is { Count: > 0 } changeable)
+                board.AllowChange(id, changeable);
             board.AddNote(id, $"A gazda válasza ({entry.Id}): {answer}");
             board.SetAttempts(id, 0);
             board.SetState(id, TaskState.Open);
@@ -21163,7 +21197,7 @@ criteria:
     pairs: [
       { nodes: ["ac", "e_ac", "resolve"], match: ["criterion ??= AddCriterion($\"AC-{entry.Id}\", PlanTexts.Criterion(answer));", "  - id: AC-D-002", "    text: \"A kedvezmény legalább 0 Ft.\""], on: true },
       { nodes: ["task", "e_task"], match: ["board.SetAcceptance(id, criterion);", "[BRIGADE] D-002 feloldva: T-043, elfogadási feltétel: AC-D-002"] },
-      { nodes: ["d002", "e_read"], match: ["if (kind is \"acceptance\" or \"suspect\")"] },
+      { nodes: ["d002", "e_read"], match: ["if (key.Kind is DecisionKey.Acceptance or DecisionKey.Suspect)"] },
       { nodes: ["other", "e_other"], match: ["board.AddNote(id, $\"A gazda válasza ({entry.Id}): {answer}\");", "board.SetAttempts(id, 0);", "else if (PlanTexts.Withdraws(answer))"] },
       { nodes: ["split"], match: ["// A döntésre váró feladat feloldása a válasz szerint."] }
     ],
@@ -21197,14 +21231,12 @@ criteria:
       ]
     },
     code: [
-      { file: "DeliveryRunner.Planning.cs (ResolveTask vége) és PlanTexts.cs", code: raw`
+      { file: "Approvals/DecisionDesk.cs (ResolveTask vége) és Planning/PlanTexts.cs", code: raw`
 // A gyanú: hiba (fogás), nem hiba (vaklárma), vagy elmarad (például ugyanaz a hiba, mint egy másik
 // gyanúé: nem számít).
-if (kind == "suspect" && (criterion is not null || !PlanTexts.Withdraws(answer)))
-    paths.Note("gyanús teszt eldöntve", new
-    {
-        test = (entry.Key ?? "")["suspect:".Length..], bug = criterion is not null, entry.Id,
-    });
+if (key.Kind == DecisionKey.Suspect && (criterion is not null || !PlanTexts.Withdraws(answer)))
+    paths.Note("gyanús teszt eldöntve",
+        new { test = key.Rest, bug = criterion is not null, entry.Id });
 // …
 [GeneratedRegex(@"^nem\b", RegexOptions.IgnoreCase)]
 private static partial Regex NoWords();
@@ -21223,7 +21255,7 @@ Válasz:   elmarad: ugyanaz a hiba, mint a D-003` },
 gyanús teszt eldöntve {"test":"…Suspicious_CalcDiscount_…","bug":true,"id":"D-003"}` }
     ],
     pairs: [
-      { nodes: ["bug", "e_bug"], match: ["bug = criterion is not null, entry.Id,", "Válasz:   Hiba, a kedvezmény legalább 0 Ft.", "\"bug\":true,\"id\":\"D-003\""], on: true },
+      { nodes: ["bug", "e_bug"], match: ["bug = criterion is not null, entry.Id });", "Válasz:   Hiba, a kedvezmény legalább 0 Ft.", "\"bug\":true,\"id\":\"D-003\""], on: true },
       { nodes: ["nobug", "e_nobug"], match: ["[GeneratedRegex(@\"^nem\\b\", RegexOptions.IgnoreCase)]"] },
       { nodes: ["skip", "e_skip", "n_trial"], match: ["!PlanTexts.Withdraws(answer)", "[GeneratedRegex(@\"^(elmarad|elhagy|nem kell|töröld)\"", "Válasz:   elmarad: ugyanaz a hiba, mint a D-003"] },
       { nodes: ["test", "q", "e_q"], match: ["// A gyanú: hiba (fogás), nem hiba (vaklárma), vagy elmarad"] }
@@ -21256,26 +21288,26 @@ gyanús teszt eldöntve {"test":"…Suspicious_CalcDiscount_…","bug":true,"id"
       ]
     },
     code: [
-      { file: "DeliveryRunner.cs (RunAsync: minden kész)", code: raw`
+      { file: "DeliveryRunner.cs (RunUntilStopAsync és FinishedAsync: minden kész)", code: raw`
 case PickOutcome.Finished:
-    if (state.FullGreen is null || TaskCommitsSince(state.FullGreen) > 0)
-    {
-        if (FullSuite(cx) is { } alarm)
-            return alarm;
-        continue;
-    }
-    // Záró hézagkeresés: előbb a gépi rész, aztán a tervező (ha van terv, és azóta változott
-    // valami).
-    if (GapSearch(cx) is not null)
-        continue;
-    if (state.Plan is not null && state.GapRound != Work.Head())
-    {
-        if (await PlannerRoundAsync(RoundState.Gaps, null, ct) is { } searched)
-            return searched;
-        continue;
-    }
-    return await HandoffAsync(cx, ct);` },
-      { file: "GapFinder.cs (rövidítve)", code: raw`
+    if (await FinishedAsync(cx, ct) is { } end)
+        return end;
+    continue;
+// …
+// Minden feladat kész: a teljes tesztkészlet, a záró hézagkeresés (előbb a gépi rész, aztán a
+// tervező, ha van terv, és azóta változott valami), végül az átadás. Null: új feladat vagy új
+// mérés jött, a hurok megy tovább.
+async Task<DeliveryOutcome?> FinishedAsync(IntentContext cx, CancellationToken ct)
+{
+    if (State.FullGreen is null || Work.TaskCommitsSince(State.FullGreen) > 0)
+        return FullSuite();
+    if (Planner.SearchGaps(cx) is not null)
+        return null;
+    if (State.Plan is not null && State.GapRound != Work.Head())
+        return await Planner.RunAsync(RoundState.Gaps, null, ct);
+    return await Handoff.RunAsync(cx, ct);
+}` },
+      { file: "Planning/GapFinder.cs (rövidítve)", code: raw`
 // A hézagkeresés gépi része. Hézag az, amit a szállítás okozott, vagy amit a szándék előír: a
 // kezdethez képest új sértés, és a szándék feltétele, amelyhez nincs teszt. A kezdetkor is meglévő
 // sértés és a kezdetkor is piros teszt régi hiba: javaslat, nem feladat. …
@@ -21297,11 +21329,11 @@ foreach (var v in current)
 proposals.AddRange(knownFailures.Select(t => $"régi piros teszt: {t}"));` }
     ],
     pairs: [
-      { nodes: ["machine", "e_start"], match: ["if (GapSearch(cx) is not null)", "foreach (var v in current)", "$\"A szállítás hézaga: {v.Message.TrimEnd('.')}\""], on: true },
+      { nodes: ["machine", "e_start"], match: ["if (Planner.SearchGaps(cx) is not null)", "foreach (var v in current)", "$\"A szállítás hézaga: {v.Message.TrimEnd('.')}\""], on: true },
       { nodes: ["proposal", "e_prop"], match: ["proposals.Add($\"régi sértés: {v.Id} — {v.Message}\"", "proposals.AddRange(knownFailures.Select(t => $\"régi piros teszt: {t}\"));"] },
-      { nodes: ["planner", "e_plan"], match: ["if (await PlannerRoundAsync(RoundState.Gaps, null, ct) is { } searched)", "if (state.Plan is not null && state.GapRound != Work.Head())"] },
-      { nodes: ["handoff", "e_hand"], match: ["return await HandoffAsync(cx, ct);"] },
-      { nodes: ["done"], match: ["case PickOutcome.Finished:", "if (FullSuite(cx) is { } alarm)"] }
+      { nodes: ["planner", "e_plan"], match: ["return await Planner.RunAsync(RoundState.Gaps, null, ct);", "if (State.Plan is not null && State.GapRound != Work.Head())"] },
+      { nodes: ["handoff", "e_hand"], match: ["return await Handoff.RunAsync(cx, ct);"] },
+      { nodes: ["done"], match: ["case PickOutcome.Finished:", "return FullSuite();"] }
     ],
     why: [
       "Ha minden feladat kész, nem azonnal jön az átadás. Ha kell, előbb a teljes készlet (G6), aztán a gép keres hézagot (`GapFinder`). Ami a kezdethez képest új sértés, vagy amit a szándék előír (feltétel teszt nélkül, `ac:untested`), az a szállítás saját hézaga, és feladat lesz belőle. A lejárt elfogadott eltérésből megszüntető feladat lesz. Ami már a kezdetkor megvolt (régi sértés, régi piros teszt), az javaslat az átadási jelentésben.",
@@ -21504,7 +21536,7 @@ allowed:
     side: "thesis",
     scene: {
       nodes: [
-        { id: "runner", kind: "box", title: "DeliveryRunner", sub: "MeasureAsync → ReviewAsync", w: 220, x: 130, y: 70, tone: "current",
+        { id: "runner", kind: "box", title: "BuildRound", sub: "MeasureAsync → ReviewAsync", w: 220, x: 130, y: 70, tone: "current",
           lines: [ok("G1–G4 zöld"), "a lapon van kérdés"] },
         { id: "reviewer", kind: "actor", label: "ellenőrző (reviewer)", x: 480, y: 70 },
         { id: "work", kind: "box", title: "work/", sub: "a Brigade munkapéldánya", w: 290, x: 165, y: 240,
@@ -21524,21 +21556,21 @@ allowed:
       ]
     },
     code: [
-      { file: "DeliveryRunner.cs", code: raw`
+      { file: "Rounds/BuildRound.cs (MeasureAsync)", code: raw`
 // 6. Kapuk: … Ha a mérhető kapuk zöldek, és a lapon nem mérhető kérdés van,
 // a független ellenőrző ítél (G5).
-var verdict = Judge(round, result);
+var verdict = judge.Judge(round, result);
 // …
 if (verdict.Green && verdict.Questions is { Count: > 0 })
-    return await ReviewAsync(round, verdict, ct);` },
-      { file: "DeliveryRunner.Review.cs", code: raw`
+    return await reviews.ReviewAsync(round, verdict, ct) is { } final ? Apply(round, final) : null;` },
+      { file: "Review/ReviewRound.cs", code: raw`
 // Az ellenőrző külön munkafája: a kiinduló commit, rajta a változások (ha vannak).
 // Visszaadja a változás diffjét.
-string ReviewTree(int round, string start, IReadOnlyList<FileChange> changes)
+public string Tree(int round, string start, IReadOnlyList<FileChange> changes)
 {
-    var dir = ReviewDir(round);
-    RemoveReviewTree(round);
-    Work.Run("worktree", "add", "--detach", "--quiet", dir, start);
+    var dir = Dir(round);
+    RemoveTree(round);
+    work.Run("worktree", "add", "--detach", "--quiet", dir, start);
     foreach (var change in changes)
     {
         // … a törölt fájlt törli, a többit a változás utáni tartalommal kiírja
@@ -21548,11 +21580,12 @@ string ReviewTree(int round, string start, IReadOnlyList<FileChange> changes)
     return git.Run("diff", "--cached", "--stat") + "\n" + git.Run("diff", "--cached");
 }
 // … a ReviewAsync-ben:
-var result = await agents.RunAsync(new AgentTask(run, task.Id, $"Ellenőrzés: {task.Title}",
-    ReviewDir(round.Number), brief,
+var result = await session.StartAsync(round, new AgentTask(run, task.Id,
+    $"Ellenőrzés: {task.Title}", Dir(round.Number), brief,
     $"A feladatod leírása itt van: {brief} — olvasd el, és ítélj; semmit ne módosíts.", [],
-    Forbidden) { Role = AgentRoles.Reviewer }, ct);` },
-      { file: "Git.cs", code: raw`
+    AgentSession.Forbidden) { Role = AgentRoles.Reviewer },
+    counted: false, "ellenőrző indul", new { round = round.Number, task = task.Id, run, … }, ct);` },
+      { file: "Infrastructure/Git.cs", code: raw`
 // Ideiglenes, leválasztott munkapéldány egy commitról (régi kód futtatása, a törő commit keresése).
 public TempWorktree At(string rev, string parent) => new(this, rev, parent);` },
       { file: "runs/r005-ellenorzes/claude-settings.json (a valódi próbából, rövidítve)", lang: "json", code: raw`
@@ -21565,10 +21598,10 @@ public TempWorktree At(string rev, string parent) => new(this, rev, parent);` },
 }` }
     ],
     pairs: [
-      { nodes: ["rtree", "e_wt"], match: ["Work.Run(\"worktree\", \"add\", \"--detach\", \"--quiet\", dir, start);", "git.Run(\"add\", \"--all\");"], on: true },
-      { nodes: ["runner"], match: ["if (verdict.Green && verdict.Questions is { Count: > 0 })", "return await ReviewAsync(round, verdict, ct);"] },
+      { nodes: ["rtree", "e_wt"], match: ["work.Run(\"worktree\", \"add\", \"--detach\", \"--quiet\", dir, start);", "git.Run(\"add\", \"--all\");"], on: true },
+      { nodes: ["runner"], match: ["if (verdict.Green && verdict.Questions is { Count: > 0 })", "return await reviews.ReviewAsync(round, verdict, ct)"] },
       { nodes: ["work", "e_copy"], match: ["foreach (var change in changes)", "// … a törölt fájlt törli"] },
-      { nodes: ["reviewer", "e_read", "n_ro"], match: ["Forbidden) { Role = AgentRoles.Reviewer }, ct);", "\"allow\": [\"Bash(git diff *)\"", "\"deny\": [\"Bash(git commit)\""] },
+      { nodes: ["reviewer", "e_read", "n_ro"], match: ["AgentSession.Forbidden) { Role = AgentRoles.Reviewer },", "\"allow\": [\"Bash(git diff *)\"", "\"deny\": [\"Bash(git commit)\""] },
       { nodes: ["n_tmp"], match: ["public TempWorktree At(string rev, string parent)"] }
     ],
     why: [
@@ -21599,10 +21632,11 @@ public TempWorktree At(string rev, string parent) => new(this, rev, parent);` },
       ]
     },
     code: [
-      { file: "DeliveryRunner.Review.cs", code: raw`
+      { file: "Review/RoundJudge.cs (ReviewQuestions)", code: raw`
 // A lap nem mérhető kérdései: a változás→szabály mátrix sorai, az új modulhatár-kapuk
 // és az új tanulság-sorok.
-static IReadOnlyList<string> ReviewQuestions(Measurement m, IReadOnlyList<string> lessons)
+static IReadOnlyList<string> ReviewQuestions(Measurement m, IReadOnlyList<string> lessons,
+    BoardTask task)
 {
     var rows = m.Sheet.Matrix.Select(r => r.Number).ToHashSet();
     List<string> questions = [];
@@ -21622,6 +21656,9 @@ static IReadOnlyList<string> ReviewQuestions(Measurement m, IReadOnlyList<string
     if (lessons.Count > 0)
         questions.Add($"új tanulság-sor az AGENTS.md-ben: {string.Join(" | ", lessons)} — "
             + "nem gyengít-e szabályt vagy tesztet");
+    if (task.Changeable.Count > 0)
+        questions.Add($"a gazda döntése szerint bővülhetett ezek elvárása: "
+            + $"{string.Join(", ", task.Changeable)} — szigorítás-e, nem gyengítés");
     return questions;
 }` },
       { file: "a jó kiemelés lapja (guard-runs/10-good-change-sheet.txt, tördelve)", lang: "text", code: raw`
@@ -21687,14 +21724,13 @@ Semmit ne módosíts: csak olvasol. Az összegzésed első sora pontosan az egyi
 - „ELUTASÍTVA: <a kérdés neve>: <mi a baj, egy-két mondatban>” — ha valamelyik kérdésben …
   (például „ELUTASÍTVA: hibakezelés: a külső hívásnak nincs időkorlátja”);
 - „DÖNTÉS: <kérdés>” — ha emberi döntés kell (például szabályváltozás).` },
-      { file: "DeliveryRunner.Review.cs (AfterReview, rövidítve)", code: raw`
-if (result.Outcome == AgentOutcome.Completed
-    && summary.StartsWith("DÖNTÉS:", StringComparison.Ordinal))
+      { file: "Review/ReviewRound.cs (AfterReview, rövidítve)", code: raw`
+var reply = AgentReply.Parse(summary);
+if (result.Outcome == AgentOutcome.Completed && reply.Kind == AgentReplyKind.Decision)
 {
     // … a munka visszaállítva, a feladat a döntési sorba kerül
 }
-var final = result.Outcome == AgentOutcome.Completed
-        && summary.StartsWith(Accepted, StringComparison.Ordinal)
+var final = result.Outcome == AgentOutcome.Completed && reply.Kind == AgentReplyKind.Accepted
     ? verdict with { Review = "ok" }
     : new RoundVerdict(false, [$"G5: {Rejection(result)}"], false, verdict.Full);` },
       { file: "rounds/005/report.md (valódi kimenet, tördelve)", lang: "text", code: raw`
@@ -21748,12 +21784,11 @@ public sealed class Statements(IReadOnlyList<InvoiceRecord> invoices)
       ]
     },
     code: [
-      { file: "DeliveryRunner.Handoff.cs (HandoffAsync, rövidítve)", code: raw`
-// Elfogadott átadás után a folytatás csak visszaadja az ítéletet. Elutasított után … újra ítél.
-if (state.Verdict is { Accepted: true } done && done.Head == Work.Head())
-    return Stop(ExitCodes.Done, done.Message);
-// …
-var conditions = HandoffConditions(cx);
+      { file: "Handoff/HandoffRound.cs (RunAsync, rövidítve)", code: raw`
+// Elutasított átadás után új commit nélkül is újra ítél: … a feltételek olcsón újramérhetők.
+var measured = MeasureHandoff(cx);
+// … ha még nincs számolt állapot, most az átadás számolja (missing)
+var conditions = HandoffConditions(cx, measured, missing);
 File.WriteAllText(ConditionsFile(number), JsonSerializer.Serialize(conditions, Report));
 paths.Note("átadás: a gép feltételei", conditions);
 if (conditions.Any(c => !c.Ok))
@@ -21761,9 +21796,9 @@ if (conditions.Any(c => !c.Ok))
         "nem futott: a gép feltételei nem teljesültek")]);
 // … költségkeret
 return await FinalReviewAsync(round, conditions, ct);` },
-      { file: "DeliveryRunner.Handoff.cs (HandoffConditions, rövidítve)", code: raw`
-var run = tools.Test(state.Worktree, TestSelection.All);
-var red = run.Ran ? run.Failed.Except(state.KnownFailures).ToList() : null;
+      { file: "Handoff/HandoffRound.cs (MeasureHandoff és HandoffConditions, rövidítve)", code: raw`
+var run = tools.Test(store.State.Worktree, TestSelection.All);
+var red = run.Ran ? run.Failed.Except(store.State.KnownFailures).ToList() : null;
 // … sértések a kezdethez képest, elfogadási feltételek, eltérések, state/
 foreach (var criterion in criteria)
 {
@@ -21785,7 +21820,7 @@ return
     new("Nincs döntés nélküli lejárt eltérés", expired.Count == 0, /* … */),
     new("Friss állapot (architecture/state/)", stale.Count == 0, /* … */),
 ];` },
-      { file: "HandoffTests.cs: a bukó esetek", lang: "text", code: raw`
+      { file: "Handoff/HandoffTests.cs: a bukó esetek", lang: "text", code: raw`
 A_red_full_suite_rejects_the_handoff
 A_new_violation_rejects_the_handoff
 A_criterion_without_a_green_test_rejects_the_handoff
@@ -21796,7 +21831,7 @@ A_rejected_handoff_is_judged_again_on_resume` }
     ],
     pairs: [
       { nodes: ["conds", "e_c"], match: ["new(\"A teljes tesztkészlet zöld\"", "new(\"0 új sértés a kezdethez képest\"", "new(\"Minden elfogadási feltételhez", "new(\"Nincs döntés nélküli lejárt eltérés\"", "new(\"Friss állapot (architecture/state/)\""], on: true },
-      { nodes: ["hc"], match: ["var run = tools.Test(state.Worktree, TestSelection.All);", "var conditions = HandoffConditions(cx);"] },
+      { nodes: ["hc"], match: ["var run = tools.Test(store.State.Worktree, TestSelection.All);", "var conditions = HandoffConditions(cx, measured, missing);"] },
       { nodes: ["n_stop"], match: ["if (conditions.Any(c => !c.Ok))", "\"nem futott: a gép feltételei nem teljesültek\")]);"] },
       { nodes: ["n_tests"], match: ["A_red_full_suite_rejects_the_handoff", "The_final_review_can_reject_the_handoff", "A_rejected_handoff_is_judged_again_on_resume"] }
     ],
@@ -21833,16 +21868,16 @@ A_rejected_handoff_is_judged_again_on_resume` }
       ]
     },
     code: [
-      { file: "DeliveryRunner.Handoff.cs (FinalReviewAsync, rövidítve)", code: raw`
-var cx = Load(round.Start);
-ReviewTree(round.Number, round.Start, []);
-var diff = Work.Run("diff", "--stat", state.Base, round.Start) + "\n"
-    + Work.Run("diff", state.Base, round.Start, "--", ".", ":(exclude)architecture/state");
-var board = TaskBoard.Load(BoardFile);
-var lessons = AgentsFile.Lessons(Work.Show(round.Start, AgentsFile.FileName) ?? "")
-    .Except(AgentsFile.Lessons(Work.Show(state.Base, AgentsFile.FileName) ?? "")).ToList();
+      { file: "Handoff/HandoffRound.cs (FinalReviewAsync, rövidítve)", code: raw`
+var cx = work.ContextAt(round.Start);
+reviews.Tree(round.Number, round.Start, []);
+var diff = work.Run("diff", "--stat", store.State.Base, round.Start) + "\n"
+    + work.Run("diff", store.State.Base, round.Start, "--", ".", ":(exclude)architecture/state");
+var board = TaskBoard.Load(work.Board);
+var lessons = AgentsFile.Lessons(work.Show(round.Start, AgentsFile.FileName) ?? "")
+    .Except(AgentsFile.Lessons(work.Show(store.State.Base, AgentsFile.FileName) ?? "")).ToList();
 // … review.md: Texts.FinalReviewBrief(terv, elvégzett feladatok, diff, szabályok, tanulságok)
-var run = NextRun($"r{round.Number:000}-zaro-itelet");` },
+var run = session.NextRun($"r{round.Number:000}-zaro-itelet");` },
       { file: "rounds/007/review.md (az e2e-forgatókönyv valódi futásából, rövidítve)", lang: "md", code: raw`
 # Záró ítélet (G5): a szállítás teljes változtatása
 …
@@ -21868,9 +21903,9 @@ var run = NextRun($"r{round.Number:000}-zaro-itelet");` },
 {"what":"ellenőrző végzett","data":{"round":7,"outcome":0,"summary":"ELFOGADVA"}}` }
     ],
     pairs: [
-      { nodes: ["diff", "e_diff", "tl"], match: ["+ Work.Run(\"diff\", state.Base, round.Start, \"--\", \".\", \":(exclude)architecture/state\");"], on: true },
+      { nodes: ["diff", "e_diff", "tl"], match: ["+ work.Run(\"diff\", store.State.Base, round.Start, \"--\", \".\", \":(exclude)architecture/state\");"], on: true },
       { nodes: ["brief"], match: ["## A terv", "## Az elvégzett feladatok", "- a terv: azt csinálja-e a változtatás, amit a terv kér."] },
-      { nodes: ["reviewer", "e_read"], match: ["var run = NextRun($\"r{round.Number:000}-zaro-itelet\");", "\"run\":\"r007-zaro-itelet\""] },
+      { nodes: ["reviewer", "e_read"], match: ["var run = session.NextRun($\"r{round.Number:000}-zaro-itelet\");", "\"run\":\"r007-zaro-itelet\""] },
       { nodes: ["st_ok"], match: ["\"summary\":\"ELFOGADVA\""] },
       { nodes: ["n_plan"], match: ["- a terv: azt csinálja-e"] }
     ],
@@ -21898,22 +21933,22 @@ var run = NextRun($"r{round.Number:000}-zaro-itelet");` },
       edges: [
         { id: "e_v", from: "conclude", to: "verdict", kind: "ok", at: 300 },
         { id: "e_h", from: "conclude", to: "handoff", kind: "ok", at: 700 },
-        { id: "e_c", from: "conclude", to: "commit", kind: "ok", label: "Work.Commit", at: 1200 }
+        { id: "e_c", from: "conclude", to: "commit", kind: "ok", label: "work.Commit", at: 1200 }
       ]
     },
     code: [
-      { file: "DeliveryRunner.Handoff.cs (Conclude, rövidítve)", code: raw`
+      { file: "Handoff/HandoffRound.cs (Conclude, rövidítve)", code: raw`
 var accepted = conditions.All(c => c.Ok);
 // … mérőszámok, összesítés a szállításokon át, szabályjavaslat → verdict
-Write(VerdictFileName, JsonSerializer.Serialize(verdict, Report) + "\n");
-Write(HandoffFileName, Texts.Handoff(verdict, state.Repo));
+work.Write(VerdictFileName, JsonSerializer.Serialize(verdict, Report) + "\n");
+work.Write(HandoffFileName, Texts.Handoff(verdict, store.State.Repo));
 var failed = conditions.Where(c => !c.Ok).Select(c => c.Name).ToList();
-var head = Work.Commit(Texts.Bookkeeping(accepted ? "átadás: elfogadva"
-    : $"átadás: elutasítva ({failed.Count} feltétel nem teljesült)", state.Id, null, null,
-    round.Number), Own(VerdictFileName, HandoffFileName, "architecture/state"));
+var head = work.Commit(Texts.Bookkeeping(accepted ? "átadás: elfogadva"
+    : $"átadás: elutasítva ({failed.Count} feltétel nem teljesült)", store.State.Id, null, null,
+    round.Number), work.Own(VerdictFileName, HandoffFileName, StateDir));
 var message = VerdictMessage(failed);
 // …
-return Stop(accepted ? ExitCodes.Done : ExitCodes.Error, message);` },
+return new DeliveryOutcome(accepted ? ExitCodes.Done : ExitCodes.Error, message);` },
       { file: "git show brigade/1:architecture/handoff.md (az e2e-forgatókönyvből, rövidítve)", lang: "md", code: raw`
 # Átadás: kedvezmeny
 
@@ -21947,10 +21982,10 @@ return Stop(accepted ? ExitCodes.Done : ExitCodes.Error, message);` },
     ],
     pairs: [
       { nodes: ["verdict", "e_v"], match: ["Write(VerdictFileName, JsonSerializer.Serialize(verdict, Report) + \"\\n\");", "\"accepted\": true,", "\"ruleProposals\": []"], on: true },
-      { nodes: ["handoff", "e_h"], match: ["Write(HandoffFileName, Texts.Handoff(verdict, state.Repo));", "**Ítélet: elfogadva.** A beolvasztásról te döntesz.", "## Feltételek"] },
-      { nodes: ["commit", "e_c"], match: ["var head = Work.Commit(Texts.Bookkeeping(accepted ? \"átadás: elfogadva\""] },
+      { nodes: ["handoff", "e_h"], match: ["work.Write(HandoffFileName, Texts.Handoff(verdict, store.State.Repo));", "**Ítélet: elfogadva.** A beolvasztásról te döntesz.", "## Feltételek"] },
+      { nodes: ["commit", "e_c"], match: ["var head = work.Commit(Texts.Bookkeeping(accepted ? \"átadás: elfogadva\""] },
       { nodes: ["conclude"], match: ["var accepted = conditions.All(c => c.Ok);"] },
-      { nodes: ["n_exit"], match: ["return Stop(accepted ? ExitCodes.Done : ExitCodes.Error, message);"] }
+      { nodes: ["n_exit"], match: ["return new DeliveryOutcome(accepted ? ExitCodes.Done : ExitCodes.Error, message);"] }
     ],
     why: [
       "A `Conclude` két fájlt ír a Brigade ágára, és commitolja őket: `[BRIGADE] átadás: elfogadva`. A `verdict.json` a gépi alak: a feltételek, a záró ítélet, az elvégzett és a félretett feladatok, a régi hibákról szóló javaslatok, a mérőszámok. Ha a gép az átadás commitja után, de a saját mentése előtt áll le, ebből olvassa vissza az ítéletet.",
@@ -21981,7 +22016,7 @@ return Stop(accepted ? ExitCodes.Done : ExitCodes.Error, message);` },
       ]
     },
     code: [
-      { file: "Metrics.cs (rövidítve)", code: raw`
+      { file: "Handoff/DeliveryMetrics.cs és Handoff/Metrics.cs (Compute, rövidítve)", code: raw`
 // Egy szállítás mérőszámai a körök történetéből. Rounds: építő körök; Lost: elveszett futás
 // (leállás után); Parked: félreállítás; Reviews: az ellenőrző ítéletei (G5). FailedByGate:
 // bukott kör kapunként. LostRounds: amiből nem lett commit.
@@ -22049,7 +22084,7 @@ return new(Count("építő indul"), green.Count, failed.Count, Count("elveszett 
       ]
     },
     code: [
-      { file: "Metrics.cs (rövidítve)", code: raw`
+      { file: "Handoff/LevelCount.cs (komment) és Handoff/Metrics.cs (Compute, rövidítve)", code: raw`
 // Szintenként: valódi fogás (a teszt bukott, és a javítás a termelő kódban történt) és vaklárma
 // (a teszt egy viselkedést nem változtató szerkezeti feladatot akasztott meg, és az nem jutott
 // zöld commitig). A jellemző tesztnél a gazda döntése számít: a gyanú hiba volt (fogás),
@@ -22075,7 +22110,7 @@ foreach (var e in events.Where(e => e.What == "gyanús teszt eldöntve"))
 |---|--:|--:|
 | jellemző teszt | 0 / 0 | 1 / 0 |
 | usecase | 1 / 0 | 1 / 0 |` },
-      { file: "Texts.cs", code: raw`
+      { file: "Rounds/Texts.cs", code: raw`
 if (v.Cumulative.Deliveries >= 3)
     lines.AddRange(["", "Három szállítás mérése megvan: ebből dönthetsz a tesztszintről."]);` }
     ],
@@ -22114,7 +22149,7 @@ if (v.Cumulative.Deliveries >= 3)
       ]
     },
     code: [
-      { file: "Metrics.cs (rövidítve)", code: raw`
+      { file: "Handoff/Metrics.cs (rövidítve)", code: raw`
 // Az ellenőrző kérdései (G5 és záró ítélet), és a szabályrendszer, amely gépileg mérhetővé
 // tehetné őket.
 public static readonly IReadOnlyDictionary<string, string?> Questions =
@@ -22137,7 +22172,7 @@ public static IReadOnlyList<string> RuleProposals(IReadOnlyDictionary<string, in
             + (existing.Contains(f.File)
                 ? $"Javaslat: a {f.File} bővítése, hogy a gép mérje. Te döntesz."
                 : $"Javaslat: új szabályrendszer ({f.File}), hogy a gép mérje. Te döntesz."))];` },
-      { file: "ReviewTests.cs (rövidítve)", code: raw`
+      { file: "Review/ReviewTests.cs (rövidítve)", code: raw`
 var verdict = Deliver.Verdict(second);
 Assert.Equal(1, verdict.Metrics.Findings!["határ"]);
 Assert.Equal(2, verdict.Cumulative.Findings["határ"]);
@@ -22186,7 +22221,7 @@ Assert.Equal("Az ellenőrző 2 szállításban is ezen a kérdésen utasított e
       ]
     },
     code: [
-      { file: "DeliveryRunner.Handoff.cs", code: raw`
+      { file: "DeliveryRunner.cs (Close)", code: raw`
 // brigade close: a gazda lezárja a szállítást (a beolvasztás után, vagy anélkül);
 // a munkapéldány törlődik, az ág marad.
 public static string Close(DeliveryPaths paths)
@@ -22430,8 +22465,8 @@ const MAIN = [
     scene: {
       nodes: [
         { id: "tests", kind: "box", title: "dotnet test Brigade.slnx", sub: "a Brigade tesztjei", w: 260, x: 150, y: 100, tone: "ok",
-          lines: [ok("251 teszt, mind zöld"), "architektúra 73 · szállítás 106", "parancssor 14 · futtató 58"] },
-        { id: "fake", kind: "box", title: "a szállítás tesztjeiben", sub: "Harness.cs", w: 290, x: 475, y: 110,
+          lines: [ok("324 teszt, mind zöld"), "architektúra 73 · szállítás 176", "parancssor 16 · futtató 59"] },
+        { id: "fake", kind: "box", title: "a szállítás tesztjeiben", sub: "Common/: Repo, FakeAgent, Killed", w: 290, x: 475, y: 110,
           lines: [ok("valódi git, valódi háló (Roslyn)"), bad("fordítás, teszt: jelölőkből"), bad("ágens: egy C#-függvény"), bad("kill -9: egy kivétel")] },
         { id: "n_gap", kind: "note", tone: "bad", text: "egy szállítás sem futott végig: valódi dotnet,\ntmux, runner és ágens együtt", x: 320, y: 265, at: 1200 },
         { id: "st_done", kind: "state", label: "„kész a Brigade”?", tone: "bad", x: 320, y: 350, at: 1700 }
@@ -22440,7 +22475,8 @@ const MAIN = [
         { id: "e_but", from: "tests", to: "fake", kind: "ref", at: 500 }
       ]
     },
-    code: raw`
+    code: [
+      { file: "tests/Brigade.Delivery.Tests/Common/Repo.cs (rövidítve)", lang: "cs", code: raw`
 // Kis teszt-repó a körökhöz: két modul (Orders → Billing) és egy független (Reports), három teszt,
 // a feladattábla. Valódi git, valódi háló (Roslyn);
 // a fordítást és a tesztfutást az álszerszám a forrás jelölőiből számolja:
@@ -22450,24 +22486,24 @@ const MAIN = [
 //   PARTIAL:<Tag>       a tag egyik elágazását a tesztek nem futtatják, amíg egy teszt szövegében
 //                       nincs COVERS:<Tag>
 sealed class Repo
-// …
-
+// …` },
+      { file: "tests/Brigade.Delivery.Tests/Common/FakeAgent.cs (rövidítve)", lang: "cs", code: raw`
 // Az álágens: futásonként egy előre megadott lépés a munkakönyvtárban (építő, tervező vagy
 // ellenőrző); a visszatérése az összegzés.
 sealed class FakeAgent(params Func<string, string>[] steps) : IAgentRunner
-// …
-
+// …` },
+      { file: "tests/Brigade.Delivery.Tests/Common/Killed.cs", lang: "cs", code: raw`
 // A Brigade folyamatának „kill -9”-je: a kivétel kirepül a futtatóból, utána új futtató folytat
 // a lemezről.
-sealed class Killed : Exception;`,
-    file: "tests/Brigade.Delivery.Tests/Harness.cs (rövidítve)",
+sealed class Killed : Exception;` }
+    ],
     pairs: [
       { nodes: ["fake"], match: ["// a fordítást és a tesztfutást az álszerszám a forrás jelölőiből számolja:", "sealed class FakeAgent(params Func<string, string>[] steps) : IAgentRunner", "sealed class Killed : Exception;"], on: true },
       { nodes: ["tests", "e_but"], match: ["// a feladattábla. Valódi git, valódi háló (Roslyn);"] },
       { nodes: ["n_gap", "st_done"], match: ["//   COMPILE-ERROR       a kód nem fordul", "//   BREAKS:<Metódus>    a teszt piros"] }
     ],
     why: [
-      "A Brigade tesztjei zöldek: ma 251 teszt (architektúra 73, szállítás 106, parancssor 14, futtató 58). Csábító azt mondani: kész. A szállítás tesztjei viszont kis, mesterséges repón futnak. A git és a háló valódi, de a fordítást és a tesztfutást egy álszerszám számolja a forrásba írt jelölőkből, az ágens egy C#-függvény, a „kill -9” pedig egy kivétel.",
+      "A Brigade tesztjei zöldek: ma 324 teszt (architektúra 73, szállítás 176, parancssor 16, futtató 59). Csábító azt mondani: kész. A szállítás tesztjei viszont kis, mesterséges repón futnak. A git és a háló valódi, de a fordítást és a tesztfutást egy álszerszám számolja a forrásba írt jelölőkből, az ágens egy C#-függvény, a „kill -9” pedig egy kivétel.",
       "Így a tesztek azt bizonyítják, hogy a döntések helyesek, ha a bemenet ilyen. Azt nem, hogy egy valódi repón, valódi `dotnet build`-del és `dotnet test`-tel, tmux-panelben futó ágenssel végigmegy-e egy szállítás. Ehhez végig kell futtatni, és meg kell nézni, mi jön ki."
     ],
     key: "A részek tesztje a részeket bizonyítja. Hogy együtt végigmennek-e, azt csak egy végigfutás mutatja meg."
@@ -22653,18 +22689,18 @@ Brigade-Gates: G1 ok, G2 ok, G3 ok, G4 ok, G5 nem kell, G6 kihagyva
      public void Ten_cheap_pieces() =>
 -        Assert.Equal(-2.5m, InvoiceWriter.CalcDiscount(new InvoiceLine("Radír", 5m, 10)));
 +        Assert.Equal(0m, InvoiceWriter.CalcDiscount(new InvoiceLine("Radír", 5m, 10)));` },
-      { file: "DeliveryRunner.cs (G2, rövidítve)", code: raw`
+      { file: "Review/RoundJudge.cs (G2, rövidítve)", code: raw`
 else if (OldCode(round, m, own) is { Ran: true } old
     && own.All(t => old.Outcomes.GetValueOrDefault(t) == "Passed"))
     problems.Add($"G2: a(z) {ac} feltétel tesztje a változtatás előtti kódon is zöld");
 // … az OldCode-ban: a régi kód külön munkafán, rajta az új tesztfájlok
-using var old = Work.At(round.Start, paths.Temp);` }
+using var old = work.At(round.Start, paths.Temp);` }
     ],
     pairs: [
       { nodes: ["d002", "owner"], match: ["step 0 decide \"$REPO\" D-002 \"Hiba, a kedvezmény legalább 0 Ft.\""], on: true },
       { nodes: ["ac", "e_resolve"], match: ["  - id: AC-D-002", "    text: \"A kedvezmény legalább 0 Ft.\""] },
       { nodes: ["fix", "e_task"], match: ["+    [Trait(\"ac\", \"AC-D-002\")]", "+        line.Quantity >= 10 ? Math.Max(0m,", "+        Assert.Equal(0m, InvoiceWriter.CalcDiscount"] },
-      { nodes: ["st_old", "e_old", "n_tmp"], match: ["using var old = Work.At(round.Start, paths.Temp);", "problems.Add($\"G2: a(z) {ac} feltétel tesztje a változtatás előtti kódon is zöld\");"] },
+      { nodes: ["st_old", "e_old", "n_tmp"], match: ["using var old = work.At(round.Start, paths.Temp);", "problems.Add($\"G2: a(z) {ac} feltétel tesztje a változtatás előtti kódon is zöld\");"] },
       { nodes: ["st_new", "e_new"], match: ["Brigade-Gates: G1 ok, G2 ok, G3 ok, G4 ok, G5 nem kell, G6 kihagyva"] }
     ],
     why: [
@@ -22904,8 +22940,12 @@ A végigfutás hibái, javítva:
   szállításokon át;
 - a commit Brigade-Rules sora csak létező szabályfájlt sorol fel;
 - a forrásbeolvasás kihagyja a rejtett mappákat (a forgatókönyvek munkamappáit).` },
-      { file: "Texts.cs, TaskCommit (a commit-sablon egy sora)", code: raw`
-Brigade-Rules: {string.Join(", ", rules.Where(r => !r.Contains(' ')).Select(Stem).Distinct())}` },
+      { file: "Rounds/Texts.cs (RuleFiles és a TaskCommit commit-sablonjának egy sora)", code: raw`
+// A lap szabályai közül a létező szabályfájlok (a „(nincs szabályfájl)” jelölésűek nem).
+static IEnumerable<string> RuleFiles(IEnumerable<string> rules) =>
+    rules.Where(r => !r.Contains(' ')).Select(Stem).Distinct();
+// …
+Brigade-Rules: {string.Join(", ", RuleFiles(rules))}` },
       { file: "GraphBuilder.cs", code: raw`
 // exclude: … A fordítás kimenete (bin, obj) és a rejtett mappák (.git, .vs, a forgatókönyvek
 // munkamappái) sosem forrás.
@@ -22914,7 +22954,7 @@ static bool Skipped(string relativePath) =>
     ],
     pairs: [
       { nodes: ["bugs"], match: ["- új modulhatár szerkezeti kiemelésnél", "- a jellemző teszt gyanújáról hozott döntés", "- az új szabály javaslata (rule_proposal)", "- a commit Brigade-Rules sora", "- a forrásbeolvasás kihagyja a rejtett mappákat"], on: true },
-      { nodes: ["sheet", "commit", "e_rules"], match: ["Brigade-Rules: {string.Join(\", \", rules.Where(r => !r.Contains(' ')).Select(Stem).Distinct())}"] },
+      { nodes: ["sheet", "commit", "e_rules"], match: ["Brigade-Rules: {string.Join(\", \", RuleFiles(rules))}", "rules.Where(r => !r.Contains(' ')).Select(Stem).Distinct();"] },
       { nodes: ["n_e2e"], match: ["A végigfutás hibái, javítva:"] }
     ],
     why: [
@@ -22932,7 +22972,7 @@ static bool Skipped(string relativePath) =>
           lines: ["4 építő kör", "8 ágensfutás (keret: 30)", "a gép: 167 mp, ~42 mp / kör"] },
         { id: "m", kind: "box", title: "kimutatas", sub: "e2e, álágens", w: 260, x: 480, y: 95,
           lines: ["8 építő kör", "16 ágensfutás (keret: 30)", "a gép: 310 mp, ~39 mp / kör"] },
-        { id: "calib", kind: "box", title: "kiinduló számok", sub: "Calibration.cs", w: 300, x: 320, y: 265, tone: "current", at: 900,
+        { id: "calib", kind: "box", title: "kiinduló számok", sub: "Planning/Calibration.cs", w: 300, x: 320, y: 265, tone: "current", at: 900,
           lines: ["3 próbálkozás · körplafon 5 / futás", "120 ágensperc, 30 futás", mut("a valódi próbák után: 240 → 120")] },
         { id: "n_fake", kind: "note", tone: "accent", text: "az álágens másodpercek alatt végez: az ágensperc itt nem mér semmit", x: 320, y: 385, at: 1500 }
       ],
@@ -22957,7 +22997,7 @@ PY` },
       { file: "ugyanez a szkript a pillanatkép naplóin (kimenet)", lang: "text", code: raw`
    kedvezmeny: 4 építő kör, 8 ágensfutás (keret: 30), a gép ideje 167 mp (körönként ~42 mp)
    kimutatas: 8 építő kör, 16 ágensfutás (keret: 30), a gép ideje 310 mp (körönként ~39 mp)` },
-      { file: "Calibration.cs (rövidítve)", code: raw`
+      { file: "Planning/Calibration.cs (rövidítve)", code: raw`
 // Kiinduló becslések; az ágensperc-keretet a valódi próbák mérése után állítottuk
 // (2026-10-14: 240 → 120).
 public sealed record Calibration
@@ -23075,12 +23115,12 @@ exit=0` }
       { file: "IMPLEMENTATION_PLAN.md, T-001 (a tervező második javaslata, részlet, tördelve)", lang: "text", code: raw`
 … A 0 Ft alatti kedvezményt rögzítő tesztek a mai értéket várják, de a nevükben szerepeljen
 a Suspicious szó, és egy egysoros komment mondja meg, miért gyanús; a termékkódhoz ne nyúlj.` },
-      { file: "Texts.cs (Brief)", code: raw`
+      { file: "Rounds/Texts.cs (Brief)", code: raw`
 if (task.Type == TaskType.Characterization)
     parts.Add("- **Gyanús viselkedés:** ami a mai viselkedésben hibának tűnik, azt ne javítsd: "
         + "a teszt a mai értéket várja, és jelöld így: [Trait(\"characterization\", \"suspect\")]. "
         + "A gép ebből kérdezi meg a gazdát, hiba-e.");` },
-      { file: "Purity.cs", code: raw`
+      { file: "Review/PurityGuard.cs", code: raw`
 var suspects = task.Type == TaskType.Bugfix ? was.Suspects.ToHashSet() : [];` },
       { file: "pending-decisions.md (a próbából)", lang: "text", code: raw`
 ## D-004  [lezárva]  Hibás viselkedés? InvoiceWriterTests.Suspicious_Write_total_line_value_…
@@ -23121,7 +23161,7 @@ Válasz:   elmarad: ugyanaz a hiba, mint a D-003` }
       ]
     },
     code: [
-      { file: "Coverage.cs", code: raw`
+      { file: "Graphs/LineCoverage.cs", code: raw`
 // Egy tag sor- és elágazás-fedettsége egy tesztfutásban. Teljes, ha minden sora lefutott, és minden
 // elágazása mindkét irányban.
 public sealed record LineCoverage(int Lines, int LinesHit, int Branches, int BranchesHit)
@@ -23131,17 +23171,18 @@ public sealed record LineCoverage(int Lines, int LinesHit, int Branches, int Bra
     public string Text => $"sor {LinesHit}/{Lines}"
         + (Branches > 0 ? $", elágazás {BranchesHit}/{Branches}" : "");
 }` },
-      { file: "DeliveryRunner.cs (a típuskapu és az Uncovered, rövidítve)", code: raw`
+      { file: "Rounds/BuildRound.cs (a típuskapu, rövidítve)", code: raw`
 if (task.Type == TaskType.Structural
     && !task.Prerequisites.Any(p => board.Contains(p) && board[p].Type == TaskType.Characterization)
-    && Uncovered(head, scopes.Start(task), sheet.RunTests) is { Count: > 0 } gaps)
+    && coverage.Uncovered(head, scopes.Start(task), sheet.RunTests) is { Count: > 0 } gaps)
 {
     // … jellemző teszt feladat a fedetlen tagokkal, előfeltételként
-    return Commit(number, task,
+    work.Bookkeep(number, task,
         $"{task.Id}: fedetlen kód, előbb jellemző teszt ({characterization})");
-}
-// … az Uncovered-ben:
-if (tools.LineCoverage(state.Worktree, Selection(tests, [])) is not { } measured)
+    return true;
+}` },
+      { file: "Review/CoverageCheck.cs (Uncovered, rövidítve)", code: raw`
+if (tools.LineCoverage(store.State.Worktree, new TestSelection(tests, [])) is not { } measured)
 {
     paths.Note("fedettség nem mérhető", new { start = start.Select(n => n.Id), tests });
     return Covered(g, start) ? []
@@ -23455,9 +23496,10 @@ allowed:
   Guard: [Architecture, ArchitectureCSharp]
   Delivery: [Architecture]` },
       { file: "boundaries.md, providers.md", lang: "yaml", code: raw`
-no_terminal_io_from: [Orchestration]
-terminal_io: [SendKeys, SendTextAsync, SendKeyAsync, CapturePane, CaptureAsync]
-terminal_modules: [Tmux, Runtime]
+forbidden_calls:
+  - from: [Orchestration]
+    members: [SendKeys, SendTextAsync, SendKeyAsync, CapturePane, CaptureAsync]
+    in: [Tmux, Runtime]
 provider_names: [claude, codex]
 allowed_in: [Host, Claude, Codex]` },
       { file: "ownership.md (részlet; a patterns sorokat kihagytuk)", lang: "yaml", code: raw`
@@ -23474,7 +23516,7 @@ resources:
     owner: Claude` },
       { file: "brigade-guard a Brigade-en (valódi futás, a saját mappánkban, rövidítve)", lang: "text", code: raw`
 v1:   Összesen: 0 új, 0 elfogadott sértés.
-ma:   Állapot: 2345 csomópont, 3999 él, 0 sértés
+ma:   Állapot: 2655 csomópont, 4926 él, 0 sértés
       Összesen: 0 új, 0 elfogadott sértés.
 próba: a Delivery a port helyett a WorkerManager-t kéri (Shortcut.cs)
       ÚJ SÉRTÉS dep:Delivery->Orchestration (dependency.md): Nem engedett függés: …
@@ -23483,19 +23525,19 @@ próba: a Delivery a port helyett a WorkerManager-t kéri (Shortcut.cs)
     ],
     pairs: [
       { nodes: ["host", "h1", "h2", "h3", "h4", "h5", "h6"], match: ["Host: [\"*\"]"], on: true },
-      { nodes: ["orch", "e_oc", "e_or"], match: ["Orchestration: [Core, Runtime]", "no_terminal_io_from: [Orchestration]"] },
+      { nodes: ["orch", "e_oc", "e_or"], match: ["Orchestration: [Core, Runtime]", "  - from: [Orchestration]"] },
       { nodes: ["claude", "codex", "e_cc", "e_cr", "e_xc", "e_xr"], match: ["Claude: [Core, Runtime]", "Codex: [Core, Runtime]", "allowed_in: [Host, Claude, Codex]"] },
       { nodes: ["runner", "e_rc", "e_rr"], match: ["Runner: [Core, Runtime]", "owner: Runner"] },
-      { nodes: ["tmux", "e_tr", "rt", "e_kr", "core"], match: ["Runtime: []", "Core: [Runtime]", "terminal_modules: [Tmux, Runtime]"] },
+      { nodes: ["tmux", "e_tr", "rt", "e_kr", "core"], match: ["Runtime: []", "Core: [Runtime]", "    in: [Tmux, Runtime]"] },
       { nodes: ["delivery", "e_da", "n_port"], match: ["Delivery: [Architecture]", "ÚJ SÉRTÉS dep:Delivery->Orchestration"] },
       { nodes: ["arch", "cs", "e_ca"], match: ["Architecture: []", "ArchitectureCSharp: [Architecture]"] },
       { nodes: ["guard", "e_ga", "e_gc"], match: ["Guard: [Architecture, ArchitectureCSharp]"] },
-      { nodes: ["n_zero"], match: ["v1:   Összesen: 0 új, 0 elfogadott sértés.", "ma:   Állapot: 2345 csomópont, 3999 él, 0 sértés"] }
+      { nodes: ["n_zero"], match: ["v1:   Összesen: 0 új, 0 elfogadott sértés.", "ma:   Állapot: 2655 csomópont, 4926 él, 0 sértés"] }
     ],
     why: [
       "A **dependency rule** egy irányt ad: kifelé a technika (tmux, Claude, Codex, runner), befelé a mag (Core, a Runtime-absztrakciók, Orchestration). A Host a kompozíciós gyökér, ezért mindent használhat. A Runtime semmit nem használ. Külön ág a minőségbiztosítás: az Architecture semmit, a `.CSharp` csak őt, a Guard mindkettőt, a Delivery csak az Architecture-t. Ami nincs a listán, tilos; kör nem lehet.",
       "A másik három szabály ugyanezt más oldalról védi. A **határ**: az orchestráció nem gépel a terminálba (13. állomás). A **szolgáltatónév**: csak a Host és a saját adapter hasonlíthat a névre (12. állomás). Az **adattulajdon**: minden futási fájlnak egy író modulja van (5. állomás).",
-      "A Delivery hívja a futtatót, fordítva soha, de a hívás is porton megy: az `IAgentRunner`-t a Host valósítja meg. Ha a Delivery a portot megkerülve a `WorkerManager`-t kérné, az őr azonnal jelez (`dep:Delivery->Orchestration`). Ma a Brigade önmagán 2327 csomópont és 3947 él, 0 sértés; a próbát a saját mappánkban futtattuk."
+      "A Delivery hívja a futtatót, fordítva soha, de a hívás is porton megy: az `IAgentRunner`-t a Host valósítja meg. Ha a Delivery a portot megkerülve a `WorkerManager`-t kérné, az őr azonnal jelez (`dep:Delivery->Orchestration`). Ma a Brigade önmagán 2655 csomópont és 4926 él, 0 sértés; a próbát a saját mappánkban futtattuk."
     ],
     key: "A szándék kézzel írt szabály, az állapot a kódból számolt háló, a sértés a kettő különbsége. A v1-ben és ma is ez a különbség nulla."
   },
@@ -23539,7 +23581,7 @@ próba: a Delivery a port helyett a WorkerManager-t kéri (Shortcut.cs)
       ]
     },
     code: [
-      { file: "WorkerManager.cs (StartAsync, rövidítve)", code: raw`
+      { file: "Runs/WorkerManager.cs (StartAsync, rövidítve)", code: raw`
 var policy = RolePolicy.For(options.Value, request.Role);
 var agent = AgentFor(policy.Provider);
 var paths = RunPaths.For(options.Value.RunsRoot, request.Run);
@@ -23553,10 +23595,11 @@ try
     {
         Environment = new Dictionary<string, string> { ["BRIGADE_RUN_DIR"] = paths.Directory },
     };
-    var prompt = $"{request.Task} {request.Title} — a szereped: {request.Role}. "
+    var prompt = request.Prompt ?? $"{request.Task} {request.Title} — a szereped: {request.Role}. "
         + $"A munkakönyvtárad: {request.Workspace}.";
     run.Attach(await agent.StartAsync(new AgentExecutionRequest(
-        request.Run, request.Worker, prompt, policy.Access, paths, terminal), ct));
+        request.Run, request.Worker, prompt, policy.Access, paths, terminal)
+        { Permissions = request.Permissions }, ct));
 }
 // … catch: Failed; finally: run.Save(), run.Gate.Release()` },
       { file: "scenario.txt, 1. felvonás (valódi futás, rövidített korlátok, a futás órája)", lang: "text", code: raw`
@@ -23612,7 +23655,7 @@ try
       ]
     },
     code: [
-      { file: "WorkerManager.cs", code: raw`
+      { file: "Runs/WorkerManager.cs", code: raw`
 public async Task<CommandStatus> SendAsync(AgentCommand command, CancellationToken ct)
 {
     var run = Find(command.Run) ?? throw new InvalidOperationException(/* … */);
@@ -23623,7 +23666,7 @@ public async Task<CommandStatus> SendAsync(AgentCommand command, CancellationTok
     try { return await commands.ExecuteOnceAsync(run, command, ct); }
     finally { run.Gate.Release(); }
 }` },
-      { file: "CommandJournal.cs (ExecuteOnceAsync, rövidítve)", code: raw`
+      { file: "Journals/CommandJournal.cs (ExecuteOnceAsync, rövidítve)", code: raw`
 // … ha már "sent": nem küldjük újra; ha "sending" maradt: "uncertain", nem küldjük újra
 Append(run.Paths, new(command.CommandId, run.Id, kind, CommandStatus.Sending));
 try
@@ -23684,7 +23727,7 @@ case SendMessage message:
       ]
     },
     code: [
-      { file: "Supervisor.cs (Decide, részlet)", code: raw`
+      { file: "Supervision/Supervisor.cs (Decide, részlet)", code: raw`
 if (state == AgentState.Unresponsive)
     return health.InterruptSentAt switch
     {
@@ -23698,7 +23741,7 @@ if (state == AgentState.Unresponsive)
     };
 if (now - (health.LastActivityAt ?? health.StartedAt) > policy.ActivityTimeout)
     return new(SupervisorAction.MarkUnresponsive, $"{policy.ActivityTimeout} óta nincs aktivitás");` },
-      { file: "ShutdownLadder.cs", code: raw`
+      { file: "Supervision/ShutdownLadder.cs", code: raw`
 var stopped = (await GracefulAsync(run, ct)
         && await ExitedWithinAsync(run, policy.GracefulShutdown, ct))
     || await SignalAsync(run, 2, Signal.Interrupt, policy.SignalStep, ct)
@@ -23759,7 +23802,7 @@ var stopped = (await GracefulAsync(run, ct)
       ]
     },
     code: [
-      { file: "Reconciler.cs (részlet)", code: raw`
+      { file: "Runs/Reconciler.cs (részlet)", code: raw`
 // A napló megelőzheti a meta.json-t: az elmaradt eseményeket pótoljuk.
 foreach (var e in journal.Read(run.Paths).Where(e => e.NativeOffset > run.Meta.NativeOffset))
     run.Apply(e);
@@ -23767,7 +23810,8 @@ foreach (var e in journal.Read(run.Paths).Where(e => e.NativeOffset > run.Meta.N
 var pane = panes.GetValueOrDefault(run.Id.Value);
 if (Lifecycle.IsFinal(run.State))
 {
-    if (pane is not null)   // ha a CLI még nyitva van, a felügyelő leállítja
+    // ha a CLI még nyitva van, a felügyelő leállítja
+    if (pane is not null)
         run.Attach(new AgentHandle(run.Id, pane, run.Paths));
 }
 else if (pane is not null && RunnerStatus.Read(run.Paths)?.IsRunning(
@@ -24462,7 +24506,7 @@ történetírás             a gép a commitok trailereiből olvas (27.)      a 
         { id: "qa", kind: "box", title: "a Brigade ma", sub: "minőségbiztosítás · 21–30.", w: 440, x: 320, y: 300, tone: "ok", at: 1000,
           lines: [{ t: "szállítás: körök, kapuk G1–G6", chip: "26–29.", chipTone: "ok" },
             { t: "őr a Brigade-en, 48 modulhatár-kapu", chip: "0 sértés", chipTone: "ok" },
-            { t: "tesztek", chip: "258", chipTone: "ok" },
+            { t: "tesztek", chip: "324", chipTone: "ok" },
             { t: "két szállítás + három valódi próba", chip: "30.", chipTone: "ok" }] },
         { id: "n_rule", kind: "note", tone: "accent", text: "Előbb elemezni. Megőrizni a működést. Határt húzni.\nCsak a bizonyítottat általánosítani. A Codex a végén.", x: 320, y: 393, at: 1800 }
       ],
@@ -24487,7 +24531,7 @@ Zárás                 Z        egyben: futtató és szállítás, két láb, A
 
 v0: 8 sértés, 3 jellemző teszt
 v1: 0 sértés, 57 teszt; a Codex egy projekt, két sor a hostban, egy sor a beállításban
-ma: 0 sértés, 258 teszt; 2345 csomópont, 3999 él, 48 modulhatár-kapu, 142 ismeretlen él` },
+ma: 0 sértés, 324 teszt; 2655 csomópont, 4926 él, 48 modulhatár-kapu, 147 ismeretlen él` },
       { file: "ismert korlátok a futtatóban (kódolvasásból, nem futtattuk)", lang: "text", code: raw`
 brigade start     nem nézi, létezik-e már a futás mappája: kétszeri indításnál két panel
                  kapja ugyanazt a címkét, és a brigade recover elhasal
@@ -24505,13 +24549,13 @@ valódi próba     eddig három (kettő Claude Code-dal, egy Codexszel); valódi
       { nodes: ["v0"], match: ["v0: 8 sértés, 3 jellemző teszt", "Ahol tartunk          1–4."], on: true },
       { nodes: ["v1", "e_v"], match: ["v1: 0 sértés, 57 teszt", "Kiemelés              9–13."] },
       { nodes: ["n_rule"], match: ["Architektúra-őrzés    5–8.", "Codex                 19–20."] },
-      { nodes: ["qa", "e_q"], match: ["ma: 0 sértés, 258 teszt", "A gép szeme           22–25.", "A szállítás           26–29.", "Végig                 30."] },
+      { nodes: ["qa", "e_q"], match: ["ma: 0 sértés, 324 teszt", "A gép szeme           22–25.", "A szállítás           26–29.", "Végig                 30."] },
       { nodes: ["v1"], match: ["Reconciler       csak a futásmappákon megy végig"] },
       { nodes: ["qa"], match: ["tesztszint       a fogás és a vaklárma mérése", "valódi próba     eddig három (kettő Claude Code-dal, egy Codexszel)"] }
     ],
     why: [
       "A kiindulás egy működő, Claude-hoz nőtt orchestrator volt: értékes viselkedés, nem eldobható örökség. Előbb láthatóvá tettük és rögzítettük (1–8.), kiemeltük a határokat (9–13.), felügyeletet kapott (14–18.), és csak a végén jött a Codex (19–20.). A racsni nyolc sértésről nullára ment. A célkép teljesült: szolgáltatófüggetlen orchestrator, két adapter a saját képességeivel, közös futtatón és felügyelettel.",
-      "A második rész erre a futtatóra szállítást épített (21–29.). Egy kör, egy feladat, friss ágens; a gép a gitből mér, csak a zöldet commitolja, és ahol mérni nem tud, független ellenőrző ítél. Két szállítás ment végig álágenssel, három valódi ágenssel: kettő Claude Code-dal, egy Codexszel (30.). Ma 258 teszt, és az őr a Brigade-en 0 sértést talál, 48 modulhatár-kapuval.",
+      "A második rész erre a futtatóra szállítást épített (21–29.). Egy kör, egy feladat, friss ágens; a gép a gitből mér, csak a zöldet commitolja, és ahol mérni nem tud, független ellenőrző ítél. Két szállítás ment végig álágenssel, három valódi ágenssel: kettő Claude Code-dal, egy Codexszel (30.). Ma 324 teszt, és az őr a Brigade-en 0 sértést talál, 48 modulhatár-kapuval.",
       "Ami nyitva maradt, ki van mondva. A futtatóban: a Codex `queue`-ja és hookjai, a munkamenet-folytatás, a cgroup a szökő unokákhoz és a négy ismert korlát. A szállításban: a tesztszint, a még nem mért kiinduló számok és egy valódi, nem minta repó. Mindegyik egy-egy következő lépés, előbb bukó teszttel (7.)."
     ],
     key: "A közös pont nem a Claude és a Codex viselkedése, hanem a szerződés, amelyen át az orchestrator kezeli őket. Fölötte a szállítás: az ágens dolgozik, a gép mér és commitol, te jóváhagysz és döntesz."
