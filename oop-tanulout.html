@@ -659,13 +659,20 @@ button{font:inherit;color:inherit}
  "lang": "cs",
  "special": {
   "Z": "Záró állomás",
-  "M": "Kitérő"
+  "M": "Kitérő",
+  "A": "Alapok"
  },
  "placeNames": {
   "M": "Mintatár"
  },
- "foot": "A Z a záró tervezés, az M a minták tára.",
+ "foot": "Az A az alapok, a Z a záró tervezés, az M a minták tára.",
  "stations": [
+  {
+   "id": "sA",
+   "num": "A",
+   "short": "SOLID-elvek",
+   "section": "Alapok"
+  },
   {
    "id": "s1",
    "num": "1",
@@ -14253,6 +14260,682 @@ OOP.station({
   map: ["events", "store"], mapNote: "ezen az állomáson: az események szerződése, verziója és tárolása",
   tracks: [
     { id: "main", name: "Fő vonal · rendelés", sub: "verzió, késleltetett olvasat, event sourcing", steps: MAIN }
+  ]
+});
+})();
+
+</script>
+<script>/* sA.js */
+/* A állomás: SOLID-elvek (alapok) */
+(function () {
+"use strict";
+const { bad, ok, mut, neu } = OOP.h;
+const raw = OOP.raw;
+
+const MAIN = [
+{
+  title:"Öt betű, öt elv",
+  scene:{
+    nodes:[
+      {id:"s",kind:"box",x:190,y:50,w:340,title:"S · Single Responsibility",lines:["egy osztály, egy ok a változásra"]},
+      {id:"o",kind:"box",x:190,y:128,w:340,title:"O · Open/Closed",lines:["bővíthető, módosítás nélkül"]},
+      {id:"l",kind:"box",x:190,y:206,w:340,title:"L · Liskov Substitution",lines:["a leszármazott helyettesíti az őst"]},
+      {id:"i",kind:"box",x:190,y:284,w:340,title:"I · Interface Segregation",lines:["sok kicsi interfész egy kövér helyett"]},
+      {id:"d",kind:"box",x:190,y:362,w:340,title:"D · Dependency Inversion",lines:["absztrakciótól függj, ne részlettől"]},
+      {id:"n_s",kind:"note",x:520,y:50,text:"→ 2. állomás",tone:"accent"},
+      {id:"n_o",kind:"note",x:520,y:128,text:"→ 5. és 6. állomás",tone:"accent"},
+      {id:"n_l",kind:"note",x:520,y:206,text:"→ 14. állomás",tone:"accent"},
+      {id:"n_i",kind:"note",x:520,y:284,text:"→ 14. állomás",tone:"accent"},
+      {id:"n_d",kind:"note",x:520,y:362,text:"→ 10. állomás",tone:"accent"}
+    ],
+    edges:[
+      {id:"r_s",from:"s",to:"n_s",kind:"ref"},
+      {id:"r_o",from:"o",to:"n_o",kind:"ref"},
+      {id:"r_l",from:"l",to:"n_l",kind:"ref"},
+      {id:"r_i",from:"i",to:"n_i",kind:"ref"},
+      {id:"r_d",from:"d",to:"n_d",kind:"ref"}
+    ]
+  },
+  code:raw`
+// SOLID: öt objektumorientált tervezési elv kezdőbetűje.
+// Robert C. Martin gyűjtötte össze, a betűszót Michael Feathers adta.
+
+// S  Single Responsibility   egy osztálynak egy oka legyen a változásra
+// O  Open/Closed             legyen bővíthető a meglévő kód módosítása nélkül
+// L  Liskov Substitution     a leszármazott álljon helyt ott, ahol az ős áll
+// I  Interface Segregation   a hívó ne függjön olyan metódustól, amit nem használ
+// D  Dependency Inversion    a magas szintű kód absztrakciótól függjön, ne részlettől
+
+// Mind az öt ugyanarra a kérdésre felel:
+// ha holnap változik valami, hány helyen kell a kódhoz nyúlni,
+// és mi romlik el közben?`,
+  pairs:[
+    {nodes:["s","n_s","r_s"],match:["// S  Single Responsibility"]},
+    {nodes:["o","n_o","r_o"],match:["// O  Open/Closed"]},
+    {nodes:["l","n_l","r_l"],match:["// L  Liskov Substitution"]},
+    {nodes:["i","n_i","r_i"],match:["// I  Interface Segregation"]},
+    {nodes:["d","n_d","r_d"],match:["// D  Dependency Inversion"]},
+    {nodes:["s","o","l","i","d"],match:["ha holnap változik valami","és mi romlik el közben?"],on:true}
+  ],
+  why:[
+    "A **SOLID** öt tervezési elv kezdőbetűiből áll. Mindegyik az olvasható, karbantartható kódot (**clean code**) szolgálja: azt, hogy egy változás kevés helyet érintsen, és ne törjön el közben más.",
+    "Ez az állomás kis példákon mutatja be mind az ötöt, a rendeléskezelő világából. A modul állomásain mindegyik visszatér, valódi helyzetben és mélyebben. A jobb oldali jegyzet mutatja, hol."
+  ],
+  key:"A SOLID nem öt külön szabály, hanem öt kérdés a változásról: ki kéri, hol bővül, mit ígér, mitől függ."
+},
+{
+  title:"S · Három szereplő, egy osztály",
+  scene:{
+    nodes:[
+      {id:"a_acc",kind:"actor",x:90,y:100,label:"könyvelés"},
+      {id:"a_mkt",kind:"actor",x:90,y:210,label:"marketing"},
+      {id:"a_ops",kind:"actor",x:90,y:320,label:"üzemeltetés"},
+      {id:"rep",kind:"box",x:440,y:210,w:280,title:"OrderReport",tone:"bad",
+        lines:["CalculateTotal(order)","RenderHtml(order)","SaveToFile(order, folder)"]},
+      {id:"n_bad",kind:"note",x:440,y:330,text:"három szereplő, egy osztály:\nhárom ok a változásra",tone:"bad"}
+    ],
+    edges:[
+      {id:"e1",from:"a_acc",to:"rep",toLine:0,kind:"bad",label:"új ÁFA-kulcs"},
+      {id:"e2",from:"a_mkt",to:"rep",toLine:1,kind:"bad",label:"új arculat"},
+      {id:"e3",from:"a_ops",to:"rep",toLine:2,kind:"bad",label:"új tárhely"}
+    ]
+  },
+  code:raw`
+// egyszerűsítve: a pénz itt decimal, a 3. állomás teszi Money-vá
+public sealed class OrderReport
+{
+    public decimal CalculateTotal(Order order)
+    {
+        var net = order.Lines.Sum(l => l.UnitPrice * l.Quantity);
+        return net * 1.27m;                  // ÁFA: a könyvelés szabálya
+    }
+
+    public string RenderHtml(Order order)
+    {
+        // a lap kinézete: a marketing kérése
+        return $"<h1>Rendelés #{order.Id}</h1><p>{CalculateTotal(order)} Ft</p>";
+    }
+
+    public void SaveToFile(Order order, string folder)
+    {
+        // a tárolás helye: az üzemeltetés döntése
+        var path = Path.Combine(folder, $"order-{order.Id}.html");
+        File.WriteAllText(path, RenderHtml(order));
+    }
+}`,
+  pairs:[
+    {nodes:["a_acc","e1"],match:["public decimal CalculateTotal","return net * 1.27m"]},
+    {nodes:["a_mkt","e2"],match:["public string RenderHtml","a marketing kérése"]},
+    {nodes:["a_ops","e3"],match:["public void SaveToFile","az üzemeltetés döntése"]},
+    {nodes:["rep","n_bad"],match:["public sealed class OrderReport"],on:true}
+  ],
+  why:[
+    "Az `OrderReport` egyszerre számol, formáz és fájlt ír. Ez kényelmesnek látszik, amíg csak egy ember kér tőle valamit.",
+    "Itt három különböző szereplő kér változást: a könyvelés új adókulcsot, a marketing új kinézetet, az üzemeltetés új tárhelyet. Mindhárom ugyanazt a fájlt módosítja. Ha a marketing kérése miatt átírod a formázást, a számítás is újrafordul, újra kell tesztelni, és egy elcsúszott sor a végösszeget is elronthatja."
+  ]
+},
+{
+  title:"S · Egy ok a változásra",
+  see:[{station:"s2",label:"Mélyebben: 2. állomás, Felelősség"}],
+  scene:{
+    nodes:[
+      {id:"a_acc",kind:"actor",x:90,y:80,label:"könyvelés"},
+      {id:"a_mkt",kind:"actor",x:90,y:200,label:"marketing"},
+      {id:"a_ops",kind:"actor",x:90,y:320,label:"üzemeltetés"},
+      {id:"b_tot",kind:"box",x:440,y:80,w:260,title:"OrderTotals",tone:"new",lines:["GrossTotal(order)"]},
+      {id:"b_html",kind:"box",x:440,y:200,w:260,title:"OrderReportHtml",tone:"new",lines:["Render(order)"]},
+      {id:"b_arch",kind:"box",x:440,y:320,w:260,title:"ReportArchive",tone:"new",lines:["Save(name, content)"]}
+    ],
+    edges:[
+      {id:"e1",from:"a_acc",to:"b_tot",kind:"ok",label:"új ÁFA-kulcs"},
+      {id:"e2",from:"a_mkt",to:"b_html",kind:"ok",label:"új arculat"},
+      {id:"e3",from:"a_ops",to:"b_arch",kind:"ok",label:"új tárhely"},
+      {id:"u1",from:"b_html",to:"b_tot",kind:"muted"}
+    ]
+  },
+  code:raw`
+public sealed class OrderTotals                              // könyvelés
+{
+    private const decimal VatRate = 0.27m;
+
+    public decimal GrossTotal(Order order) =>
+        order.Lines.Sum(l => l.UnitPrice * l.Quantity) * (1 + VatRate);
+}
+
+public sealed class OrderReportHtml(OrderTotals totals)      // marketing
+{
+    public string Render(Order order) =>
+        $"<h1>Rendelés #{order.Id}</h1><p>{totals.GrossTotal(order)} Ft</p>";
+}
+
+public sealed class ReportArchive(string folder)             // üzemeltetés
+{
+    public void Save(string name, string content) =>
+        File.WriteAllText(Path.Combine(folder, name), content);
+}`,
+  pairs:[
+    {nodes:["a_acc","b_tot","e1"],match:["class OrderTotals","private const decimal VatRate"]},
+    {nodes:["a_mkt","b_html","e2","u1"],match:["class OrderReportHtml","public string Render"]},
+    {nodes:["a_ops","b_arch","e3"],match:["class ReportArchive","public void Save"]},
+    {nodes:["b_tot","b_html","b_arch"],match:["// könyvelés","// marketing","// üzemeltetés"],on:true}
+  ],
+  why:[
+    "Az **egyetlen felelősség elve** (Single Responsibility Principle, SRP): egy osztálynak egyetlen oka legyen a változásra. A „felelősség” itt nem metódust jelent, hanem egy szereplőt, akinek az igénye miatt a kód változik.",
+    "Most minden kérés egy osztályba fut be. Az adókulcs cseréje nem érinti a HTML-t, az új tárhely nem érinti a számítást. Az elv nem azt kéri, hogy minden osztály egy metódusból álljon: egy osztálynak lehet sok metódusa, ha mind ugyanannak a szereplőnek szól."
+  ],
+  key:"Próba: ki kérheti ennek az osztálynak a módosítását? Ha egynél több, egymástól független szereplő, szedd szét."
+},
+{
+  title:"O · Minden új mód a régi kódba nyúl",
+  scene:{
+    nodes:[
+      {id:"a_wh",kind:"actor",x:100,y:70,label:"raktár: új mód"},
+      {id:"calc",kind:"box",x:400,y:170,w:300,title:"ShippingCalculator",
+        lines:["standard","express","pickup",{t:"locker",tone:"bad",chip:"módosítás",chipTone:"bad"}]},
+      {id:"del",kind:"box",x:400,y:330,w:300,title:"Delivery(type)",
+        lines:["express",{t:"locker",tone:"bad",chip:"módosítás",chipTone:"bad"}]},
+      {id:"n_bad",kind:"note",x:115,y:370,text:"minden új mód:\nugyanaz a fájl,\nminden ág újra tesztelve",tone:"bad"}
+    ],
+    edges:[
+      {id:"e1",from:"a_wh",to:"calc",toLine:3,kind:"bad",label:"switch-ág"},
+      {id:"e2",from:"a_wh",to:"del",toLine:1,kind:"bad",curve:0.35}
+    ]
+  },
+  code:raw`
+public sealed class ShippingCalculator
+{
+    public decimal Cost(string type, int itemCount) => type switch
+    {
+        "standard" => 1490m,
+        "express"  => 2990m + 200m * itemCount,
+        "pickup"   => 0m,
+        "locker"   => 990m,          // új mód: bele kell nyúlni a működő kódba
+        _ => throw new ArgumentException($"ismeretlen mód: {type}")
+    };
+
+    public TimeSpan Delivery(string type) => type switch
+    {
+        "express" => TimeSpan.FromDays(1),
+        "locker"  => TimeSpan.FromDays(2),   // és itt is, ha nem felejtjük el
+        _ => TimeSpan.FromDays(3)
+    };
+}`,
+  pairs:[
+    {nodes:["calc","e1"],match:["\"locker\"   => 990m"],on:true},
+    {nodes:["del","e2"],match:["\"locker\"  => TimeSpan.FromDays(2)"],on:true},
+    {nodes:["n_bad"],match:["public decimal Cost(string type","public TimeSpan Delivery(string type)"]}
+  ],
+  why:[
+    "A szállítási módok egy `switch`-ben élnek. Amikor a raktár bevezeti a csomagautomatát, a működő, letesztelt osztályt kell módosítani, ráadásul két helyen. Ha a második helyet elfelejted, a fordító nem szól.",
+    "Ez a **nyitott-zárt elv** (Open/Closed Principle) megsértése: új viselkedéshez régi kódot kell átírni, és minden régi ág újra kockán forog."
+  ]
+},
+{
+  title:"O · Új mód, új osztály",
+  see:[{station:"s5",label:"Mélyebben: 5. állomás, Polimorfizmus és kompozíció"}],
+  scene:{
+    nodes:[
+      {id:"iface",kind:"box",x:320,y:70,w:260,title:"IShippingMethod",lines:["Cost(itemCount)","Delivery"]},
+      {id:"std",kind:"box",x:85,y:240,w:150,title:"StandardShipping",lines:["1490 Ft"]},
+      {id:"exp",kind:"box",x:240,y:240,w:150,title:"ExpressShipping",lines:["2990 Ft + db"]},
+      {id:"pick",kind:"box",x:395,y:240,w:150,title:"PickupShipping",lines:["0 Ft"]},
+      {id:"lock",kind:"box",x:550,y:240,w:150,title:"LockerShipping",tone:"new",lines:["990 Ft"]},
+      {id:"n_ok",kind:"note",x:320,y:360,text:"új mód = új fájl; a régiekhez senki nem nyúlt",tone:"ok"}
+    ],
+    edges:[
+      {id:"i1",from:"std",to:"iface",kind:"inherit"},
+      {id:"i2",from:"exp",to:"iface",kind:"inherit"},
+      {id:"i3",from:"pick",to:"iface",kind:"inherit"},
+      {id:"i4",from:"lock",to:"iface",kind:"inherit"}
+    ]
+  },
+  code:raw`
+public interface IShippingMethod
+{
+    decimal Cost(int itemCount);
+    TimeSpan Delivery { get; }
+}
+
+public sealed class StandardShipping : IShippingMethod
+{
+    public decimal Cost(int itemCount) => 1490m;
+    public TimeSpan Delivery => TimeSpan.FromDays(3);
+}
+// ExpressShipping és PickupShipping ugyanígy, mind a saját fájljában
+
+// az új mód: egy új fájl, a meglévő kód érintetlen
+public sealed class LockerShipping : IShippingMethod
+{
+    public decimal Cost(int itemCount) => 990m;
+    public TimeSpan Delivery => TimeSpan.FromDays(2);
+}
+
+// a hívó csak az interfészt ismeri, nem tudja, melyik módot kapta
+public decimal ShippingFor(IShippingMethod method, int itemCount) =>
+    method.Cost(itemCount);`,
+  pairs:[
+    {nodes:["lock","i4","n_ok"],match:["public sealed class LockerShipping","az új mód: egy új fájl"],on:true},
+    {nodes:["iface"],match:["public interface IShippingMethod","public decimal ShippingFor"]},
+    {nodes:["std","i1"],match:["public sealed class StandardShipping"]},
+    {nodes:["exp","pick","i2","i3"],match:["ExpressShipping és PickupShipping"]}
+  ],
+  why:[
+    "A **nyitott-zárt elv**: a kód legyen nyitott a bővítésre és zárt a módosításra. Új viselkedéshez új kódot írunk, a működőt békén hagyjuk. Az eszköze a **polimorfizmus**: a hívó egy interfésszel beszél, és nem tudja, melyik megvalósítást kapta.",
+    "A „zárt” nem azt jelenti, hogy egy osztályt soha többé nem javítunk. Azt jelenti, hogy ahol a változás várható, ott legyen bővítési pont. Ahol még soha nem változott semmi, ott nem kell előre interfészt építeni."
+  ],
+  key:"Ha egy új változat bevezetése működő kód átírásával jár, keresd a hiányzó bővítési pontot."
+},
+{
+  title:"L · A leszármazott, amely nem áll helyt",
+  scene:{
+    nodes:[
+      {id:"job",kind:"actor",x:110,y:60,label:"éjszakai címkenyomtatás"},
+      {id:"iface",kind:"box",x:440,y:70,w:260,title:"IShippingMethod",lines:["Cost(itemCount)","PrintLabel(order)"]},
+      {id:"std",kind:"box",x:180,y:260,w:240,title:"StandardShipping",lines:["címkét ad"]},
+      {id:"pick",kind:"box",x:460,y:260,w:240,title:"PickupShipping",tone:"bad",
+        lines:[{t:"PrintLabel",tone:"bad",chip:"kivétel",chipTone:"bad"}]},
+      {id:"n_bad",kind:"note",x:460,y:370,text:"NotSupportedException:\na nyomtatás megáll",tone:"bad",at:2100}
+    ],
+    edges:[
+      {id:"i1",from:"std",to:"iface",kind:"inherit"},
+      {id:"i2",from:"pick",to:"iface",kind:"inherit"}
+    ],
+    msgs:[
+      {from:"job",to:"std",label:"PrintLabel",at:0,code:["printer.Print(order.Shipping.PrintLabel(order))"]},
+      {from:"std",to:"job",label:"címke",kind:"ret",at:800,curve:-0.5},
+      {from:"job",to:"pick",label:"PrintLabel",kind:"bad",at:1500,curve:0.15}
+    ]
+  },
+  code:raw`
+public interface IShippingMethod
+{
+    decimal Cost(int itemCount);
+    Label PrintLabel(Order order);
+}
+
+public sealed class PickupShipping : IShippingMethod
+{
+    public decimal Cost(int itemCount) => 0m;
+
+    // személyes átvételnél nincs csomag, tehát címke sincs
+    public Label PrintLabel(Order order) =>
+        throw new NotSupportedException("személyes átvételhez nincs címke");
+}
+
+// a nyomtatás joggal hiszi, hogy minden szállítási mód ad címkét
+foreach (var order in todaysOrders)
+    printer.Print(order.Shipping.PrintLabel(order));  // az első átvételes rendelésnél elszáll`,
+  pairs:[
+    {nodes:["pick","n_bad"],match:["throw new NotSupportedException","az első átvételes rendelésnél"],on:true},
+    {nodes:["iface","i1","i2"],match:["Label PrintLabel(Order order);"]},
+    {nodes:["job"],match:["foreach (var order in todaysOrders)","a nyomtatás joggal hiszi"]}
+  ],
+  why:[
+    "A `PickupShipping` megvalósítja az interfészt, a fordító elégedett. A címkét viszont nem tudja előállítani, ezért kivételt dob. Az éjszakai nyomtatás az első személyes átvételnél megáll.",
+    "A hiba nem a nyomtatóban van. A hívó jogosan hitte el, amit az interfész ígért: minden szállítási mód ad címkét. A `PickupShipping` ezt az ígéretet szegi meg."
+  ]
+},
+{
+  title:"L · Amit az ős ígér, azt a leszármazott is tartsa",
+  see:[{station:"s14",label:"Mélyebben: 14. állomás, Helyettesíthetőség"}],
+  scene:{
+    nodes:[
+      {id:"check",kind:"box",x:200,y:150,w:340,title:"Liskov-próba",sub:"a hívó szemszögéből",
+        lines:["előfeltétel: nem szigorúbb","utófeltétel: nem gyengébb","invariáns: megmarad","új fajta kivétel: nincs"]},
+      {id:"n_bad",kind:"note",x:490,y:70,text:"if (x is PickupShipping)\na hívóban: rossz jel",tone:"bad"},
+      {id:"n_ok",kind:"note",x:490,y:200,text:"az ős csak azt ígérje,\namit mindenki tud",tone:"ok"},
+      {id:"n_next",kind:"note",x:320,y:340,text:"a címke külön képesség lesz: ez az I betű, két lépés múlva",tone:"accent"}
+    ],
+    edges:[
+      {id:"e1",from:"n_ok",to:"n_next",kind:"ref"}
+    ]
+  },
+  code:raw`
+// Rossz javítás: a hívó kezdi megkülönböztetni a megvalósításokat
+foreach (var order in todaysOrders)
+{
+    if (order.Shipping is PickupShipping) continue;   // minden új kivételnél újabb if
+    printer.Print(order.Shipping.PrintLabel(order));
+}
+
+// A Liskov-próba: amit az ős ígér, azt minden leszármazott tartsa be
+//   előfeltétel:   nem lehet szigorúbb   (nem kérhet többet a hívótól)
+//   utófeltétel:   nem lehet gyengébb    (nem adhat kevesebbet)
+//   invariáns:     megmarad              (ami az ősnél mindig igaz, itt is igaz)
+//   kivétel:       nincs új fajta        (NotSupportedException sem)
+
+// Jó javítás: az interfész csak azt ígérje, amit minden megvalósítás teljesít.
+// A címkenyomtatás külön képesség, csak az kapja, aki tényleg tudja.`,
+  pairs:[
+    {nodes:["n_bad"],match:["if (order.Shipping is PickupShipping) continue;","Rossz javítás"]},
+    {nodes:["check"],match:["előfeltétel:","utófeltétel:","invariáns:","kivétel:"],on:true},
+    {nodes:["n_ok","n_next","e1"],match:["Jó javítás","A címkenyomtatás külön képesség"]}
+  ],
+  why:[
+    "A **Liskov-féle helyettesítési elv** (Liskov Substitution Principle, LSP; Barbara Liskov, 1987): ahol a program egy őst vagy interfészt vár, ott bármelyik leszármazott megállja a helyét, a hívó meglepetése nélkül.",
+    "A típus egyezése ehhez kevés, a viselkedésnek is egyeznie kell. Ha a hívóban `is` vizsgálat vagy `NotSupportedException` jelenik meg, a szerződés rossz. Ilyenkor nem a hívót foltozzuk, hanem a szerződést szűkítjük arra, amit mindenki teljesít."
+  ],
+  key:"Ha a hívónak tudnia kell, melyik leszármazottat kapta, a helyettesíthetőség már sérült."
+},
+{
+  title:"I · Kövér interfész, kényszerű megvalósítás",
+  scene:{
+    nodes:[
+      {id:"cart",kind:"actor",x:90,y:60,label:"kosár"},
+      {id:"printer",kind:"actor",x:90,y:160,label:"címkenyomtató"},
+      {id:"iface",kind:"box",x:430,y:110,w:280,title:"IShippingMethod",tone:"bad",
+        lines:["Cost(itemCount)","PrintLabel(order)","TrackingUrl(parcelId)","SchedulePickup(day)"]},
+      {id:"pick",kind:"box",x:170,y:320,w:260,title:"PickupShipping",
+        lines:["Cost: 0 Ft",bad("PrintLabel: kivétel"),bad("TrackingUrl: kivétel")]},
+      {id:"lock",kind:"box",x:470,y:320,w:260,title:"LockerShipping",
+        lines:["Cost, PrintLabel","TrackingUrl",bad("SchedulePickup: kivétel")]}
+    ],
+    edges:[
+      {id:"u1",from:"cart",to:"iface",toLine:0,kind:"muted",label:"csak ár"},
+      {id:"u2",from:"printer",to:"iface",toLine:1,kind:"muted",label:"csak címke"},
+      {id:"i1",from:"pick",to:"iface",kind:"inherit"},
+      {id:"i2",from:"lock",to:"iface",kind:"inherit"}
+    ]
+  },
+  code:raw`
+public interface IShippingMethod
+{
+    decimal Cost(int itemCount);
+    Label PrintLabel(Order order);
+    Uri TrackingUrl(string parcelId);
+    void SchedulePickup(DateOnly day);       // futár rendelése a raktárhoz
+}
+
+public sealed class PickupShipping : IShippingMethod
+{
+    public decimal Cost(int itemCount) => 0m;
+    public Label PrintLabel(Order order) => throw new NotSupportedException();
+    public Uri TrackingUrl(string parcelId) => throw new NotSupportedException();
+    public void SchedulePickup(DateOnly day) => throw new NotSupportedException();
+}
+
+// a kosár csak árat kér, mégis a teljes felülettől függ
+public sealed class CartPage(IShippingMethod shipping)
+{
+    public decimal ShippingCost(int itemCount) => shipping.Cost(itemCount);
+}`,
+  pairs:[
+    {nodes:["pick","i1"],match:["=> throw new NotSupportedException();"],on:true},
+    {nodes:["iface"],match:["public interface IShippingMethod","void SchedulePickup(DateOnly day);"]},
+    {nodes:["cart","u1"],match:["public sealed class CartPage(IShippingMethod shipping)","shipping.Cost(itemCount)"]},
+    {nodes:["printer","u2"],match:["Label PrintLabel(Order order);"]},
+    {nodes:["lock","i2"],match:["void SchedulePickup(DateOnly day);"]}
+  ],
+  why:[
+    "Az interfész idővel mindent magába szívott, amit valaha valamelyik szállítási mód tudott. Aki megvalósítja, annak mindent meg kell írnia, akkor is, ha nem érti. A `PickupShipping` háromszor dob kivételt, és ez már a Liskov-elv megsértése.",
+    "A hívók oldalán is baj van. A kosár csak az árat kéri, mégis egy négymetódusos felülettől függ. Ha a futárrendelés szignatúrája változik, a kosarat is újra kell fordítani és tesztelni, pedig hozzá semmi köze."
+  ]
+},
+{
+  title:"I · Kicsi interfészek, pontos függés",
+  see:[{station:"s14",label:"Mélyebben: 14. állomás, Helyettesíthetőség"}],
+  scene:{
+    nodes:[
+      {id:"quote",kind:"box",x:110,y:70,w:190,title:"IShippingQuote",tone:"new",lines:["Cost(itemCount)"]},
+      {id:"label",kind:"box",x:320,y:70,w:190,title:"ILabelPrinting",tone:"new",lines:["PrintLabel(order)"]},
+      {id:"track",kind:"box",x:530,y:70,w:190,title:"IParcelTracking",tone:"new",lines:["TrackingUrl(id)"]},
+      {id:"std",kind:"box",x:200,y:290,w:220,title:"StandardShipping",lines:["mindhármat tudja"]},
+      {id:"pick",kind:"box",x:480,y:290,w:220,title:"PickupShipping",lines:["csak árat ad"]},
+      {id:"n_ok",kind:"note",x:320,y:385,text:"mindenki csak azt kéri és ígéri, amit tényleg használ",tone:"ok"}
+    ],
+    edges:[
+      {id:"i1",from:"std",to:"quote",kind:"inherit"},
+      {id:"i2",from:"std",to:"label",kind:"inherit"},
+      {id:"i3",from:"std",to:"track",kind:"inherit"},
+      {id:"i4",from:"pick",to:"quote",kind:"inherit"}
+    ]
+  },
+  code:raw`
+public interface IShippingQuote  { decimal Cost(int itemCount); }
+public interface ILabelPrinting  { Label PrintLabel(Order order); }
+public interface IParcelTracking { Uri TrackingUrl(string parcelId); }
+
+public sealed class StandardShipping : IShippingQuote, ILabelPrinting, IParcelTracking
+{ /* ... */ }
+
+public sealed class PickupShipping : IShippingQuote
+{
+    public decimal Cost(int itemCount) => 0m;     // ennyit ígér, ezt be is tartja
+}
+
+// a kosár csak az árat kéri
+public sealed class CartPage(IShippingQuote quote)
+{
+    public decimal ShippingCost(int itemCount) => quote.Cost(itemCount);
+}
+
+// a nyomtatás csak címkét kér; PickupShipping ide le sem fordul
+public sealed class NightlyLabels(ILabelPrinting printing) { /* ... */ }`,
+  pairs:[
+    {nodes:["pick","i4"],match:["public sealed class PickupShipping : IShippingQuote"],on:true},
+    {nodes:["std","i1","i2","i3"],match:["class StandardShipping : IShippingQuote, ILabelPrinting, IParcelTracking"]},
+    {nodes:["quote"],match:["public interface IShippingQuote","class CartPage(IShippingQuote quote)"]},
+    {nodes:["label"],match:["public interface ILabelPrinting","class NightlyLabels(ILabelPrinting printing)"]},
+    {nodes:["track"],match:["public interface IParcelTracking"]}
+  ],
+  why:[
+    "Az **interfész-szétválasztás elve** (Interface Segregation Principle, ISP): a hívó ne függjön olyan metódustól, amelyet nem használ. Több kicsi, egy-egy szerepre szabott interfész jobb, mint egy nagy, mindent tudó.",
+    "A megvalósítás annyit vállal, amennyit tud: a `PickupShipping` csak árat ad, és ezt be is tartja. Az I így a Liskov-elv párja: a szűk ígéretet könnyű betartani. Ha valaki átvételes módot adna a nyomtatásnak, már a fordító szól."
+  ],
+  key:"Az interfészt a hívó igénye szabja meg, nem a megvalósító tudása."
+},
+{
+  title:"D · Az üzleti lépés a technikától függ",
+  scene:{
+    nodes:[
+      {id:"svc",kind:"box",x:320,y:80,w:300,title:"OrderService",sub:"magas szint: üzleti lépés",lines:["Confirm(orderId)"]},
+      {id:"db",kind:"box",x:170,y:270,w:250,title:"MySqlOrderRepository",sub:"alacsony szint",lines:["Load, Save"]},
+      {id:"mail",kind:"box",x:470,y:270,w:250,title:"SmtpMailer",sub:"alacsony szint",lines:["Send(to, text)"]},
+      {id:"n_bad",kind:"note",x:320,y:380,text:"adatbázis-csere = az OrderService átírása",tone:"bad"}
+    ],
+    edges:[
+      {id:"e1",from:"svc",to:"db",kind:"bad",label:"new"},
+      {id:"e2",from:"svc",to:"mail",kind:"bad",label:"new"}
+    ]
+  },
+  code:raw`
+public sealed class OrderService
+{
+    public void Confirm(Guid orderId)
+    {
+        var repository = new MySqlOrderRepository("Server=db;Database=shop");
+        var mailer = new SmtpMailer("smtp.example.com");
+
+        var order = repository.Load(orderId);
+        order.Confirm();
+        repository.Save(order);
+        mailer.Send(order.CustomerEmail, "A rendelésedet megerősítettük.");
+    }
+}
+
+// MySQL helyett PostgreSQL: az OrderService-t kell átírni.
+// Teszt adatbázis és levelezőszerver nélkül: nem futtatható.`,
+  pairs:[
+    {nodes:["db","e1"],match:["new MySqlOrderRepository","MySQL helyett PostgreSQL"],on:true},
+    {nodes:["mail","e2"],match:["new SmtpMailer","mailer.Send"]},
+    {nodes:["svc","n_bad"],match:["public void Confirm(Guid orderId)","nem futtatható"]}
+  ],
+  why:[
+    "Az `OrderService` egy üzleti lépést visz: a rendelés megerősítését. Közben maga hozza létre az adatbázis-elérést és a levelezőt, tehát a legfontosabb kód a legkönnyebben cserélődő részletektől függ.",
+    "Ha a cég MySQL-ről PostgreSQL-re vált, vagy SMTP helyett levelezőszolgáltatást használ, az üzleti osztályt kell átírni. Tesztelni sem lehet anélkül, hogy egy valódi adatbázis és levelező futna."
+  ]
+},
+{
+  title:"D · A mag mondja meg, mire van szüksége",
+  see:[{station:"s10",label:"Mélyebben: 10. állomás, Rétegek és függőségi irány"}],
+  scene:{
+    nodes:[
+      {id:"core",kind:"group",x:320,y:125,w:610,h:220,label:"üzleti mag"},
+      {id:"svc",kind:"box",x:320,y:70,w:240,title:"OrderService",lines:["Confirm(orderId)"]},
+      {id:"repo",kind:"box",x:170,y:185,w:220,title:"IOrderRepository",tone:"new",lines:["Load, Save"]},
+      {id:"notif",kind:"box",x:470,y:185,w:220,title:"INotifier",tone:"new",lines:["OrderConfirmed(order)"]},
+      {id:"pg",kind:"box",x:170,y:320,w:240,title:"PostgresOrderRepository",lines:["a technika a szélén"]},
+      {id:"smtp",kind:"box",x:470,y:320,w:220,title:"SmtpNotifier",lines:["a technika a szélén"]},
+      {id:"n_ok",kind:"note",x:320,y:395,text:"a nyíl a mag felé mutat: a technika igazodik",tone:"ok"}
+    ],
+    edges:[
+      {id:"u1",from:"svc",to:"repo",kind:"ok"},
+      {id:"u2",from:"svc",to:"notif",kind:"ok"},
+      {id:"i1",from:"pg",to:"repo",kind:"inherit"},
+      {id:"i2",from:"smtp",to:"notif",kind:"inherit"}
+    ]
+  },
+  code:raw`
+// az üzleti mag mondja meg, mire van szüksége
+public interface IOrderRepository
+{
+    Order Load(Guid id);
+    void Save(Order order);
+}
+
+public interface INotifier
+{
+    void OrderConfirmed(Order order);
+}
+
+public sealed class OrderService(IOrderRepository repository, INotifier notifier)
+{
+    public void Confirm(Guid orderId)
+    {
+        var order = repository.Load(orderId);
+        order.Confirm();
+        repository.Save(order);
+        notifier.OrderConfirmed(order);
+    }
+}
+
+// a technika a szélén: ezek igazodnak a maghoz
+public sealed class PostgresOrderRepository : IOrderRepository { /* ... */ }
+public sealed class SmtpNotifier : INotifier { /* ... */ }`,
+  pairs:[
+    {nodes:["pg","smtp","i1","i2"],match:["class PostgresOrderRepository : IOrderRepository","class SmtpNotifier : INotifier"],on:true},
+    {nodes:["repo","u1"],match:["public interface IOrderRepository","repository.Load(orderId)"]},
+    {nodes:["notif","u2"],match:["public interface INotifier","notifier.OrderConfirmed(order)"]},
+    {nodes:["svc","core"],match:["class OrderService(IOrderRepository repository, INotifier notifier)"]}
+  ],
+  why:[
+    "A **függőség-megfordítás elve** (Dependency Inversion Principle, DIP) két dolgot mond. A magas szintű kód ne függjön az alacsony szintűtől: mindkettő absztrakciótól függjön. Az absztrakció pedig ne a részletekhez igazodjon, hanem a részletek hozzá.",
+    "A „megfordítás” az interfész gazdájára vonatkozik. Az `IOrderRepository` a maghoz tartozik, az ő nyelvén beszél, és a PostgreSQL-es osztály valósítja meg. Ezért a nyíl most kintről befelé mutat. Az adatbázis cseréje egy új megvalósítás és egy beállítás, az `OrderService` érintetlen marad."
+  ],
+  key:"Absztrakciótól függj, ne konkrét megvalósítástól, és az absztrakció a hívóé legyen."
+},
+{
+  title:"D · Befecskendezés és megfordítás: nem ugyanaz",
+  scene:{
+    nodes:[
+      {id:"root",kind:"box",x:150,y:80,w:250,title:"Program.cs",sub:"összerakás (DI)",lines:["AddScoped<IOrderRepository, …>"]},
+      {id:"svc",kind:"box",x:480,y:80,w:220,title:"OrderService",lines:["(repository, notifier)"]},
+      {id:"pg",kind:"box",x:480,y:230,w:240,title:"PostgresOrderRepository",lines:["élesben"]},
+      {id:"test",kind:"actor",x:150,y:230,label:"teszt"},
+      {id:"fake",kind:"box",x:170,y:330,w:240,title:"InMemoryOrderRepository",lines:["tesztben"]},
+      {id:"n_def",kind:"note",x:480,y:345,text:"DI: honnan kapja.\nDIP: kié az interfész.",tone:"accent"}
+    ],
+    edges:[
+      {id:"e1",from:"root",to:"svc",kind:"ok",label:"beadja"},
+      {id:"e2",from:"root",to:"pg",kind:"muted",label:"kiválasztja"},
+      {id:"e3",from:"test",to:"svc",kind:"ok"},
+      {id:"e4",from:"test",to:"fake",kind:"muted"}
+    ]
+  },
+  code:[
+    {file:"Program.cs",code:raw`
+var builder = WebApplication.CreateBuilder(args);
+
+// egyetlen hely, ahol eldől, melyik megvalósítás áll az interfész mögött
+builder.Services.AddScoped<IOrderRepository, PostgresOrderRepository>();
+builder.Services.AddScoped<INotifier, SmtpNotifier>();
+builder.Services.AddScoped<OrderService>();
+
+var app = builder.Build();
+
+// DI elv nélkül is lehet: ez befecskendezett, mégis konkrét technikától függ
+public sealed class ReportService(MySqlOrderRepository repository) { /* ... */ }`},
+    {file:"OrderServiceTests.cs",code:raw`
+[Fact]
+public void Confirm_notifies_the_customer()
+{
+    var notifier = new FakeNotifier();
+    var service = new OrderService(new InMemoryOrderRepository(SampleOrder()), notifier);
+
+    service.Confirm(SampleOrderId);
+
+    Assert.Single(notifier.Confirmed);
+}`}
+  ],
+  pairs:[
+    {nodes:["root","e1","e2"],match:["builder.Services.AddScoped<IOrderRepository, PostgresOrderRepository>()","AddScoped<OrderService>"],on:true},
+    {nodes:["pg"],match:["PostgresOrderRepository>()"]},
+    {nodes:["test","fake","e3","e4"],match:["new OrderService(new InMemoryOrderRepository(SampleOrder()), notifier)"]},
+    {nodes:["n_def"],match:["DI elv nélkül is lehet","class ReportService(MySqlOrderRepository repository)"]}
+  ],
+  why:[
+    "A **függőség-befecskendezés** (Dependency Injection, DI) technika: az osztály kívülről, a konstruktorán át kapja a függőségeit, nem maga hozza létre őket. A **függőség-megfordítás** (DIP) elv: arról szól, kié az interfész és merre mutat a függőség.",
+    "A kettő gyakran együtt jár, de nem ugyanaz. A `ReportService` befecskendezve kapja a függőségét, mégis egy konkrét MySQL-osztálytól függ: DI van, DIP nincs. A DIP-hez a DI adja az eszközt: a `Program.cs` egy helyen rakja össze az éles változatot, a teszt pedig a saját, adatbázis nélküli változatát adja be."
+  ],
+  key:"A DI azt mondja meg, honnan kapja az osztály a függőségét. A DIP azt, hogy mitől szabad függenie."
+},
+{
+  title:"Mérleg: öt kérdés, nem öt törvény",
+  scene:{
+    nodes:[
+      {id:"s",kind:"state",x:80,y:70,label:"S"},
+      {id:"o",kind:"state",x:200,y:70,label:"O"},
+      {id:"l",kind:"state",x:320,y:70,label:"L"},
+      {id:"i",kind:"state",x:440,y:70,label:"I"},
+      {id:"d",kind:"state",x:560,y:70,label:"D"},
+      {id:"n_ok",kind:"note",x:320,y:200,text:"mindegyik azt kérdezi: mi történik, ha változik a kód?",tone:"ok"},
+      {id:"n_bad",kind:"note",x:320,y:320,
+        text:"túlzás:\ninterfész minden osztályhoz, egyetlen megvalósítással\nbővítési pont ott, ahol soha nem változik semmi\nöt apró osztály egy háromsoros szabály helyett",tone:"bad"}
+    ],
+    edges:[
+      {id:"e_il",from:"i",to:"l",kind:"ok",curve:0.5,label:"szűk ígéret"},
+      {id:"e_do",from:"d",to:"o",kind:"ok",curve:-0.35,label:"cserélhetőség"}
+    ]
+  },
+  code:raw`
+// Az öt elv öt kérdés, amit a kódnak felteszel:
+//   S  Ki kéri ennek a változását? Ha több független szereplő, szedd szét.
+//   O  Hol várható új változat? Ott legyen bővítési pont, máshol ne.
+//   L  Megállja-e a helyét a leszármazott ott, ahol az ős áll?
+//   I  Használja-e a hívó mindazt, amitől függ?
+//   D  A mag mondja-e meg, mire van szüksége, vagy a technika diktál?
+
+// Összefüggnek:
+//   az I szűk interfésze miatt könnyű betartani az L-t;
+//   a D absztrakciója teszi lehetővé az O bővítését.
+
+// Túlzás is van:
+//   interfész minden osztályhoz, egyetlen megvalósítással és semmi cserével
+//   bővítési pont ott, ahol még soha nem változott semmi
+//   öt apró osztály egy háromsoros szabály helyett
+
+// Hol jön vissza a tanulóúton:
+//   S → 2. állomás   O → 5. és 6. állomás   L, I → 14. állomás   D → 10. állomás`,
+  pairs:[
+    {nodes:["s","o","l","i","d","n_ok"],match:["Az öt elv öt kérdés"],on:true},
+    {nodes:["i","l","e_il"],match:["az I szűk interfésze miatt"]},
+    {nodes:["d","o","e_do"],match:["a D absztrakciója"]},
+    {nodes:["n_bad"],match:["Túlzás is van","interfész minden osztályhoz","bővítési pont ott","öt apró osztály"]}
+  ],
+  why:[
+    "A SOLID-elvek nem pipálandó szabályok, hanem kérdések. Akkor érnek valamit, ha egy valódi változás felől nézed őket: ki kéri, hol bővül, mit ígér, mitől függ.",
+    "Túl is lehet tolni őket. Egy interfész, amelynek egyetlen megvalósítása van és soha nem is lesz több, csak egy újabb fájl. Az öt apró osztály egy háromsoros szabály helyett nehezebben olvasható, mint az eredeti. Az 1. állomástól kezdve ugyanez a rendeléskezelő alakul át lépésenként, és az elvek ott, a valódi helyükön jönnek elő."
+  ],
+  key:"Az elv akkor jó, ha egy várható változást olcsóbbá tesz. Ha semmilyen változást nem könnyít meg, felesleges."
+}
+];
+
+OOP.station({
+  id: "sA", num: "A", title: "SOLID-elvek",
+  goal: "Megismered az objektumorientált tervezés öt alapelvét kis, átlátható példákon. A modul állomásain mindegyiket felismered, amikor visszatér.",
+  map: [], mapNote: "az alapok: az elvek kis példákon, a modul előtt",
+  tracks: [
+    { id: "main", name: "Fő vonal · rendelés", sub: "az öt elv, egyenként", steps: MAIN }
   ]
 });
 })();
