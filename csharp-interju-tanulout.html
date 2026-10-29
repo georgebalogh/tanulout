@@ -56,7 +56,7 @@ button{font:inherit;color:inherit}
 .top .sub{color:var(--muted);font-size:13.5px}
 
 .shell{display:grid;grid-template-columns:212px minmax(0,1fr);gap:28px;align-items:start}
-.stations{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px)}
+.stations{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);max-height:calc(100vh - 28px);overflow-y:auto;overscroll-behavior:contain}
 .stations h2,.eyebrow,.key .lab,.mm-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0}
 .sthd{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;padding-left:9px}
 .navtoggle{display:grid;place-items:center;width:28px;height:26px;padding:0;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--muted);font:700 14px/1 var(--f-mono);cursor:pointer}
@@ -77,6 +77,15 @@ button{font:inherit;color:inherit}
 .stations .foot{margin:12px 9px 0;font-size:12px;color:var(--muted);line-height:1.4}
 .stations .sec{margin:12px 9px 3px;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .stations .sec:first-child{margin-top:0}
+/* Az aktív állomás kinyitott menüje: a sávjai (ha több van) és az aktív sáv lépései. Csak az aktív állomás van nyitva. */
+.stations ol.stepnav{display:grid;gap:1px;margin:2px 0 6px 18px;padding-left:8px;border-left:2px solid var(--line)}
+.stp,.trk{display:grid;grid-template-columns:22px 1fr;gap:5px;align-items:baseline;width:100%;padding:4px 7px;border:0;border-radius:5px;background:none;color:var(--muted);font-size:12.5px;line-height:1.3;text-align:left;cursor:pointer}
+.stp:hover,.trk:hover{background:var(--panel-2);color:var(--ink)}
+.stp .n{font-family:var(--f-mono);font-size:11px;text-align:right}
+.stp.on{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.trk{grid-template-columns:1fr;font-weight:600;color:var(--ink)}
+.trk.on{color:var(--accent)}
+.nav-min .stepnav{display:none}
 
 .modmap{display:grid;gap:8px;margin-bottom:20px}
 .mm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1.5px solid transparent;border-radius:14px;padding:4px}
@@ -263,12 +272,12 @@ button{font:inherit;color:inherit}
 }
 @media (max-width:860px){
   .shell{grid-template-columns:minmax(0,1fr);gap:18px}
-  .stations{position:static}
+  .stations{position:static;max-height:none;overflow:visible}
   .stations ol{display:flex;overflow-x:auto;gap:4px;padding-bottom:4px}
   .st{flex:0 0 auto;grid-template-columns:auto auto;white-space:nowrap;width:auto}
   .st.sep{margin-top:0}
   .stations .foot{margin-inline:0}
-  .stations .sec{display:none}
+  .stations .sec,.stations ol.stepnav{display:none}
   .below{grid-template-columns:minmax(0,1fr)}
 }
 @media (prefers-reduced-motion:reduce){
@@ -19346,10 +19355,47 @@ function renderSidebar(){
     else b.addEventListener("click", () => go(s.id, null, 0));
     if (cur && cur.station === s.id) b.setAttribute("aria-current", "page");
     li.appendChild(b);
+    if (cur && cur.station === s.id) li.appendChild(stepNav(OOP.stations[s.id]));
     ol.appendChild(li);
   });
+  /* A görgethető menüben az aktív lépés maradjon látható (az oldalt nem görgeti). */
+  const box = ol.parentNode, act = ol.querySelector && (ol.querySelector(".stp.on") || ol.querySelector(".st.on"));
+  if (box && act && box.getBoundingClientRect && act.getBoundingClientRect){
+    const br = box.getBoundingClientRect(), ar = act.getBoundingClientRect();
+    if (ar.top < br.top) box.scrollTop += ar.top - br.top - 8;
+    else if (ar.bottom > br.bottom) box.scrollTop += ar.bottom - br.bottom + 8;
+  }
   const missing = C.stations.length - available().length;
   $("stfoot").textContent = missing ? `${missing} állomás még készül.` : (C.foot || "");
+}
+
+/* Az aktív állomás menüje. Egy sávnál a lépések listája; több sávnál a sávok, és csak az aktív sáv lépései nyílnak ki. */
+function stepNav(st){
+  const nav = document.createElement("ol");
+  nav.className = "stepnav";
+  const steps = tr => tr.steps.forEach((step, i) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    const on = cur.track === tr.id && cur.idx === i;
+    b.className = "stp" + (on ? " on" : "");
+    b.innerHTML = `<span class="n">${i + 1}</span><span class="t">${esc(step.title)}</span>`;
+    if (on) b.setAttribute("aria-current", "step");
+    b.addEventListener("click", () => go(st.id, tr.id, i));
+    li.appendChild(b);
+    nav.appendChild(li);
+  });
+  if (st.tracks.length === 1){ steps(st.tracks[0]); return nav; }
+  st.tracks.forEach(tr => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.className = "trk" + (cur.track === tr.id ? " on" : "");
+    b.textContent = tr.name;
+    b.addEventListener("click", () => { if (tr.id !== cur.track) go(st.id, tr.id, 0); });
+    li.appendChild(b);
+    nav.appendChild(li);
+    if (cur.track === tr.id) steps(tr);
+  });
+  return nav;
 }
 
 function mapItems(){
@@ -19388,13 +19434,13 @@ function renderStation(st){
   $("sttitle").textContent = st.title;
   $("goal").textContent = st.goal || "";
   renderMap(st);
-  renderSidebar();
 }
 
 function render(){
   const st = OOP.stations[cur.station], tr = trackOf(st, cur.track), step = tr.steps[cur.idx];
   const skey = cur.station + ":" + tr.id;
   (seen[skey] = seen[skey] || new Set()).add(cur.idx);
+  renderSidebar();
 
   const tabs = $("tabs");
   tabs.innerHTML = "";
