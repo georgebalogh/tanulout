@@ -19359,11 +19359,16 @@ function renderSidebar(){
     ol.appendChild(li);
   });
   /* A görgethető menüben az aktív lépés maradjon látható (az oldalt nem görgeti). */
-  const box = ol.parentNode, act = ol.querySelector && (ol.querySelector(".stp.on") || ol.querySelector(".st.on"));
-  if (box && act && box.getBoundingClientRect && act.getBoundingClientRect){
-    const br = box.getBoundingClientRect(), ar = act.getBoundingClientRect();
-    if (ar.top < br.top) box.scrollTop += ar.top - br.top - 8;
-    else if (ar.bottom > br.bottom) box.scrollTop += ar.bottom - br.bottom + 8;
+  /* Az állomás gombja és az aktív lépés is látsszon; ha mindkettő nem fér el, a lépés a fontosabb. */
+  const box = ol.parentNode, head = ol.querySelector && ol.querySelector(".st.on");
+  const act = (ol.querySelector && ol.querySelector(".stp.on")) || head;
+  if (box && head && act && box.getBoundingClientRect && act.getBoundingClientRect){
+    const br = box.getBoundingClientRect();
+    const hr = head.getBoundingClientRect();
+    if (hr.top < br.top) box.scrollTop += hr.top - br.top - 8;
+    const ar = act.getBoundingClientRect();
+    if (ar.bottom > br.bottom) box.scrollTop += ar.bottom - br.bottom + 8;
+    else if (ar.top < br.top) box.scrollTop += ar.top - br.top - 8;
   }
   const missing = C.stations.length - available().length;
   $("stfoot").textContent = missing ? `${missing} állomás még készül.` : (C.foot || "");

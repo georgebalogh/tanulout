@@ -669,18 +669,24 @@ button{font:inherit;color:inherit}
  "special": {
   "Z": "Záró állomás",
   "M": "Kitérő",
-  "A": "Alapok"
+  "A": "Alapok",
+  "B": "Alapok"
  },
  "placeNames": {
   "M": "Mintatár"
  },
- "foot": "Az A az alapok, a Z a záró tervezés, az M a minták tára.",
+ "foot": "Az A és a B az alapok, a Z a záró tervezés, az M a minták tára.",
  "stations": [
   {
    "id": "sA",
    "num": "A",
    "short": "SOLID-elvek",
    "section": "Alapok"
+  },
+  {
+   "id": "sB",
+   "num": "B",
+   "short": "Tiszta kód"
   },
   {
    "id": "s1",
@@ -14950,6 +14956,795 @@ OOP.station({
 })();
 
 </script>
+<script>/* sB.js */
+/* B állomás: Tiszta kód (alapok) */
+(function () {
+"use strict";
+const { bad, ok, mut, neu } = OOP.h;
+const raw = OOP.raw;
+
+const MAIN = [
+{
+  title:"Mi a tiszta kód?",
+  scene:{
+    nodes:[
+      {id:"names",kind:"box",x:110,y:45,w:196,title:"Nevek",lines:["mondja meg, mi ez"]},
+      {id:"funcs",kind:"box",x:320,y:45,w:196,title:"Függvények",lines:["kicsi, egy dolgot tesz"]},
+      {id:"comm",kind:"box",x:530,y:45,w:196,title:"Kommentek",lines:["a miértet mondják"]},
+      {id:"form",kind:"box",x:110,y:125,w:196,title:"Formázás",lines:["fentről lefelé olvasható"]},
+      {id:"obj",kind:"box",x:320,y:125,w:196,title:"Objektum és adat",lines:["Demeter-törvény"]},
+      {id:"err",kind:"box",x:530,y:125,w:196,title:"Hibakezelés",lines:["kivétel, nem null"]},
+      {id:"bound",kind:"box",x:110,y:205,w:196,title:"Határok",lines:["idegen kód fal mögött"]},
+      {id:"tests",kind:"box",x:320,y:205,w:196,title:"Tesztek",lines:["TDD, FIRST"]},
+      {id:"cls",kind:"box",x:530,y:205,w:196,title:"Osztályok",lines:["kicsi, összetartó"]},
+      {id:"simple",kind:"box",x:110,y:285,w:196,title:"Egyszerű tervezés",lines:["Kent Beck négy szabálya"]},
+      {id:"smells",kind:"box",x:320,y:285,w:196,title:"Kód-szagok",lines:["gyanús jelek"]},
+      {id:"short",kind:"box",x:530,y:285,w:196,title:"Rövid elvek",lines:["DRY, KISS, YAGNI"]},
+      {id:"scout",kind:"note",x:320,y:375,text:"cserkészszabály: hagyd tisztábban, mint ahogy találtad",tone:"ok"}
+    ]
+  },
+  code:raw`
+// Clean Code: Robert C. Martin könyve (2008), és a szemlélet, amelyet összefoglal.
+// A kódot sokkal többször olvassák, mint írják: az olvasó idejét spóroljuk.
+
+// Ezen az állomáson, lépésenként:
+//    2  nevek
+//    3  függvények: kicsik, egy szinten
+//    4  függvények: paraméterek, mellékhatás, parancs és kérdés
+//    5  kommentek
+//    6  formázás
+//    7  objektum, adatszerkezet, Demeter-törvény
+//    8  hibakezelés: kivétel és null
+//    9  határok
+//   10  tesztek: TDD és FIRST
+//   11  osztályok
+//   12  egyszerű tervezés
+//   13  kód-szagok
+//   14  DRY, KISS, YAGNI
+//   15  cserkészszabály`,
+  pairs:[
+    {nodes:["names"],match:["2  nevek"]},
+    {nodes:["funcs"],match:["3  függvények","4  függvények"]},
+    {nodes:["comm"],match:["5  kommentek"]},
+    {nodes:["form"],match:["6  formázás"]},
+    {nodes:["obj"],match:["7  objektum"]},
+    {nodes:["err"],match:["8  hibakezelés"]},
+    {nodes:["bound"],match:["9  határok"]},
+    {nodes:["tests"],match:["10  tesztek"]},
+    {nodes:["cls"],match:["11  osztályok"]},
+    {nodes:["simple"],match:["12  egyszerű tervezés"]},
+    {nodes:["smells"],match:["13  kód-szagok"]},
+    {nodes:["short"],match:["14  DRY, KISS, YAGNI"]},
+    {nodes:["scout"],match:["15  cserkészszabály"]},
+    {nodes:["names","funcs","comm","form","obj","err","bound","tests","cls","simple","smells","short"],
+      match:["többször olvassák, mint írják"],on:true}
+  ],
+  why:[
+    "A **tiszta kód** (clean code) olyan kód, amelyet egy másik fejlesztő gyorsan megért és biztonságosan módosít. A kifejezés Robert C. Martin 2008-as könyvéből ismert, de a gondolatai régebbiek, és sok szerzőtől jönnek.",
+    "A SOLID-elvek (A állomás) az osztályok és modulok szintjén dolgoznak. Ez az állomás a sorok, a nevek és a függvények szintjén kezdi, és onnan halad felfelé. Minden lépés egy témát mutat egy rövid előtte–utána példán."
+  ],
+  key:"A tiszta kód mércéje az olvasó: mennyi idő alatt érti meg, és mennyire biztos benne, hogy a módosítása nem tör el mást."
+},
+{
+  title:"Nevek, amelyek elmondják, mi ez",
+  scene:{
+    nodes:[
+      {id:"before",kind:"box",x:165,y:120,w:290,title:"Előtte",tone:"bad",
+        lines:["int d;","List<int[]> list1","GetThem()","OrderManager.Proc(o)"]},
+      {id:"after",kind:"box",x:480,y:120,w:280,title:"Utána",tone:"new",
+        lines:["int elapsedDays;","List<OrderLine> overdueLines","OverdueLines()","Order.Confirm()"]},
+      {id:"n_rule",kind:"note",x:320,y:300,text:"a név felel arra: mi ez, miért van, hogyan használd",tone:"accent"}
+    ],
+    edges:[
+      {id:"e1",from:"before",to:"after",kind:"ok"}
+    ]
+  },
+  code:raw`
+// Előtte: a név semmit nem mond, a kommentnek kell magyaráznia
+int d;                                   // eltelt napok
+List<int[]> list1 = new();
+public List<int[]> GetThem() { /* ... */ }
+public class OrderManager { public void Proc(Order o) { /* ... */ } }
+
+// Utána: a név elmondja, mi ez és mire való
+int elapsedDays;
+List<OrderLine> overdueLines = new();
+public IReadOnlyList<OrderLine> OverdueLines() { /* ... */ }
+public sealed class Order { public void Confirm() { /* ... */ } }
+
+// Szabályok:
+//   osztály: főnév (Order, Invoice), nem Manager, Helper, Data
+//   metódus: ige (Confirm, Ship), eldöntendő kérdésnél Is vagy Has (IsPaid)
+//   egy fogalom, egy szó: nem keverjük a Get, Fetch, Retrieve igéket
+//   a név hossza a hatókörrel nő: ciklusváltozónak jó az i, mezőnek nem`,
+  pairs:[
+    {nodes:["before"],match:["int d;","List<int[]> list1","GetThem()","OrderManager"]},
+    {nodes:["after","e1"],match:["int elapsedDays;","overdueLines","OverdueLines()","public void Confirm()"],on:true},
+    {nodes:["n_rule"],match:["osztály: főnév","metódus: ige","egy fogalom, egy szó","a név hossza"]}
+  ],
+  why:[
+    "A név az első dokumentáció, amit az olvasó lát. Ha egy változó mellé komment kell, hogy kiderüljön, mit tárol, a név rossz. A `d` helyett az `elapsedDays` ugyanazt mondja el, és ott is ott van, ahol a változót használják.",
+    "Az osztály neve főnév, a metódusé ige. Egy fogalomra egy szót használunk az egész kódban. A `Manager`, `Helper` és `Data` végű nevek gyanúsak: ritkán mondják meg, miért felel az osztály."
+  ],
+  key:"Ha egy névhez magyarázó komment kell, keress jobb nevet."
+},
+{
+  title:"Függvények: kicsik, egy dolgot tesznek",
+  scene:{
+    nodes:[
+      {id:"before",kind:"box",x:165,y:140,w:290,title:"Process (előtte)",tone:"bad",
+        lines:["mennyiség-ellenőrzés",mut("ciklus a végösszegre"),"kedvezmény: 50 000",
+          bad("SQL UPDATE szövegből"),bad("SMTP küldés")]},
+      {id:"after",kind:"box",x:480,y:140,w:280,title:"Process (utána)",tone:"new",
+        lines:["EnsureValid(order)","LinesTotal(order)","ApplyVolumeDiscount(…)","SaveTotal(order, total)","SendThankYou(order)"]},
+      {id:"n_lvl",kind:"note",x:320,y:320,text:"egy dolgot tesz = egy szinten mondja el a lépéseit",tone:"ok"}
+    ],
+    edges:[
+      {id:"e1",from:"before",to:"after",kind:"ok"}
+    ]
+  },
+  code:raw`
+// Előtte: egy metódus ellenőriz, számol, ment és levelet ír, vegyes szinteken
+public void Process(Order order)
+{
+    foreach (var line in order.Lines)
+        if (line.Quantity <= 0) throw new InvalidOperationException("Rossz mennyiség.");
+    decimal total = 0;
+    foreach (var line in order.Lines) total += line.UnitPrice * line.Quantity;
+    if (total >= 50000) total *= 0.95m;
+    _db.Execute("UPDATE Orders SET Total = @t WHERE Id = @id", new { t = total, id = order.Id });
+    _smtp.Send(order.CustomerEmail, "Köszönjük a rendelést!");
+}
+
+// Utána: minden sor ugyanazon a szinten, a részletek egy szinttel lejjebb
+public void Process(Order order)
+{
+    EnsureValid(order);
+    var total = ApplyVolumeDiscount(LinesTotal(order));
+    SaveTotal(order, total);
+    SendThankYou(order);
+}
+
+private static decimal ApplyVolumeDiscount(decimal total) =>
+    total >= VolumeDiscountThreshold ? total * (1 - VolumeDiscountRate) : total;`,
+  pairs:[
+    {nodes:["before"],match:["if (line.Quantity <= 0)","total += line.UnitPrice","if (total >= 50000)","_db.Execute","_smtp.Send"]},
+    {nodes:["after","e1"],match:["EnsureValid(order);","ApplyVolumeDiscount(LinesTotal(order))","SaveTotal(order, total);","SendThankYou(order);"],on:true},
+    {nodes:["n_lvl"],match:["private static decimal ApplyVolumeDiscount"]}
+  ],
+  why:[
+    "A függvény legyen kicsi, és **egy dolgot tegyen**. Hogy mi az „egy dolog”, arra jó próba az **elvonatkoztatási szint**: az előtte változatban az üzleti döntés („kedvezmény jár”) egy SQL-szöveg mellett áll, és az olvasónak folyton szintet kell váltania.",
+    "Az utána változat úgy olvasható, mint egy tartalomjegyzék: négy lépés, mindegyik egy névvel. Aki a részletre kíváncsi, egy szinttel lejjebb megtalálja. A varázsszámokból (50 000, 0,95) nevesített konstans lett."
+  ],
+  key:"Egy függvény sorai egy szinten beszéljenek. Ha egy részlet kilóg, emeld ki egy jó nevű függvénybe."
+},
+{
+  title:"Függvények: kevés paraméter, nincs rejtett hatás",
+  scene:{
+    nodes:[
+      {id:"create",kind:"box",x:170,y:70,w:300,title:"CreateOrder(…)",
+        lines:[bad("7 paraméter, ebből 2 bool"),ok("customer, address, options")]},
+      {id:"check",kind:"box",x:170,y:230,w:300,title:"CheckPassword",tone:"bad",
+        lines:["Verify(hash, password)",{t:"_session.Start(user)",tone:"bad",chip:"rejtett",chipTone:"bad"}]},
+      {id:"query",kind:"box",x:480,y:185,w:250,title:"IsPasswordValid",sub:"kérdés: nem változtat",tone:"new"},
+      {id:"cmd",kind:"box",x:480,y:285,w:250,title:"SignIn",sub:"parancs: nem válaszol",tone:"new"},
+      {id:"n_cqs",kind:"note",x:320,y:385,text:"a név pontosan azt mondja, amit a függvény tesz",tone:"ok"}
+    ],
+    edges:[
+      {id:"e_q",from:"check",to:"query",kind:"ok"},
+      {id:"e_c",from:"check",to:"cmd",kind:"ok"}
+    ]
+  },
+  code:raw`
+// Sok paraméter, logikai kapcsolókkal: a hívásból nem derül ki, mit jelent
+CreateOrder("Kiss Anna", "Budapest", "Fő utca 1.", "1011", true, false, 3);
+
+// Kevesebb paraméter: az összetartozók egy értékké állnak össze
+CreateOrder(customer, shippingAddress, OrderOptions.Express);
+
+// Rejtett mellékhatás: a neve ellenőrzést ígér, de közben be is jelentkeztet
+public bool CheckPassword(User user, string password)
+{
+    var valid = _hasher.Verify(user.PasswordHash, password);
+    if (valid) _session.Start(user);         // erre a hívó nem számít
+    return valid;
+}
+
+// Parancs vagy kérdés, a kettő egyszerre nem (Command-Query Separation)
+public bool IsPasswordValid(User user, string password) =>    // kérdés: nem változtat
+    _hasher.Verify(user.PasswordHash, password);
+
+public void SignIn(User user) => _session.Start(user);         // parancs: nem válaszol`,
+  pairs:[
+    {nodes:["create"],match:["CreateOrder(\"Kiss Anna\"","CreateOrder(customer, shippingAddress"]},
+    {nodes:["check"],match:["public bool CheckPassword","if (valid) _session.Start(user);"],on:true},
+    {nodes:["query","e_q"],match:["public bool IsPasswordValid"]},
+    {nodes:["cmd","e_c"],match:["public void SignIn"]},
+    {nodes:["n_cqs"],match:["Parancs vagy kérdés"]}
+  ],
+  why:[
+    "Minél több a paraméter, annál nehezebb a hívást olvasni és tesztelni. A `true, false` egy hívásban semmit nem mond; a logikai kapcsoló ráadásul azt jelzi, hogy a függvény két dolgot csinál. Az összetartozó paraméterekből érdemes egy értéket (`Address`, `OrderOptions`) képezni.",
+    "A **rejtett mellékhatás** az, amit a név nem árul el. A **parancs és kérdés szétválasztása** (Command-Query Separation) szerint egy függvény vagy kérdez és nem változtat, vagy változtat és nem válaszol. Így egy kérdést bármikor, bárhányszor nyugodtan meg lehet hívni."
+  ],
+  key:"Kevés paraméter, nincs meglepetés: a függvény neve és szignatúrája elmondja, mit tesz."
+},
+{
+  title:"Kommentek: a miértet mondják el",
+  scene:{
+    nodes:[
+      {id:"badc",kind:"box",x:165,y:130,w:290,title:"Rossz komment",tone:"bad",
+        lines:["megismétli a kódot","jobb név helyett magyaráz","kikommentezett kód"]},
+      {id:"goodc",kind:"box",x:480,y:130,w:280,title:"Jó komment",tone:"new",
+        lines:["a miért, amit a kód nem tud","nyilvános API leírása","figyelmeztetés"]},
+      {id:"n_k",kind:"note",x:320,y:300,text:"a kód mondja el, MIT tesz; a komment azt, MIÉRT így",tone:"accent"}
+    ]
+  },
+  code:raw`
+// Rossz: a kód megismétlése
+count++;                                 // a darabszám növelése eggyel
+
+// Rossz: komment egy jobb név helyett
+// ellenőrzi, hogy a vevő jogosult-e a hűségkedvezményre
+if (customer.Orders.Count >= 5 && customer.Since < today.AddYears(-1)) { /* ... */ }
+
+// Jó: a név elmondja, ami a kommentben volt
+if (customer.IsEligibleForLoyaltyDiscount(today)) { /* ... */ }
+
+// Jó: a miért, amit a kód nem tud elmondani
+// A szolgáltató 30 másodperc után bontja a kapcsolatot, ezért 25-nél újrapróbálunk.
+private static readonly TimeSpan RetryAfter = TimeSpan.FromSeconds(25);
+
+/// <summary>A rendelés végösszege kedvezménnyel, szállítás nélkül.</summary>
+public Money Subtotal { get; private set; }
+
+// Rossz: kikommentezett kód. A verziókezelő úgyis megőrzi: töröld.
+// var legacy = OldPricing.Calculate(order);`,
+  pairs:[
+    {nodes:["badc"],match:["count++;","ellenőrzi, hogy a vevő jogosult-e","var legacy = OldPricing"]},
+    {nodes:["goodc"],match:["A szolgáltató 30 másodperc után","/// <summary>","IsEligibleForLoyaltyDiscount"],on:true},
+    {nodes:["n_k"],match:["private static readonly TimeSpan RetryAfter"]}
+  ],
+  why:[
+    "A komment nem fordul le és nem fut, ezért senki nem ellenőrzi. Ha a kód változik, a komment könnyen hazudni kezd. A legtöbb magyarázó komment helyett jobb egy beszédes név vagy egy kiemelt függvény.",
+    "Ami megmarad, az a **miért**: egy külső kényszer, egy szándékos döntés, egy figyelmeztetés. A nyilvános API leírása (`/// <summary>`) is hasznos, mert a fejlesztőkörnyezet a hívás helyén mutatja. A kikommentezett kód törlendő: a verziókezelő úgyis megőrzi."
+  ],
+  key:"Mielőtt kommentet írsz, próbáld meg a kódot úgy átírni, hogy ne kelljen."
+},
+{
+  title:"Formázás: fentről lefelé, mint egy újságcikk",
+  scene:{
+    nodes:[
+      {id:"file",kind:"box",x:210,y:150,w:340,title:"OrderConfirmation.cs",
+        lines:["mezők és konstruktor","Confirm(orderId)","   EnsureCanConfirm(order)","   ReserveStock(order)"]},
+      {id:"n_head",kind:"note",x:520,y:85,text:"cím és bevezető:\na nyilvános lépés",tone:"accent"},
+      {id:"n_det",kind:"note",x:520,y:215,text:"részletek: alatta,\na hívás sorrendjében",tone:"accent"},
+      {id:"n_rule",kind:"note",x:320,y:330,text:"aki hív, fölötte áll; akit hív, közvetlenül alatta",tone:"ok"}
+    ],
+    edges:[
+      {id:"r1",from:"n_head",to:"file",toLine:1,kind:"ref"},
+      {id:"r2",from:"n_det",to:"file",toLine:2,kind:"ref"}
+    ]
+  },
+  code:raw`
+public sealed class OrderConfirmation
+{
+    private readonly IOrderRepository _orders;
+    private readonly IStockService _stock;
+
+    public OrderConfirmation(IOrderRepository orders, IStockService stock)
+    {
+        _orders = orders;
+        _stock = stock;
+    }
+
+    // a nyilvános lépés áll fent: ez a cikk címe és bevezetője
+    public void Confirm(Guid orderId)
+    {
+        var order = _orders.Load(orderId);
+        EnsureCanConfirm(order);
+        ReserveStock(order);
+        order.Confirm();
+        _orders.Save(order);
+    }
+
+    // a részletek alatta, abban a sorrendben, ahogy a hívó említi őket
+    private static void EnsureCanConfirm(Order order)
+    {
+        if (order.Lines.Count == 0)
+            throw new InvalidOperationException("Üres rendelést nem lehet megerősíteni.");
+    }
+
+    private void ReserveStock(Order order)
+    {
+        foreach (var line in order.Lines)
+            _stock.Reserve(line.ProductId, line.Quantity);
+    }
+}`,
+  pairs:[
+    {nodes:["file"],match:["private readonly IOrderRepository _orders;","public OrderConfirmation("]},
+    {nodes:["n_head","r1"],match:["public void Confirm(Guid orderId)","a nyilvános lépés áll fent"],on:true},
+    {nodes:["n_det","r2"],match:["private static void EnsureCanConfirm","private void ReserveStock"]},
+    {nodes:["n_rule"],match:["a részletek alatta"]}
+  ],
+  why:[
+    "A formázás kommunikáció. Az **újságcikk-szabály**: fent a cím és a lényeg, lefelé haladva egyre több részlet. Egy osztályban ez azt jelenti, hogy a nyilvános metódus áll elöl, a segédfüggvényei közvetlenül alatta, abban a sorrendben, ahogy hívja őket.",
+    "Ami összetartozik, álljon közel egymáshoz, és egy üres sor válassza el a következő gondolattól. A behúzást, a szóközöket és a sortöréseket ne vita döntse el: a csapat egy formázót és egy közös beállítást használ (például `dotnet format` és `.editorconfig`)."
+  ],
+  key:"Az olvasó fentről lefelé halad. Ne kelljen ugrálnia a fájlban, hogy egy lépést megértsen."
+},
+{
+  title:"Objektum, adatszerkezet és a Demeter-törvény",
+  scene:{
+    nodes:[
+      {id:"caller",kind:"actor",x:60,y:80,label:"hívó"},
+      {id:"o",kind:"box",x:170,y:80,w:100,title:"Order"},
+      {id:"c",kind:"box",x:290,y:80,w:110,title:"Customer"},
+      {id:"a",kind:"box",x:410,y:80,w:110,title:"Address"},
+      {id:"ci",kind:"box",x:530,y:80,w:100,title:"City"},
+      {id:"caller2",kind:"actor",x:60,y:240,label:"hívó"},
+      {id:"o2",kind:"box",x:290,y:240,w:240,title:"Order",tone:"new",lines:["DeliveryCityName()"]},
+      {id:"n_bad",kind:"note",x:350,y:160,text:"vonatroncs: a hívó négy osztály belsejét ismeri",tone:"bad"},
+      {id:"n_ok",kind:"note",x:320,y:350,text:"ne a belsejét kérdezd: kérd meg, hogy mondja meg",tone:"ok"}
+    ],
+    edges:[
+      {id:"t0",from:"caller",to:"o",kind:"bad"},
+      {id:"t1",from:"o",to:"c",kind:"bad"},
+      {id:"t2",from:"c",to:"a",kind:"bad"},
+      {id:"t3",from:"a",to:"ci",kind:"bad"},
+      {id:"g1",from:"caller2",to:"o2",kind:"ok"}
+    ]
+  },
+  code:raw`
+// Adatszerkezet: kiteszi az adatát, nincs viselkedése. Üzenetnek, DTO-nak jó.
+public sealed record OrderDto(Guid Id, string CustomerName, decimal Total);
+
+// Objektum: elrejti az adatát, és viselkedést mutat
+public sealed class Order
+{
+    private readonly List<OrderLine> _lines = new();
+    public Customer Customer { get; }
+
+    public void AddLine(Product product, int quantity) { /* ... */ }
+
+    public string DeliveryCityName() => Customer.DeliveryCityName();
+}
+
+// Demeter-törvény: csak a közvetlen ismerőseiddel beszélj
+var city = order.Customer.Address.City.Name;      // vonatroncs: négy osztályt ismer
+
+// helyette kérd meg azt, aki a következő lépést ismeri
+var cityName = order.DeliveryCityName();`,
+  pairs:[
+    {nodes:["caller","o","c","a","ci","t0","t1","t2","t3","n_bad"],match:["order.Customer.Address.City.Name"],on:true},
+    {nodes:["caller2","o2","g1","n_ok"],match:["order.DeliveryCityName()","public string DeliveryCityName()"]},
+    {nodes:["o2"],match:["public sealed class Order","public void AddLine"]}
+  ],
+  why:[
+    "Az **adatszerkezet** kiteszi az adatát és nincs viselkedése: egy üzenetnek vagy egy adatátviteli objektumnak (DTO) éppen ez a dolga. Az **objektum** fordítva működik: elrejti az adatát, és műveleteket kínál. A baj a keverékből jön, amikor egy osztály kiteszi a belsejét, és a döntéseket mások hozzák meg helyette.",
+    "A **Demeter-törvény**: egy metódus csak a saját mezőivel, a paramétereivel és az általa létrehozott objektumokkal beszéljen, azok belsejével ne. Az `order.Customer.Address.City.Name` négy osztály szerkezetét égeti a hívóba, és bármelyik változása eltöri."
+  ],
+  key:"Egy pont jó, négy pont gyanús: a hívó ne tudja, hogyan épül fel az, amit használ.",
+  see:[{station:"s2",label:"Mélyebben: 2. állomás, Felelősség"}]
+},
+{
+  title:"Hibakezelés: kivétel, és nem null",
+  scene:{
+    nodes:[
+      {id:"code",kind:"box",x:165,y:90,w:290,title:"Ship(order) → int",tone:"bad",
+        lines:["-1: nincs kifizetve","-2: nincs szállítási cím","0: rendben"]},
+      {id:"exc",kind:"box",x:480,y:90,w:280,title:"Ship(order)",tone:"new",
+        lines:["throw: nincs kifizetve"]},
+      {id:"nul",kind:"box",x:165,y:280,w:290,title:"OrdersOf(id) → null",tone:"bad",
+        lines:["minden hívó ellenőrizze"]},
+      {id:"empty",kind:"box",x:480,y:280,w:280,title:"OrdersOf(id) → []",tone:"new",
+        lines:["üres lista, nem null"]}
+    ],
+    edges:[
+      {id:"e1",from:"code",to:"exc",kind:"ok"},
+      {id:"e2",from:"nul",to:"empty",kind:"ok"}
+    ]
+  },
+  code:raw`
+// Hibakód: a hívó könnyen elfelejti megnézni, és a hiba csendben továbbmegy
+public int Ship(Order order)
+{
+    if (order.Status != OrderStatus.Paid) return -1;
+    if (order.ShippingAddress is null) return -2;
+    /* ... */
+    return 0;
+}
+
+// Kivétel: a hiba nem mehet tovább észrevétlenül, a boldog út tiszta marad
+public void Ship(Order order)
+{
+    if (order.Status != OrderStatus.Paid)
+        throw new InvalidOperationException($"A(z) {order.Id} rendelés nincs kifizetve.");
+    /* ... */
+}
+
+// null-t ne adj vissza: minden hívónak ellenőriznie kellene
+public List<Order>? OrdersOf(Guid customerId) => _db.Find(customerId);        // rossz
+public IReadOnlyList<Order> OrdersOf(Guid customerId) => _db.Find(customerId) ?? [];
+
+// ha valami tényleg hiányozhat, a típus mondja ki: Order? vagy TryFind(id, out var order)`,
+  pairs:[
+    {nodes:["code"],match:["public int Ship(Order order)","return -1;","return -2;"]},
+    {nodes:["exc","e1"],match:["throw new InvalidOperationException","public void Ship(Order order)"],on:true},
+    {nodes:["nul"],match:["public List<Order>? OrdersOf"]},
+    {nodes:["empty","e2"],match:["_db.Find(customerId) ?? [];"]}
+  ],
+  why:[
+    "A **hibakódot** a hívónak minden alkalommal ellenőriznie kell, és ha egyszer elfelejti, a hiba csendben továbbmegy. A **kivétel** nem hagyható figyelmen kívül, és a hibakezelés nem keveredik a boldog úttal. A kivétel üzenete mondja meg, mi történt és melyik adattal.",
+    "A `null` visszaadása ugyanilyen csapda: minden hívónak ellenőriznie kellene, és ha egy nem teszi, `NullReferenceException` jön, messze a hiba helyétől. Gyűjteménynél üres listát adunk vissza. Ahol valami tényleg hiányozhat, ott a típus mondja ki (`Order?`, `TryFind`)."
+  ],
+  key:"A hiba legyen hangos és közel a helyéhez: kivétel hibakód helyett, üres lista null helyett."
+},
+{
+  title:"Határok: az idegen kód saját fal mögött",
+  scene:{
+    nodes:[
+      {id:"own",kind:"group",x:230,y:180,w:420,h:300,label:"saját kód"},
+      {id:"svc",kind:"box",x:120,y:100,w:170,title:"OrderService"},
+      {id:"inv",kind:"box",x:120,y:200,w:170,title:"InvoiceService"},
+      {id:"port",kind:"box",x:340,y:150,w:180,title:"IMailSender",tone:"new",lines:["SendAsync(…)"]},
+      {id:"adapter",kind:"box",x:330,y:280,w:190,title:"SendGridMailSender"},
+      {id:"lib",kind:"box",x:550,y:280,w:140,title:"SendGrid",tone:"muted",lines:["külső könyvtár"]},
+      {id:"n_ok",kind:"note",x:320,y:385,text:"csak egy osztály ismeri a külső könyvtárat",tone:"ok"}
+    ],
+    edges:[
+      {id:"u1",from:"svc",to:"port",kind:"ok"},
+      {id:"u2",from:"inv",to:"port",kind:"ok"},
+      {id:"i1",from:"adapter",to:"port",kind:"inherit"},
+      {id:"x1",from:"adapter",to:"lib",kind:"muted"}
+    ]
+  },
+  code:raw`
+// Közvetlen használat: a könyvtár típusai szétszóródnak a kódban
+var client = new SendGridClient(apiKey);
+var msg = MailHelper.CreateSingleEmail(from, to, subject, text, html);
+await client.SendEmailAsync(msg);
+
+// Határ: saját interfész a saját nyelvünkön
+public interface IMailSender
+{
+    Task SendAsync(string to, string subject, string body);
+}
+
+// egyetlen osztály ismeri a könyvtárat
+public sealed class SendGridMailSender(string apiKey) : IMailSender
+{
+    public async Task SendAsync(string to, string subject, string body)
+    {
+        var client = new SendGridClient(apiKey);
+        var msg = MailHelper.CreateSingleEmail(
+            new EmailAddress("shop@example.com"), new EmailAddress(to), subject, body, null);
+        await client.SendEmailAsync(msg);
+    }
+}
+
+// Szolgáltatócsere: egy új IMailSender-megvalósítás, a többi kód érintetlen.
+// Tanuló tesztek (learning tests) rögzítik, amit a könyvtárról feltételezünk;
+// könyvtárfrissítéskor ezek szólnak először.`,
+  pairs:[
+    {nodes:["lib","x1"],match:["new SendGridClient(apiKey)","MailHelper.CreateSingleEmail("]},
+    {nodes:["port","u1","u2"],match:["public interface IMailSender","Task SendAsync(string to"]},
+    {nodes:["adapter","i1","n_ok"],match:["class SendGridMailSender(string apiKey) : IMailSender"],on:true},
+    {nodes:["own"],match:["Szolgáltatócsere"]}
+  ],
+  why:[
+    "A külső könyvtár más tempóban változik, mint a mi kódunk, és a saját fogalmaival beszél. Ha a típusai szétszóródnak a kódban, egy verzióváltás vagy egy szolgáltatócsere mindenhol nyomot hagy.",
+    "A **határ** egy saját interfész a saját nyelvünkön (`IMailSender`), mögötte egyetlen osztállyal, amely a könyvtárat ismeri. A **tanuló tesztek** azt rögzítik, amit a könyvtár viselkedéséről feltételezünk; frissítéskor ezek jeleznek elsőként, ha a feltevés már nem igaz."
+  ],
+  key:"Amit nem te írtál, azt tedd saját interfész mögé. Így a változása egy helyen marad.",
+  see:[{station:"sA",label:"Kapcsolódik: A állomás, SOLID-elvek (D)"}]
+},
+{
+  title:"Tesztek: TDD és a FIRST szabály",
+  scene:{
+    nodes:[
+      {id:"red",kind:"state",x:110,y:80,label:"piros: bukó teszt",tone:"bad"},
+      {id:"green",kind:"state",x:320,y:80,label:"zöld: kevés kód",tone:"ok"},
+      {id:"ref",kind:"state",x:215,y:220,label:"refaktorálás",tone:"accent"},
+      {id:"first",kind:"box",x:530,y:160,w:190,title:"FIRST",
+        lines:["Fast","Independent","Repeatable","Self-validating","Timely"]},
+      {id:"n_ok",kind:"note",x:270,y:340,text:"a teszt is kód: ugyanolyan tisztán írjuk",tone:"ok"}
+    ],
+    edges:[
+      {id:"c1",from:"red",to:"green",kind:"ok"},
+      {id:"c2",from:"green",to:"ref",kind:"ok"},
+      {id:"c3",from:"ref",to:"red",kind:"ok"}
+    ]
+  },
+  code:raw`
+[Fact]
+public void Volume_discount_applies_from_50000_HUF()
+{
+    // Arrange: egy rendelés pontosan a határon
+    var order = OrderWith(unitPrice: 25_000m, quantity: 2);
+
+    // Act
+    var total = order.TotalWithDiscount();
+
+    // Assert: egy fogalom, egy állítás
+    Assert.Equal(47_500m, total);
+}
+
+// TDD-ciklus: piros (előbb a bukó teszt) → zöld (a legkevesebb kód, ami átviszi)
+//             → refaktorálás (tisztítás, a tesztek zöldek maradnak)
+
+// FIRST:
+//   Fast             gyors: másodpercek alatt lefut, ezért gyakran futtatod
+//   Independent      független: nem épít egy másik teszt eredményére
+//   Repeatable       megismételhető: bármely gépen, hálózat és valós óra nélkül
+//   Self-validating  önellenőrző: igen vagy nem, nem kell naplót olvasni
+//   Timely           időben: a kód előtt vagy vele együtt készül`,
+  pairs:[
+    {nodes:["red","green","ref","c1","c2","c3"],match:["TDD-ciklus","→ refaktorálás"],on:true},
+    {nodes:["first"],match:["Fast   ","Independent   ","Repeatable   ","Self-validating  ","Timely   "]},
+    {nodes:["n_ok"],match:["public void Volume_discount_applies_from_50000_HUF()","// Arrange","// Act","// Assert"]}
+  ],
+  why:[
+    "A teszt a kód első olvasója és az egyetlen, amely minden változás után újra ellenőriz. Ezért ugyanolyan tisztán kell írni: beszédes név, **Arrange–Act–Assert** szerkezet, egy fogalom tesztenként.",
+    "A **TDD** (Test-Driven Development) ciklusa: előbb egy bukó teszt, aztán a legkevesebb kód, ami átviszi, végül rendrakás zöld tesztek mellett. A **FIRST** öt tulajdonsága azt biztosítja, hogy a teszteket szívesen és sokszor futtassuk: gyors, független, megismételhető, önellenőrző és időben készül."
+  ],
+  key:"Ha a tesztet nehéz megírni, az a tervről árul el valamit: túl sok a függőség, vagy túl sokat tud egy osztály."
+},
+{
+  title:"Osztályok: kicsik és összetartók",
+  see:[{station:"sA",label:"Kapcsolódik: A állomás, SOLID-elvek (S és O)"}],
+  scene:{
+    nodes:[
+      {id:"big",kind:"box",x:170,y:150,w:300,title:"Customer (előtte)",tone:"bad",
+        lines:[{t:"_name, _email",chip:"azonosság"},{t:"_points, _since",chip:"hűség"},{t:"_street, _city",chip:"szállítás"}]},
+      {id:"cust",kind:"box",x:500,y:60,w:220,title:"Customer",tone:"new",lines:["Name, Email"]},
+      {id:"loy",kind:"box",x:500,y:160,w:220,title:"LoyaltyAccount",tone:"new",lines:["Points, AddPoints()"]},
+      {id:"addr",kind:"box",x:500,y:260,w:220,title:"Address",tone:"new",lines:["Street, City"]},
+      {id:"n_t",kind:"note",x:320,y:370,text:"ha a nevét csak „és”-sel tudod leírni, túl sokat tud",tone:"accent"}
+    ],
+    edges:[
+      {id:"e1",from:"big",to:"cust",fromLine:0,kind:"ok"},
+      {id:"e2",from:"big",to:"loy",fromLine:1,kind:"ok"},
+      {id:"e3",from:"big",to:"addr",fromLine:2,kind:"ok"}
+    ]
+  },
+  code:raw`
+// Alacsony kohézió: minden metódus a mezőknek csak egy harmadát használja
+public sealed class Customer
+{
+    private string _name = "", _email = "";                 // azonosság
+    private int _points; private DateOnly _since;           // hűségprogram
+    private string _street = "", _city = "";                // szállítás
+
+    public void Rename(string name) => _name = name;
+    public void AddPoints(int points) => _points += points;
+    public string ShippingLabel() => $"{_name}, {_street}, {_city}";
+}
+
+// Összetartó osztályok: minden metódus a saját mezőivel dolgozik
+public sealed class Customer(string name, string email, Address shippingAddress)
+{
+    public string Name { get; private set; } = name;
+    public string Email { get; } = email;
+    public LoyaltyAccount Loyalty { get; } = new();
+    public Address ShippingAddress { get; private set; } = shippingAddress;
+}
+
+public sealed class LoyaltyAccount
+{
+    public int Points { get; private set; }
+    public void AddPoints(int points) => Points += points;
+}
+
+public sealed record Address(string Street, string City);`,
+  pairs:[
+    {nodes:["big"],match:["// azonosság","// hűségprogram","// szállítás"],on:true},
+    {nodes:["cust","e1"],match:["public sealed class Customer(string name"]},
+    {nodes:["loy","e2"],match:["public sealed class LoyaltyAccount"]},
+    {nodes:["addr","e3"],match:["public sealed record Address"]}
+  ],
+  why:[
+    "Egy osztály legyen kicsi. Itt a méretet nem sorokban mérjük, hanem felelősségben: az A állomás **S** betűje szerint egy osztálynak egy oka legyen a változásra.",
+    "A **kohézió** azt méri, mennyire használják a metódusok ugyanazokat a mezőket. Ha a mezők csoportokra esnek szét, és minden csoportnak saját metódusai vannak, akkor több osztály rejtőzik egyben. Szétszedve mindegyik kicsi, egy fogalomról szól, és az új igény (O betű) egy helyre fut be."
+  ],
+  key:"Ha egy osztály mezői csoportokra bomlanak, emeld ki a csoportokat saját osztályba."
+},
+{
+  title:"Egyszerű tervezés: Kent Beck négy szabálya",
+  scene:{
+    nodes:[
+      {id:"r1",kind:"box",x:220,y:50,w:360,title:"1 · minden teszten átmegy",tone:"current"},
+      {id:"r2",kind:"box",x:220,y:140,w:360,title:"2 · nincs benne ismétlés"},
+      {id:"r3",kind:"box",x:220,y:230,w:360,title:"3 · kifejezi a szándékot"},
+      {id:"r4",kind:"box",x:220,y:320,w:360,title:"4 · a legkevesebb elemből áll",tone:"muted"},
+      {id:"n_ord",kind:"note",x:520,y:185,text:"a sorrend számít:\nelőbb helyes,\naztán érthető,\naztán kicsi",tone:"accent"}
+    ],
+    edges:[
+      {id:"d1",from:"r1",to:"r2",kind:"muted"},
+      {id:"d2",from:"r2",to:"r3",kind:"muted"},
+      {id:"d3",from:"r3",to:"r4",kind:"muted"}
+    ]
+  },
+  code:raw`
+// Kent Beck négy szabálya, fontossági sorrendben. Az egyszerű terv:
+//   1. átmegy minden teszten
+//   2. nincs benne ismétlés
+//   3. kifejezi a programozó szándékát
+//   4. a lehető legkevesebb osztályból és metódusból áll
+
+// a 2. szabály megsértése: ugyanaz a képlet két helyen
+public decimal CartTotal(Cart cart) => cart.Items.Sum(i => i.Price * i.Quantity) * 1.27m;
+public decimal OrderTotal(Order order) => order.Lines.Sum(l => l.UnitPrice * l.Quantity) * 1.27m;
+
+// a 2. és a 3. szabály együtt: egy hely, és a szándék neve
+private const decimal VatRate = 0.27m;
+public static decimal WithVat(decimal net) => net * (1 + VatRate);
+
+// a 4. szabály a leggyengébb: nem ér osztályt és interfészt gyártani
+// egy olyan változásért, amely még nem jött el`,
+  pairs:[
+    {nodes:["r1"],match:["1. átmegy minden teszten"]},
+    {nodes:["r2"],match:["2. nincs benne ismétlés","public decimal CartTotal","public decimal OrderTotal"],on:true},
+    {nodes:["r3"],match:["3. kifejezi a programozó szándékát","public static decimal WithVat"]},
+    {nodes:["r4"],match:["4. a lehető legkevesebb","a 4. szabály a leggyengébb"]},
+    {nodes:["n_ord","d1","d2","d3"],match:["fontossági sorrendben"]}
+  ],
+  why:[
+    "Kent Beck négy szabálya az **egyszerű tervezésről** (simple design) szól, fontossági sorrendben. Az első a helyesség: amit a tesztek nem igazolnak, az nem kész. Utána jön az ismétlés eltüntetése és a szándék kifejezése; ezek szinte mindig együtt járnak.",
+    "A negyedik szabály fékként működik: ne legyen több osztály, interfész és réteg, mint amennyit az első három megkövetel. Ez a szabály vigyáz arra, hogy a többi elv túlbuzgó alkalmazása ne bonyolítsa el a kódot."
+  ],
+  key:"Előbb legyen helyes, aztán ne ismételje magát és legyen érthető, végül legyen kicsi."
+},
+{
+  title:"Kód-szagok: gyanús jelek",
+  scene:{
+    nodes:[
+      {id:"smell",kind:"box",x:150,y:165,w:240,title:"Szag",tone:"bad",
+        lines:["hosszú metódus","duplikáció","feature envy","varázsszám","vonatroncs","rejtélyes név"]},
+      {id:"cure",kind:"box",x:480,y:165,w:240,title:"Gyógymód",tone:"new",
+        lines:["függvény kiemelése","egy helyre kiemelni","áthelyezés az adathoz","nevesített konstans","kérd meg, ne kérdezd","átnevezés"]},
+      {id:"n_s",kind:"note",x:320,y:345,text:"a szag nem hiba, hanem gyanú: nézd meg közelebbről",tone:"accent"}
+    ],
+    edges:[
+      {id:"m0",from:"smell",to:"cure",fromLine:0,toLine:0,kind:"ok"},
+      {id:"m1",from:"smell",to:"cure",fromLine:1,toLine:1,kind:"ok"},
+      {id:"m2",from:"smell",to:"cure",fromLine:2,toLine:2,kind:"ok"},
+      {id:"m3",from:"smell",to:"cure",fromLine:3,toLine:3,kind:"ok"},
+      {id:"m4",from:"smell",to:"cure",fromLine:4,toLine:4,kind:"ok"},
+      {id:"m5",from:"smell",to:"cure",fromLine:5,toLine:5,kind:"ok"}
+    ]
+  },
+  code:raw`
+public decimal Calc(Order o, int t)                       // rejtélyes név és paraméter
+{
+    decimal s = 0;
+    foreach (var l in o.Customer.LastOrder.Lines)         // vonatroncs
+        s += l.UnitPrice * l.Quantity;
+    if (t == 2) s *= 0.9m;                                // varázsszám
+    if (o.Customer.Points > 1000 && o.Customer.Since.Year < 2020)
+        s -= o.Customer.Points / 100m;                    // feature envy: a Customer adatain
+    // ... még hatvan sor ...                             // hosszú metódus
+    s *= 1.27m;                                           // duplikáció: a képlet máshol is
+    return s;
+}`,
+  pairs:[
+    {nodes:["m0"],match:["hosszú metódus"]},
+    {nodes:["m1"],match:["duplikáció"]},
+    {nodes:["m2"],match:["feature envy"]},
+    {nodes:["m3"],match:["varázsszám"]},
+    {nodes:["m4"],match:["vonatroncs"]},
+    {nodes:["m5"],match:["rejtélyes név"]},
+    {nodes:["smell","n_s"],match:["public decimal Calc(Order o, int t)"],on:true}
+  ],
+  why:[
+    "A **kód-szag** (code smell) olyan felszíni jel, amely mögött gyakran tervezési hiba áll. Nem szabály, hanem gyanú: a **hosszú metódus**, a **duplikáció**, a más osztály adatait piszkáló metódus (**feature envy**), a megnevezetlen **varázsszám**, a pontokkal végigfűzött **vonatroncs** és a semmitmondó név mind ide tartozik.",
+    "Mindegyikhez tartozik egy ismert, kis lépésű javítás (**refaktorálás**). A szagokat érdemes név szerint ismerni, mert így a kódátnézésben egy szóval meg lehet nevezni, mi a baj."
+  ],
+  key:"A szag kérdést tesz fel. A válasz néha az, hogy itt rendben van így, de ezt tudatosan kell eldönteni.",
+  see:[{station:"s1",label:"Mélyebben: 1. állomás, Rossz kiindulás"}]
+},
+{
+  title:"DRY, KISS, YAGNI",
+  scene:{
+    nodes:[
+      {id:"dry",kind:"box",x:110,y:110,w:196,title:"DRY",sub:"Don't Repeat Yourself",lines:["egy tudás, egy hely"]},
+      {id:"kiss",kind:"box",x:320,y:110,w:196,title:"KISS",sub:"Keep It Simple",lines:["a legegyszerűbb jó"]},
+      {id:"yagni",kind:"box",x:530,y:110,w:196,title:"YAGNI",sub:"You Aren't Gonna Need It",lines:["csak, ami ma kell"]},
+      {id:"n_dry",kind:"note",x:110,y:250,text:"ÁFA-kulcs:\negy konstans",tone:"ok"},
+      {id:"n_kiss",kind:"note",x:320,y:250,text:"szabálymotor helyett\negy feltétel",tone:"ok"},
+      {id:"n_yagni",kind:"note",x:530,y:250,text:"három exportáló\nhelyett egy",tone:"ok"},
+      {id:"n_all",kind:"note",x:320,y:360,text:"kevesebb kód, kevesebb hely a hibának",tone:"accent"}
+    ],
+    edges:[
+      {id:"e1",from:"dry",to:"n_dry",kind:"ref"},
+      {id:"e2",from:"kiss",to:"n_kiss",kind:"ref"},
+      {id:"e3",from:"yagni",to:"n_yagni",kind:"ref"}
+    ]
+  },
+  code:raw`
+// DRY: minden tudásnak egy helye legyen.
+// Nem a hasonló sorokról szól, hanem az ismétlődő döntésről: az ÁFA-kulcs egy helyen él.
+public static class Vat { public const decimal Rate = 0.27m; }
+
+// KISS: a legegyszerűbb megoldás, amely működik
+// bonyolult: saját szabálynyelv és értelmező egy kétágú döntésre
+var shippingFee = _ruleInterpreter.Evaluate(order, LoadRules("shipping-rules.json"));
+// egyszerű:
+var fee = order.Total >= FreeShippingThreshold ? 0m : StandardShippingFee;
+
+// YAGNI: ne építsd meg, amíg nincs rá szükség
+public interface IOrderExporter { void Export(Order order); }   // "hátha egyszer kell"
+public sealed class XmlOrderExporter : IOrderExporter { /* senki nem hívja */ }
+public sealed class JsonOrderExporter : IOrderExporter { /* senki nem hívja */ }
+// helyette: az az egy export, amit ma kérnek; ha jön a második, akkor bővítünk`,
+  pairs:[
+    {nodes:["dry","n_dry","e1"],match:["DRY: minden tudásnak","public static class Vat"]},
+    {nodes:["kiss","n_kiss","e2"],match:["KISS: a legegyszerűbb","_ruleInterpreter.Evaluate","var fee = order.Total"],on:true},
+    {nodes:["yagni","n_yagni","e3"],match:["YAGNI: ne építsd meg","IOrderExporter","az az egy export"]}
+  ],
+  why:[
+    "A **DRY** (Don't Repeat Yourself) szerint minden tudásnak egy helye legyen. Nem a hasonló kinézetű sorokat tiltja, hanem azt, hogy ugyanaz a döntés két helyen éljen, mert akkor egyszer csak az egyiket javítják.",
+    "A **KISS** (Keep It Simple, Stupid) a legegyszerűbb működő megoldást kéri: egy kétágú döntéshez nem kell szabálymotor. A **YAGNI** (You Aren't Gonna Need It) szerint azt sem építjük meg előre, amire „hátha egyszer szükség lesz”. Amire ma senki nem hívja, azt karban kell tartani, és közben csak útban van."
+  ],
+  key:"Egy hely minden döntésnek, a legegyszerűbb működő megoldás, és semmi olyan, amit ma senki nem kér."
+},
+{
+  title:"Cserkészszabály: tisztábban hagyd ott",
+  scene:{
+    nodes:[
+      {id:"found",kind:"box",x:165,y:110,w:290,title:"Ahogy találtad",tone:"bad",
+        lines:["c(o)","o.T > 20000 ? 0 : 1490"]},
+      {id:"left",kind:"box",x:480,y:110,w:280,title:"Ahogy otthagyod",tone:"new",
+        lines:["ShippingCost(order)","FreeShippingThreshold","StandardShippingFee"]},
+      {id:"task",kind:"actor",x:320,y:250,label:"a feladat: új határ, 25 000 Ft"},
+      {id:"n_rule",kind:"note",x:320,y:350,text:"kicsiben, minden alkalommal; a viselkedés csak a kért módon változik",tone:"ok"}
+    ],
+    edges:[
+      {id:"e1",from:"found",to:"left",kind:"ok"},
+      {id:"e2",from:"task",to:"left",kind:"muted"}
+    ]
+  },
+  code:raw`
+// Cserkészszabály: hagyd a kódot tisztábban, mint ahogy találtad.
+// A feladat: az ingyenes szállítás határa 20 000 helyett 25 000 Ft.
+
+// Ahogy találtad:
+decimal c(Order o) => o.T > 20000 ? 0 : 1490;
+
+// Ahogy otthagyod: a kért módosítás, mellette egy átnevezés és két nevesített konstans
+private const decimal FreeShippingThreshold = 25_000m;
+private const decimal StandardShippingFee = 1_490m;
+
+decimal ShippingCost(Order order) =>
+    order.Total > FreeShippingThreshold ? 0m : StandardShippingFee;
+
+// A > maradt >: a rendrakás nem változtat viselkedést, csak a kért módosítás.
+// Ahol nincs teszt, ott előbb rögzítsd a mostani viselkedést (15. állomás).`,
+  pairs:[
+    {nodes:["found"],match:["decimal c(Order o)"]},
+    {nodes:["left","e1"],match:["decimal ShippingCost(Order order)","FreeShippingThreshold = 25_000m","StandardShippingFee = 1_490m"],on:true},
+    {nodes:["task","e2"],match:["A feladat: az ingyenes szállítás határa"]},
+    {nodes:["n_rule"],match:["A > maradt >","Ahol nincs teszt"]}
+  ],
+  why:[
+    "A **cserkészszabály** (Boy Scout Rule): hagyd a táborhelyet tisztábban, mint ahogy találtad. A kódban ez nem nagy átírást jelent, hanem apró javítást ott, ahol épp dolgozol: egy jobb név, egy kiemelt konstans, egy rövidebb függvény.",
+    "A rendrakás nem változtathat viselkedést: itt a `>` jel `>` maradt, csak a határ értéke változott, mert azt kérték. Ahol nincs teszt, ott előbb a mostani viselkedést rögzítjük, és csak utána nyúlunk hozzá; a 15. állomás mutatja, hogyan.",
+    "Ezek az elvek nem törvények, hanem a csapat közös nyelve. A modul állomásain mind visszatérnek, valódi helyzetben."
+  ],
+  key:"Minden érintés egy kicsit javít. Sok kis rendrakásból lesz a tiszta kód, nem egy nagy átírásból."
+}
+];
+
+OOP.station({
+  id: "sB", num: "B", title: "Tiszta kód",
+  goal: "Megismered a tiszta kód fő területeit a nevektől a tesztekig, és a rövid elveket (DRY, KISS, YAGNI, cserkészszabály), kis előtte–utána példákon.",
+  map: [], mapNote: "az alapok: a tiszta kód elvei kis példákon, a modul előtt",
+  tracks: [
+    { id: "main", name: "Fő vonal · rendelés", sub: "a nevektől a cserkészszabályig", steps: MAIN }
+  ]
+});
+})();
+
+</script>
 <script>/* sM.js */
 /* M: Mintatár. A fő vonalon kívüli minták, mintánként egy rövid sáv. */
 (function () {
@@ -18524,11 +19319,16 @@ function renderSidebar(){
     ol.appendChild(li);
   });
   /* A görgethető menüben az aktív lépés maradjon látható (az oldalt nem görgeti). */
-  const box = ol.parentNode, act = ol.querySelector && (ol.querySelector(".stp.on") || ol.querySelector(".st.on"));
-  if (box && act && box.getBoundingClientRect && act.getBoundingClientRect){
-    const br = box.getBoundingClientRect(), ar = act.getBoundingClientRect();
-    if (ar.top < br.top) box.scrollTop += ar.top - br.top - 8;
-    else if (ar.bottom > br.bottom) box.scrollTop += ar.bottom - br.bottom + 8;
+  /* Az állomás gombja és az aktív lépés is látsszon; ha mindkettő nem fér el, a lépés a fontosabb. */
+  const box = ol.parentNode, head = ol.querySelector && ol.querySelector(".st.on");
+  const act = (ol.querySelector && ol.querySelector(".stp.on")) || head;
+  if (box && head && act && box.getBoundingClientRect && act.getBoundingClientRect){
+    const br = box.getBoundingClientRect();
+    const hr = head.getBoundingClientRect();
+    if (hr.top < br.top) box.scrollTop += hr.top - br.top - 8;
+    const ar = act.getBoundingClientRect();
+    if (ar.bottom > br.bottom) box.scrollTop += ar.bottom - br.bottom + 8;
+    else if (ar.top < br.top) box.scrollTop += ar.top - br.top - 8;
   }
   const missing = C.stations.length - available().length;
   $("stfoot").textContent = missing ? `${missing} állomás még készül.` : (C.foot || "");
